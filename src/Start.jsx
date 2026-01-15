@@ -38,7 +38,7 @@ export default function Start({ onStart }) {
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">Computer Based Test</span>
             </h1>
             <p className="text-lg text-slate-400 max-w-lg leading-relaxed">
-              Experience a high-fidelity examination environment designed for Himachal Pradesh General Knowledge series. Challenge yourself with industry-standard questions and instant detailed feedback.
+              Experience a high-fidelity examination environment designed for Himachal Pradesh Patwari Exam. Challenge yourself with tcs-standard questions and instant detailed feedback.
             </p>
           </div>
 
@@ -63,87 +63,92 @@ export default function Start({ onStart }) {
         </div>
 
         {/* Right Column: Candidate Action Card */}
-        <div className="relative group">
-          {/* Glow backing */}
-          <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200" />
+        <div className="flex flex-col gap-4 items-end">
+          <div className="relative group w-full">
+            {/* Glow backing */}
+            <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200" />
 
-          <div className="relative bg-[#1a1c23] border border-white/10 rounded-xl p-8 shadow-2xl flex flex-col gap-8">
+            <div className="relative bg-[#1a1c23] border border-white/10 rounded-xl p-8 shadow-2xl flex flex-col gap-8">
 
-            <div className="flex items-center justify-between border-b border-white/5 pb-6">
-              <div>
-                <h3 className="text-xl font-bold text-white">Candidate Portal</h3>
-                <p className="text-xs text-slate-500 mt-1">Configure your session</p>
-              </div>
-              <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center">
-                <User className="w-5 h-5 text-slate-400" />
-              </div>
-            </div>
-
-            {/* Step 1: Set Selection */}
-            <div className="space-y-3">
-              <label className="text-xs font-bold text-blue-400 uppercase tracking-wider flex items-center gap-2">
-                <Layers className="w-3 h-3" /> Select Module
-              </label>
-              <div className="grid grid-cols-4 gap-2">
-                {["1", "2", "3", "4"].map((id) => (
-                  <button
-                    key={id}
-                    onClick={() => setTestSet(id)}
-                    className={cn(
-                      "relative h-14 rounded-lg font-bold text-sm transition-all overflow-hidden group/btn",
-                      testSet === id
-                        ? "bg-blue-600 text-white shadow-lg shadow-blue-900/20"
-                        : "bg-[#0f1116] text-slate-500 hover:bg-white/5 border border-white/5"
-                    )}
-                  >
-                    <span className="relative z-10 flex flex-col items-center justify-center">
-                      <span>SET</span>
-                      <span className="text-lg leading-none">{id}</span>
-                    </span>
-                    {testSet === id && (
-                      <div className="absolute inset-0 bg-gradient-to-tr from-blue-600 to-purple-500 opacity-100" />
-                    )}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Step 2: Name Input */}
-            <div className="space-y-3">
-              <label className="text-xs font-bold text-blue-400 uppercase tracking-wider flex items-center gap-2">
-                <User className="w-3 h-3" /> Identification
-              </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Enter full candidate name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="block w-full pl-4 pr-4 py-4 bg-[#0f1116] border border-white/10 rounded-xl text-white placeholder-slate-600 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none text-sm font-medium"
-                />
-              </div>
-            </div>
-
-            {/* Step 3: Action */}
-            <div className="pt-4">
-              <button
-                onClick={handleStart}
-                disabled={!name.trim()}
-                className="w-full relative group/start overflow-hidden rounded-xl p-[1px] focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 opacity-100 animate-gradient-x" />
-                <div className="relative bg-[#1a1c23] hover:bg-transparent transition-colors duration-200 rounded-xl h-full px-6 py-4 flex items-center justify-center">
-                  <span className="font-bold text-white flex items-center gap-2 group-disabled/start:text-slate-400">
-                    Initialize Exam <ChevronRight className="w-4 h-4" />
-                  </span>
+              <div className="flex items-center justify-between border-b border-white/5 pb-6">
+                <div>
+                  <h3 className="text-xl font-bold text-white">Candidate Portal</h3>
+                  <p className="text-xs text-slate-500 mt-1">Configure your session</p>
                 </div>
-              </button>
-              <p className="text-center text-[10px] text-slate-600 mt-4 uppercase tracking-widest">
-                Secure Browser Environment • Ver 2.4.0
-              </p>
-            </div>
+                <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center">
+                  <User className="w-5 h-5 text-slate-400" />
+                </div>
+              </div>
 
+              {/* Step 1: Set Selection */}
+              <div className="space-y-3">
+                <label className="text-xs font-bold text-blue-400 uppercase tracking-wider flex items-center gap-2">
+                  <Layers className="w-3 h-3" /> Select Module
+                </label>
+                <div className="grid grid-cols-4 gap-2">
+                  {["1", "2", "3", "4"].map((id) => (
+                    <button
+                      key={id}
+                      onClick={() => setTestSet(id)}
+                      className={cn(
+                        "relative h-14 rounded-lg font-bold text-sm transition-all overflow-hidden group/btn",
+                        testSet === id
+                          ? "bg-blue-600 text-white shadow-lg shadow-blue-900/20"
+                          : "bg-[#0f1116] text-slate-500 hover:bg-white/5 border border-white/5"
+                      )}
+                    >
+                      <span className="relative z-10 flex flex-col items-center justify-center">
+                        <span>SET</span>
+                        <span className="text-lg leading-none">{id}</span>
+                      </span>
+                      {testSet === id && (
+                        <div className="absolute inset-0 bg-gradient-to-tr from-blue-600 to-purple-500 opacity-100" />
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Step 2: Name Input */}
+              <div className="space-y-3">
+                <label className="text-xs font-bold text-blue-400 uppercase tracking-wider flex items-center gap-2">
+                  <User className="w-3 h-3" /> Identification
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Enter full candidate name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="block w-full pl-4 pr-4 py-4 bg-[#0f1116] border border-white/10 rounded-xl text-white placeholder-slate-600 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none text-sm font-medium"
+                  />
+                </div>
+              </div>
+
+              {/* Step 3: Action */}
+              <div className="pt-4">
+                <button
+                  onClick={handleStart}
+                  disabled={!name.trim()}
+                  className="w-full relative group/start overflow-hidden rounded-xl p-[1px] focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 opacity-100 animate-gradient-x" />
+                  <div className="relative bg-[#1a1c23] hover:bg-transparent transition-colors duration-200 rounded-xl h-full px-6 py-4 flex items-center justify-center">
+                    <span className="font-bold text-white flex items-center gap-2 group-disabled/start:text-slate-400">
+                      Initialize Exam <ChevronRight className="w-4 h-4" />
+                    </span>
+                  </div>
+                </button>
+                <p className="text-center text-[10px] text-slate-600 mt-4 uppercase tracking-widest">
+                  Secure Browser Environment • Ver 2.4.0
+                </p>
+              </div>
+
+            </div>
           </div>
+          <p className="text-slate-500 text-xs italic opacity-70 hover:opacity-100 transition-opacity">
+            Developed by Ansh Powered by Gemini 3 pro
+          </p>
         </div>
 
       </div>
