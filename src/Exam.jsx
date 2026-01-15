@@ -165,7 +165,7 @@ export default function Exam({
 
         {/* Center: Title (Desktop) */}
         <h1 className="hidden lg:block font-bold text-lg opacity-80 tracking-tight absolute left-1/2 -translate-x-1/2">
-          HP GK <span className="font-normal opacity-60">— Mock Test 1</span>
+          State Prep <span className="font-normal opacity-60">- AI Engine</span>
         </h1>
 
         {/* Right: Controls */}
