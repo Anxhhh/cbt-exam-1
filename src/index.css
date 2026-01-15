@@ -1,38 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
 @theme {
   --font-sans: 'Inter', system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
-  --color-brand-50: oklch(97% 0.01 var(--brand-hue));
-  --color-brand-100: oklch(94% 0.03 var(--brand-hue));
-  --color-brand-200: oklch(89% 0.05 var(--brand-hue));
-  --color-brand-300: oklch(80% 0.08 var(--brand-hue));
-  --color-brand-400: oklch(68% 0.12 var(--brand-hue));
-  --color-brand-500: oklch(55% 0.15 var(--brand-hue));
-  --color-brand-600: oklch(45% 0.14 var(--brand-hue));
-  --color-brand-700: oklch(35% 0.12 var(--brand-hue));
-  --color-brand-800: oklch(25% 0.10 var(--brand-hue));
-  --color-brand-900: oklch(15% 0.08 var(--brand-hue));
-}
-
-@layer base {
-  :root {
-    --brand-hue: 260;
-    /* Indigo/Deep Purple default */
-  }
-
-  body {
-    @apply font-sans text-slate-800 bg-slate-50 antialiased selection:bg-brand-200 selection:text-brand-900;
-  }
-}
-
-@layer utilities {
-  .safe-bottom {
-    padding-bottom: env(safe-area-inset-bottom);
-  }
-
-  .glass-panel {
-    @apply bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border border-white/20 dark:border-white/10 shadow-xl;
-  }
 }

@@ -14,26 +14,26 @@ export default function App() {
 
   const [answers, setAnswers] = useState({});
   const [marked, setMarked] = useState({});
-  
+
 
   /* ================= LOAD EXAM JSON ================= */
   useEffect(() => {
-  fetch(import.meta.env.BASE_URL + "exam.json")
-    .then(res => {
-      if (!res.ok) throw new Error("Failed to load exam.json");
-      return res.json();
-    })
-    .then(data => {
-      setExam({
-        ...data,
-        questions: shuffleArray(data.questions) // ✅ SHUFFLE ONCE
+    fetch(import.meta.env.BASE_URL + "exam.json")
+      .then(res => {
+        if (!res.ok) throw new Error("Failed to load exam.json");
+        return res.json();
+      })
+      .then(data => {
+        setExam({
+          ...data,
+          questions: shuffleArray(data.questions) // ✅ SHUFFLE ONCE
+        });
+      })
+      .catch(err => {
+        console.error("EXAM LOAD ERROR:", err);
+        setExam({ questions: [] });
       });
-    })
-    .catch(err => {
-      console.error("EXAM LOAD ERROR:", err);
-      setExam({ questions: [] });
-    });
-}, []);
+  }, []);
 
   /* ================= LOADING STATE ================= */
   if (!exam || !exam.questions) {
@@ -59,34 +59,34 @@ export default function App() {
 
   /* ================= RESULT SCREEN ================= */
   if (submitted) {
-  if (!exam || !Array.isArray(exam.questions)) {
+    if (!exam || !Array.isArray(exam.questions)) {
+      return (
+        <div
+          style={{
+            height: "100vh",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center"
+          }}
+        >
+          Loading result...
+        </div>
+      );
+    }
+
     return (
-      <div
-        style={{
-          height: "100vh",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center"
+      <Result
+        exam={exam}
+        answers={answers}
+        onRetake={() => {
+          setAnswers({});
+          setMarked({});
+          setSubmitted(false);
+          setStarted(false);
         }}
-      >
-        Loading result...
-      </div>
+      />
     );
   }
-
-  return (
-    <Result
-      exam={exam}
-      answers={answers}
-      onRetake={() => {
-        setAnswers({});
-        setMarked({});
-        setSubmitted(false);
-        setStarted(false);
-      }}
-    />
-  );
-}
 
   /* ================= EXAM SCREEN ================= */
   return (

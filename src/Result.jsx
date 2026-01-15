@@ -1,266 +1,257 @@
+import { useRef, useEffect } from "react";
 import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
+import { Download, RefreshCw, CheckCircle, XCircle, AlertCircle, FileText, Share2, Award, TrendingUp } from 'lucide-react';
+import confetti from 'canvas-confetti';
 
 export default function Result({ exam, answers, onRetake }) {
-  // HARD SAFETY GUARD (DO NOT REMOVE)
-  if (!exam || !Array.isArray(exam.questions)) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        Loading result...
-      </div>
-    );
-  }
-
-  const total = exam.questions.length;
-
-  let attempted = 0;
-  let correct = 0;
-
-  exam.questions.forEach(q => {
-    if (answers && answers[q.id] !== undefined) {
-      attempted++;
-      if (answers[q.id] === q.answer) {
-        correct++;
-      }
+    if (!exam || !Array.isArray(exam.questions)) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-[#1a1c23] font-sans text-slate-500">
+                <div className="animate-pulse flex flex-col items-center gap-4">
+                    <div className="w-12 h-12 rounded-full border-4 border-t-blue-500 border-white/10 animate-spin"></div>
+                    <span className="text-slate-400 font-medium">Calculating Performance...</span>
+                </div>
+            </div>
+        );
     }
-  });
 
-  const wrong = attempted - correct;
-  const unattempted = total - attempted;
-  const scorePercent = Math.round((correct / total) * 100);
+    const total = exam.questions.length;
+    let attempted = 0;
+    let correct = 0;
 
-  const downloadPDF = () => {
-    const doc = new jsPDF();
-
-    // === HEADER ===
-    doc.setFontSize(22);
-    doc.setTextColor(30, 58, 138); // Blue 900
-    doc.text("StatePrep CBT - Performance Report", 105, 20, { align: "center" });
-
-    doc.setFontSize(12);
-    doc.setTextColor(100);
-    doc.text("Himachal Pradesh GK (Mock-1)", 105, 28, { align: "center" });
-    doc.line(20, 32, 190, 32);
-
-    // === SCORE SUMMARY ===
-    doc.setFontSize(16);
-    doc.setTextColor(0);
-    doc.text("Summary", 20, 45);
-
-    doc.setFontSize(12);
-    doc.text(`Total Questions: ${total}`, 20, 55);
-    doc.text(`Attempted: ${attempted}`, 20, 62);
-    doc.text(`Correct: ${correct}`, 80, 55);
-    doc.text(`Wrong: ${wrong}`, 80, 62);
-    doc.text(`Unattempted: ${unattempted}`, 140, 55);
-    doc.text(`Score: ${correct} / ${total} (${scorePercent}%)`, 140, 62);
-
-    // === WEAKNESS ANALYSIS (Rules based on sections or question types) ===
-    doc.setFontSize(16);
-    doc.text("Improvement Strategy", 20, 80);
-    doc.setFontSize(11);
-    doc.setTextColor(80);
-
-    const strategy = [
-      "• Review the questions you skipped. Was it due to time pressure or lack of concept clarity?",
-      "• Analyze your wrong answers. Did you fall for a 'distractor' option?",
-      "• Focus on accuracy. Ensure you do not guess wildly in sections with negative marking (if active).",
-      "• For HP GK, revise the 'Rivers' and 'Temples' topics as they carried high weightage."
-    ];
-
-    let yPos = 90;
-    strategy.forEach(line => {
-      doc.text(line, 20, yPos);
-      yPos += 7;
-    });
-
-    // === DETAILED QUESTION TABLE ===
-    const tableData = exam.questions.map((q, i) => {
-      const userAnswerIdx = answers[q.id];
-      const correctText = q.options[q.answer] || "N/A";
-      const userText = userAnswerIdx !== undefined ? q.options[userAnswerIdx] : "Skipped";
-      const status = userAnswerIdx === q.answer ? "Correct" : userAnswerIdx === undefined ? "Skipped" : "Wrong";
-
-      return [
-        `Q${i + 1}`,
-        q.question.substring(0, 40) + "...",
-        userText,
-        correctText,
-        status
-      ];
-    });
-
-    autoTable(doc, {
-      startY: 120,
-      head: [["#", "Question", "Your Answer", "Correct Answer", "Status"]],
-      body: tableData,
-      theme: 'grid',
-      headStyles: { fillColor: [30, 58, 138] },
-      styles: { fontSize: 8 },
-      columnStyles: {
-        0: { cellWidth: 10 },
-        1: { cellWidth: 70 },
-        4: { cellWidth: 20 }
-      },
-      didParseCell: (data) => {
-        if (data.section === 'body' && data.column.index === 4) {
-          const val = data.cell.raw;
-          if (val === 'Correct') data.cell.styles.textColor = [22, 163, 74];
-          else if (val === 'Wrong') data.cell.styles.textColor = [220, 38, 38];
-          else data.cell.styles.textColor = [100, 116, 139];
+    exam.questions.forEach(q => {
+        if (answers && answers[q.id] !== undefined) {
+            attempted++;
+            if (answers[q.id] === q.answer) {
+                correct++;
+            }
         }
-      }
     });
 
-    doc.save("Exam_Report.pdf");
-  };
+    const wrong = attempted - correct;
+    const unattempted = total - attempted;
+    const scorePercent = Math.round((correct / total) * 100);
 
-  return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "#f1f5f9",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        padding: 24
-      }}
-    >
-      <div
-        style={{
-          width: "100%",
-          maxWidth: 600,
-          background: "#ffffff",
-          borderRadius: 16,
-          padding: "36px 40px",
-          boxShadow: "0 20px 50px rgba(0,0,0,0.15)"
-        }}
-      >
-        {/* HEADER */}
-        <h1 style={{ marginTop: 0, color: "#1e3a8a", fontSize: 32 }}>
-          Exam Result
-        </h1>
-        <p style={{ color: "#475569", marginTop: 4 }}>
-          StatePrep CBT – Himachal Pradesh
-        </p>
+    // Trigger confetti on high score
+    useEffect(() => {
+        if (scorePercent > 70) {
+            const duration = 3 * 1000;
+            const animationEnd = Date.now() + duration;
+            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
 
-        <hr style={{ margin: "24px 0" }} />
+            const randomInRange = (min, max) => Math.random() * (max - min) + min;
 
-        {/* SCORE */}
-        <div
-          style={{
-            textAlign: "center",
-            marginBottom: 32
-          }}
-        >
-          <div
-            style={{
-              fontSize: 56,
-              fontWeight: 700,
-              color: "#1d4ed8"
-            }}
-          >
-            {correct} / {total}
-          </div>
-          <div style={{ color: "#475569", marginTop: 4, fontSize: 18 }}>
-            Score ({scorePercent}%)
-          </div>
+            const interval = setInterval(function () {
+                const timeLeft = animationEnd - Date.now();
+
+                if (timeLeft <= 0) {
+                    return clearInterval(interval);
+                }
+
+                const particleCount = 50 * (timeLeft / duration);
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: randomInRange(0.9, 0.9) } }));
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: randomInRange(0.9, 0.9) } }));
+            }, 250);
+        }
+    }, [scorePercent]);
+
+    const generatePDF = () => {
+        const doc = new jsPDF();
+
+        // Background
+        doc.setFillColor(26, 28, 35); // Dark bg
+        doc.rect(0, 0, 210, 297, 'F');
+
+        // Header Band
+        doc.setFillColor(37, 99, 235); // Blue
+        doc.rect(0, 0, 210, 40, 'F');
+
+        doc.setTextColor(255, 255, 255);
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(24);
+        doc.text("PERFORMANCE REPORT", 105, 20, { align: "center" });
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "normal");
+        doc.text("StatePrep CBT - Himachal Pradesh Mock Test", 105, 30, { align: "center" });
+
+        // Score Card
+        doc.setFillColor(30, 41, 59); // Card bg
+        doc.roundedRect(20, 50, 170, 50, 3, 3, 'F');
+
+        doc.setTextColor(148, 163, 184);
+        doc.setFontSize(12);
+        doc.text("FINAL SCORE", 105, 65, { align: 'center' });
+
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(36);
+        doc.setFont("helvetica", "bold");
+        doc.text(`${correct} / ${total}`, 105, 80, { align: 'center' });
+
+        doc.setFontSize(10);
+        doc.setTextColor(scorePercent > 70 ? 74 : 248, scorePercent > 70 ? 222 : 113, scorePercent > 70 ? 128 : 113); // Green or Slate
+        doc.text(`Accuracy: ${Math.round((correct / (attempted || 1)) * 100)}%`, 105, 90, { align: 'center' });
+
+        // Candidate Info Table
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(12);
+        doc.text("Candidate Details", 20, 120);
+
+        doc.setDrawColor(51, 65, 85);
+        doc.line(20, 125, 190, 125);
+
+        doc.setFontSize(10);
+        doc.setTextColor(148, 163, 184);
+        doc.text("Name:", 20, 135);
+        doc.setTextColor(255, 255, 255);
+        doc.text("Demo Candidate", 60, 135);
+
+        doc.setTextColor(148, 163, 184);
+        doc.text("Roll No:", 20, 142);
+        doc.setTextColor(255, 255, 255);
+        doc.text("HPGK-2026-001", 60, 142);
+
+        doc.setTextColor(148, 163, 184);
+        doc.text("Date:", 120, 135);
+        doc.setTextColor(255, 255, 255);
+        doc.text(new Date().toLocaleDateString(), 150, 135);
+
+        // Stats Grid
+        const startY = 160;
+        const boxWidth = 35;
+        const gap = 10;
+
+        const drawMiniBox = (x, title, val, color) => {
+            doc.setFillColor(30, 41, 59);
+            doc.roundedRect(x, startY, boxWidth, 30, 2, 2, 'F');
+
+            doc.setFontSize(8);
+            doc.setTextColor(148, 163, 184);
+            doc.text(title, x + boxWidth / 2, startY + 10, { align: 'center' });
+
+            doc.setFontSize(14);
+            doc.setTextColor(...color);
+            doc.setFont("helvetica", "bold");
+            doc.text(String(val), x + boxWidth / 2, startY + 22, { align: 'center' });
+        }
+
+        drawMiniBox(20, "ATTEMPTED", attempted, [96, 165, 250]);
+        drawMiniBox(65, "CORRECT", correct, [74, 222, 128]);
+        drawMiniBox(110, "WRONG", wrong, [248, 113, 113]);
+        drawMiniBox(155, "SKIPPED", unattempted, [148, 163, 184]);
+
+        // Footer
+        doc.setFontSize(8);
+        doc.setTextColor(71, 85, 105);
+        doc.text("Generated by StatePrep CBT System", 105, 280, { align: "center" });
+
+        doc.save("StatePrep-Results.pdf");
+    };
+
+    return (
+        <div className="min-h-screen bg-[#0f1116] flex items-center justify-center p-4 font-sans text-slate-200">
+            <div className="w-full max-w-5xl grid lg:grid-cols-[1.2fr_0.8fr] gap-6 animate-in slide-in-from-bottom-4 duration-500">
+
+                {/* Main Card */}
+                <div className="bg-[#1a1c23] rounded-3xl p-8 border border-white/5 shadow-2xl relative overflow-hidden flex flex-col justify-between">
+                    <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+
+                    <div>
+                        <header className="flex items-center justify-between mb-8">
+                            <div>
+                                <h1 className="text-2xl font-bold text-white tracking-tight">Performance Summary</h1>
+                                <p className="text-slate-500 text-sm">HP GK - Mock Test Series 1</p>
+                            </div>
+                            <div className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-bold text-slate-400">
+                                {new Date().toLocaleDateString()}
+                            </div>
+                        </header>
+
+                        <div className="flex flex-col items-center justify-center py-8">
+                            <div className="relative mb-6">
+                                {/* Simple CSS Circular Progress */}
+                                <svg className="w-48 h-48 transform -rotate-90">
+                                    <circle cx="96" cy="96" r="88" stroke="currentColor" strokeWidth="12" fill="transparent" className="text-slate-800" />
+                                    <circle cx="96" cy="96" r="88" stroke="currentColor" strokeWidth="12" fill="transparent"
+                                        strokeDasharray={2 * Math.PI * 88}
+                                        strokeDashoffset={2 * Math.PI * 88 * (1 - scorePercent / 100)}
+                                        className={`transition-all duration-1000 ease-out ${scorePercent > 70 ? 'text-emerald-500' : scorePercent > 40 ? 'text-blue-500' : 'text-rose-500'}`}
+                                    />
+                                </svg>
+                                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                                    <span className="text-5xl font-bold text-white">{scorePercent}%</span>
+                                    <span className="text-sm font-medium text-slate-400 uppercase tracking-widest mt-1">Score</span>
+                                </div>
+                            </div>
+
+                            <div className="text-center space-y-1">
+                                <h3 className="text-xl font-bold text-white">
+                                    {scorePercent > 80 ? "Outstanding Performance!" :
+                                        scorePercent > 60 ? "Good Job, Keep Improving!" : "Needs More Practice"}
+                                </h3>
+                                <p className="text-slate-400 text-sm max-w-sm mx-auto">
+                                    You answered <span className="text-white font-bold">{correct}</span> out of <span className="text-white font-bold">{total}</span> questions correctly.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3 mt-8">
+                        <button onClick={onRetake} className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold text-sm bg-white/5 hover:bg-white/10 text-white transition-all border border-white/5">
+                            <RefreshCw className="w-4 h-4" /> Retake Test
+                        </button>
+                        <button onClick={generatePDF} className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold text-sm bg-blue-600 hover:bg-blue-700 text-white transition-all shadow-lg shadow-blue-600/20">
+                            <Download className="w-4 h-4" /> Download Report
+                        </button>
+                    </div>
+                </div>
+
+                {/* Analysis Side */}
+                <div className="space-y-6">
+                    {/* Stats Grid */}
+                    <div className="grid grid-cols-2 gap-4">
+                        <StatCard label="Accuracy" value={`${Math.round((correct / (attempted || 1)) * 100)}%`} icon={<TrendingUp className="w-5 h-5 text-blue-400" />} />
+                        <StatCard label="Attempted" value={attempted} icon={<FileText className="w-5 h-5 text-purple-400" />} />
+                        <StatCard label="Correct" value={correct} icon={<CheckCircle className="w-5 h-5 text-emerald-400" />} />
+                        <StatCard label="Wrong" value={wrong} icon={<XCircle className="w-5 h-5 text-rose-400" />} />
+                    </div>
+
+                    {/* Insights Card */}
+                    <div className="bg-[#1a1c23] rounded-3xl p-6 border border-white/5 shadow-xl">
+                        <h4 className="font-bold text-white flex items-center gap-2 mb-4">
+                            <Award className="w-5 h-5 text-amber-500" /> Key Insights
+                        </h4>
+                        <ul className="space-y-4">
+                            <li className="flex gap-3 text-sm text-slate-400">
+                                <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-2 flex-shrink-0" />
+                                <span>Your accuracy is {Math.round((correct / (attempted || 1)) * 100)}%. Focus on reducing negative marking in the next attempt.</span>
+                            </li>
+                            <li className="flex gap-3 text-sm text-slate-400">
+                                <div className="w-1.5 h-1.5 rounded-full bg-purple-500 mt-2 flex-shrink-0" />
+                                <span>You skipped {unattempted} questions. Try to manage time better to attempt more.</span>
+                            </li>
+                            <li className="flex gap-3 text-sm text-slate-400">
+                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-2 flex-shrink-0" />
+                                <span>Great consistency in the first half of the exam. Keep it up!</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
         </div>
-
-        {/* STATS */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: 16
-          }}
-        >
-          <Stat label="Attempted" value={attempted} />
-          <Stat label="Correct" value={correct} />
-          <Stat label="Wrong" value={wrong} />
-          <Stat label="Unattempted" value={unattempted} />
-        </div>
-
-        {/* ACTIONS */}
-        <div
-          style={{
-            marginTop: 40,
-            display: "flex",
-            flexDirection: "column",
-            gap: 12
-          }}
-        >
-          <button
-            onClick={downloadPDF}
-            style={{
-              background: "#0f172a",
-              color: "#ffffff",
-              padding: "16px 28px",
-              fontSize: 16,
-              borderRadius: 8,
-              border: "none",
-              cursor: "pointer",
-              fontWeight: 600,
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              gap: 8,
-              boxShadow: "0 10px 20px rgba(0,0,0,0.1)"
-            }}
-          >
-            <span>Download Detailed Report (PDF)</span>
-          </button>
-
-          <button
-            onClick={onRetake}
-            style={{
-              background: "#ffffff",
-              color: "#1d4ed8",
-              padding: "14px 28px",
-              fontSize: 16,
-              borderRadius: 8,
-              border: "1px solid #1d4ed8",
-              cursor: "pointer",
-              fontWeight: 600
-            }}
-          >
-            Retake Exam
-          </button>
-        </div>
-      </div>
-    </div>
-  );
+    );
 }
 
-/* SMALL STAT CARD COMPONENT */
-function Stat({ label, value }) {
-  return (
-    <div
-      style={{
-        background: "#f8fafc",
-        borderRadius: 12,
-        padding: 16,
-        textAlign: "center"
-      }}
-    >
-      <div
-        style={{
-          fontSize: 24,
-          fontWeight: 700,
-          color: "#0f172a"
-        }}
-      >
-        {value}
-      </div>
-      <div
-        style={{
-          fontSize: 14,
-          color: "#64748b",
-          marginTop: 4
-        }}
-      >
-        {label}
-      </div>
-    </div>
-  );
+function StatCard({ label, value, icon }) {
+    return (
+        <div className="bg-[#1a1c23] p-5 rounded-2xl border border-white/5 flex flex-col justify-between h-32 hover:border-white/10 transition-colors group">
+            <div className="flex justify-between items-start">
+                <span className="text-slate-500 text-xs font-bold uppercase tracking-wider">{label}</span>
+                <div className="p-2 bg-white/5 rounded-lg group-hover:bg-white/10 transition-colors">
+                    {icon}
+                </div>
+            </div>
+            <span className="text-3xl font-bold text-white">{value}</span>
+        </div>
+    );
 }
