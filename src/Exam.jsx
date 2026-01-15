@@ -12,7 +12,8 @@ export default function Exam({
   marked,
   setAnswers,
   setMarked,
-  onSubmit
+  onSubmit,
+  candidateName
 }) {
   // ================= STATE =================
   const [index, setIndex] = useState(0);
@@ -27,7 +28,7 @@ export default function Exam({
   const [theme] = useState('dark'); // dark mode enforced
 
   const candidate = {
-    name: "Demo Candidate",
+    name: candidateName || "Demo Candidate",
     rollNo: "HPGK-2026-001",
     photo: profileImg
   };
@@ -39,12 +40,17 @@ export default function Exam({
   // Timer
   useEffect(() => {
     if (time <= 0) {
-      onSubmit();
+      handleSubmit(); // Use wrapper
       return;
     }
     const t = setInterval(() => setTime(prev => prev - 1), 1000);
     return () => clearInterval(t);
-  }, [time, onSubmit]);
+  }, [time]); // removed onSubmit dependency to avoid loop if it changes
+
+  const handleSubmit = () => {
+    const timeTaken = (data.duration * 60) - time;
+    onSubmit(timeTaken);
+  };
 
   // Mark Visited
   useEffect(() => {
@@ -174,7 +180,7 @@ export default function Exam({
           </div>
 
           <button
-            onClick={onSubmit}
+            onClick={handleSubmit}
             className={cn("hidden lg:block px-6 py-2 rounded-lg font-bold text-sm bg-blue-600 text-white hover:bg-blue-700 active:scale-95 transition-all shadow-lg shadow-blue-600/20")}
           >
             Submit
@@ -274,7 +280,7 @@ export default function Exam({
           </div>
 
           {/* Question Area */}
-          <div className="flex-1 overflow-hidden p-6 md:p-10 lg:p-16 w-full mx-auto max-w-5xl">
+          <div className="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-10 lg:p-16 w-full mx-auto max-w-5xl">
             <div key={currentQ.id} className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
 
               {/* Question Header */}
@@ -420,7 +426,7 @@ export default function Exam({
                 </button>
                 <button
                   onClick={() => {
-                    window.confirm("Are you surely you want to submit? This cannot be undone.") && onSubmit();
+                    window.confirm("Are you surely you want to submit? This cannot be undone.") && handleSubmit();
                   }}
                   className="px-8 py-2.5 rounded-lg bg-blue-600 text-white font-bold hover:bg-blue-700 shadow-lg shadow-blue-500/20"
                 >

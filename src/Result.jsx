@@ -1,9 +1,9 @@
 import { useRef, useEffect } from "react";
 import jsPDF from "jspdf";
-import { Download, RefreshCw, CheckCircle, XCircle, AlertCircle, FileText, Share2, Award, TrendingUp } from 'lucide-react';
+import { Download, RefreshCw, CheckCircle, XCircle, AlertCircle, FileText, Share2, Award, TrendingUp, Clock } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
-export default function Result({ exam, answers, onRetake }) {
+export default function Result({ exam, answers, timeTaken, onRetake, candidateName }) {
     if (!exam || !Array.isArray(exam.questions)) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-[#1a1c23] font-sans text-slate-500">
@@ -32,6 +32,12 @@ export default function Result({ exam, answers, onRetake }) {
     const unattempted = total - attempted;
     const scorePercent = Math.round((correct / total) * 100);
 
+    const formatTime = (s) => {
+        const m = Math.floor(s / 60);
+        const sec = s % 60;
+        return `${m}m ${sec}s`;
+    };
+
     // Trigger confetti on high score
     useEffect(() => {
         if (scorePercent > 70) {
@@ -58,93 +64,172 @@ export default function Result({ exam, answers, onRetake }) {
     const generatePDF = () => {
         const doc = new jsPDF();
 
-        // Background
-        doc.setFillColor(26, 28, 35); // Dark bg
+        // --- PAGE 1: REPORT CARD ---
+
+        // Clear background (White)
+        doc.setFillColor(255, 255, 255);
         doc.rect(0, 0, 210, 297, 'F');
 
-        // Header Band
-        doc.setFillColor(37, 99, 235); // Blue
+        // Header
+        doc.setFillColor(30, 58, 138); // Dark Blue Header
         doc.rect(0, 0, 210, 40, 'F');
 
         doc.setTextColor(255, 255, 255);
         doc.setFont("helvetica", "bold");
-        doc.setFontSize(24);
-        doc.text("PERFORMANCE REPORT", 105, 20, { align: "center" });
+        doc.setFontSize(22);
+        doc.text("PERFORMANCE REPORT", 20, 20);
         doc.setFontSize(10);
         doc.setFont("helvetica", "normal");
-        doc.text("StatePrep CBT - Himachal Pradesh Mock Test", 105, 30, { align: "center" });
+        doc.text("StatePrep CBT - Himachal Pradesh Mock Test", 20, 30);
 
-        // Score Card
-        doc.setFillColor(30, 41, 59); // Card bg
-        doc.roundedRect(20, 50, 170, 50, 3, 3, 'F');
+        doc.text(`Roll No: HPGK-2026-001`, 190, 20, { align: 'right' });
+        doc.text(`Date: ${new Date().toLocaleDateString()}`, 190, 30, { align: 'right' });
 
-        doc.setTextColor(148, 163, 184);
+        // Candidate Summary Box
+        doc.setDrawColor(200, 200, 200);
+        doc.setFillColor(250, 250, 250);
+        doc.rect(20, 50, 170, 35, 'F');
+        doc.rect(20, 50, 170, 35, 'S');
+
+        doc.setTextColor(50, 50, 50);
         doc.setFontSize(12);
-        doc.text("FINAL SCORE", 105, 65, { align: 'center' });
+        doc.text(`Candidate Name: ${candidateName || "Demo Candidate"}`, 25, 62);
+        doc.text(`Total Questions: ${total}`, 25, 75);
 
-        doc.setTextColor(255, 255, 255);
-        doc.setFontSize(36);
+        doc.text(`Time Taken: ${formatTime(timeTaken || 0)}`, 110, 62);
+        doc.text(`Total Marks: ${correct}`, 110, 75);
+
+        // Infographic Chart (Bar Chart Simulation)
+        const chartY = 110;
         doc.setFont("helvetica", "bold");
-        doc.text(`${correct} / ${total}`, 105, 80, { align: 'center' });
+        doc.text("Performance Analysis", 20, 100);
 
-        doc.setFontSize(10);
-        doc.setTextColor(scorePercent > 70 ? 74 : 248, scorePercent > 70 ? 222 : 113, scorePercent > 70 ? 128 : 113); // Green or Slate
-        doc.text(`Accuracy: ${Math.round((correct / (attempted || 1)) * 100)}%`, 105, 90, { align: 'center' });
+        const maxVal = Math.max(attempted, correct, wrong, unattempted, 1); // Avoid div by 0
+        const barMaxHeight = 80;
+        const scale = barMaxHeight / maxVal;
 
-        // Candidate Info Table
-        doc.setTextColor(255, 255, 255);
-        doc.setFontSize(12);
-        doc.text("Candidate Details", 20, 120);
+        // Draw Bars
+        const drawBar = (x, val, label, color) => {
+            const h = val * scale;
+            doc.setFillColor(...color);
+            doc.rect(x, chartY + (barMaxHeight - h), 30, h, 'F');
 
-        doc.setDrawColor(51, 65, 85);
-        doc.line(20, 125, 190, 125);
+            // Value Top
+            doc.setTextColor(0, 0, 0);
+            doc.text(String(val), x + 15, chartY + (barMaxHeight - h) - 5, { align: 'center' });
 
-        doc.setFontSize(10);
-        doc.setTextColor(148, 163, 184);
-        doc.text("Name:", 20, 135);
-        doc.setTextColor(255, 255, 255);
-        doc.text("Demo Candidate", 60, 135);
-
-        doc.setTextColor(148, 163, 184);
-        doc.text("Roll No:", 20, 142);
-        doc.setTextColor(255, 255, 255);
-        doc.text("HPGK-2026-001", 60, 142);
-
-        doc.setTextColor(148, 163, 184);
-        doc.text("Date:", 120, 135);
-        doc.setTextColor(255, 255, 255);
-        doc.text(new Date().toLocaleDateString(), 150, 135);
-
-        // Stats Grid
-        const startY = 160;
-        const boxWidth = 35;
-        const gap = 10;
-
-        const drawMiniBox = (x, title, val, color) => {
-            doc.setFillColor(30, 41, 59);
-            doc.roundedRect(x, startY, boxWidth, 30, 2, 2, 'F');
-
-            doc.setFontSize(8);
-            doc.setTextColor(148, 163, 184);
-            doc.text(title, x + boxWidth / 2, startY + 10, { align: 'center' });
-
-            doc.setFontSize(14);
-            doc.setTextColor(...color);
-            doc.setFont("helvetica", "bold");
-            doc.text(String(val), x + boxWidth / 2, startY + 22, { align: 'center' });
+            // Label Bottom
+            doc.setFontSize(10);
+            doc.setTextColor(100, 100, 100);
+            doc.text(label, x + 15, chartY + barMaxHeight + 15, { align: 'center' });
         }
 
-        drawMiniBox(20, "ATTEMPTED", attempted, [96, 165, 250]);
-        drawMiniBox(65, "CORRECT", correct, [74, 222, 128]);
-        drawMiniBox(110, "WRONG", wrong, [248, 113, 113]);
-        drawMiniBox(155, "SKIPPED", unattempted, [148, 163, 184]);
+        drawBar(30, attempted, "Attempted", [59, 130, 246]); // Blue
+        drawBar(75, correct, "Correct", [34, 197, 94]);    // Green
+        drawBar(120, wrong, "Wrong", [239, 68, 68]);       // Red
+        drawBar(165, unattempted, "Skipped", [148, 163, 184]); // Gray
 
-        // Footer
+        // Pie Chart Legend Simulation (Text based summary)
+        doc.setFontSize(12);
+        doc.setTextColor(50, 50, 50);
+        doc.setFont("helvetica", "bold");
+        doc.text("Overall Accuracy", 20, 230);
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(30);
+        doc.setTextColor(30, 58, 138);
+        doc.text(`${Math.round((correct / (attempted || 1)) * 100)}%`, 20, 245);
+
+        doc.setFontSize(10);
+        doc.setTextColor(100, 100, 100);
+        doc.text("Accuracy is calculated on attempted questions.", 20, 255);
+
+        // Footer Page 1
         doc.setFontSize(8);
-        doc.setTextColor(71, 85, 105);
-        doc.text("Generated by StatePrep CBT System", 105, 280, { align: "center" });
+        doc.text("Page 1 of Detailed Report", 105, 290, { align: "center" });
 
-        doc.save("StatePrep-Results.pdf");
+
+        // --- PAGE 2+: DETAILED SOLUTIONS ---
+        doc.addPage();
+
+        let y = 20;
+
+        doc.setFillColor(30, 58, 138);
+        doc.rect(0, 0, 210, 20, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(12);
+        doc.setFont("helvetica", "bold");
+        doc.text("DETAILED QUESTION ANALYSIS", 105, 13, { align: 'center' });
+
+        y = 35;
+
+        exam.questions.forEach((q, i) => {
+            // Check page break
+            if (y > 250) {
+                doc.addPage();
+                y = 20;
+                // Header on new page
+                doc.setFillColor(240, 240, 240);
+                doc.rect(0, 0, 210, 10, 'F');
+                doc.setTextColor(100, 100, 100);
+                doc.setFontSize(8);
+                doc.text("Detailed Analysis Continued...", 105, 7, { align: 'center' });
+                y += 10;
+            }
+
+            // Question Text
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(10);
+            doc.setFont("helvetica", "bold");
+
+            const qPrefix = `Q${i + 1}. `;
+            const qLines = doc.splitTextToSize(qPrefix + q.question, 170);
+            doc.text(qLines, 20, y);
+            y += (qLines.length * 5) + 2;
+
+            // Options & Status
+            const userAnsIdx = answers[q.id];
+            const correctAnsIdx = q.answer;
+            const correctText = q.options[correctAnsIdx];
+            const userText = userAnsIdx !== undefined ? q.options[userAnsIdx] : "Not Attempted";
+
+            // Status Badge
+            let statusText = "SKIPPED";
+            let statusColor = [150, 150, 150]; // Gray
+
+            if (userAnsIdx !== undefined) {
+                if (userAnsIdx === correctAnsIdx) {
+                    statusText = "CORRECT";
+                    statusColor = [34, 197, 94]; // Green
+                } else {
+                    statusText = "WRONG";
+                    statusColor = [239, 68, 68]; // Red
+                }
+            }
+
+            doc.setFillColor(...statusColor);
+            doc.rect(20, y, 20, 6, 'F'); // Status badge bg
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(7);
+            doc.text(statusText, 30, y + 4, { align: 'center' });
+
+            doc.setTextColor(50, 50, 50);
+            doc.setFontSize(9);
+
+            doc.text(`Correct Answer: ${correctText}`, 45, y + 4);
+            y += 8;
+            if (userAnsIdx !== undefined && userAnsIdx !== correctAnsIdx) {
+                doc.setTextColor(220, 38, 38); // Red text for wrong
+                doc.text(`Your Answer: ${userText}`, 45, y);
+                y += 6;
+            }
+
+            // Separator
+            doc.setDrawColor(230, 230, 230);
+            doc.line(20, y + 2, 190, y + 2);
+            y += 10;
+        });
+
+        doc.save("StatePrep-Detailed-Report.pdf");
     };
 
     return (
@@ -210,7 +295,7 @@ export default function Result({ exam, answers, onRetake }) {
                     {/* Stats Grid */}
                     <div className="grid grid-cols-2 gap-4">
                         <StatCard label="Accuracy" value={`${Math.round((correct / (attempted || 1)) * 100)}%`} icon={<TrendingUp className="w-5 h-5 text-blue-400" />} />
-                        <StatCard label="Attempted" value={attempted} icon={<FileText className="w-5 h-5 text-purple-400" />} />
+                        <StatCard label="Time Taken" value={formatTime(timeTaken || 0)} icon={<Clock className="w-5 h-5 text-amber-500" />} />
                         <StatCard label="Correct" value={correct} icon={<CheckCircle className="w-5 h-5 text-emerald-400" />} />
                         <StatCard label="Wrong" value={wrong} icon={<XCircle className="w-5 h-5 text-rose-400" />} />
                     </div>
