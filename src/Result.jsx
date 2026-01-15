@@ -244,7 +244,6 @@ export default function Result({ exam, answers, timeTaken, onRetake, candidateNa
                         <header className="flex items-center justify-between mb-8">
                             <div>
                                 <h1 className="text-2xl font-bold text-white tracking-tight">Performance Summary</h1>
-                                <p className="text-slate-500 text-sm">HP GK - Mock Test Series 1</p>
                             </div>
                             <div className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-bold text-slate-400">
                                 {new Date().toLocaleDateString()}
