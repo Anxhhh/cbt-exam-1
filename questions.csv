@@ -1,0 +1,6 @@
+id,question,option1,option2,option3,option4,answer,section
+Q001,"Which district accounts for 25% of the total area of Himachal Pradesh?","Chamba","Lahaul and Spiti","Kinnaur","Kangra",1,"Geography"
+Q002,"What is the population density of Lahaul and Spiti per square kilometer?","2","5","10","15",0,"Geography"
+Q003,"Who is the author of the book \"Lahaul a valley of Glacier\"?","Moorcroft","Cunningham","Andrew Wilson","Rahul Sanskrityayan",2,"History"
+Q004,"According to local history, who is considered the founder of the area of Lahaul Spiti?","Manu","Harshvardhan","Samudra Sen","Hiun Tsang",0,"History"
+Q005,"In which year did the Chinese traveler Hiun Tsang visit the area of Lahaul Spiti?","435 AD","535 AD","635 AD","735 AD",2,"History"
