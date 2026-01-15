@@ -285,7 +285,7 @@ export default function Result({ exam, answers, timeTaken, onRetake, candidateNa
                             <RefreshCw className="w-4 h-4" /> Retake Test
                         </button>
                         <button onClick={generatePDF} className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold text-sm bg-blue-600 hover:bg-blue-700 text-white transition-all shadow-lg shadow-blue-600/20">
-                            <Download className="w-4 h-4" /> Download Report
+                            <Download className="w-4 h-4" /> Download AI Report
                         </button>
                     </div>
                 </div>
@@ -303,7 +303,7 @@ export default function Result({ exam, answers, timeTaken, onRetake, candidateNa
                     {/* Insights Card */}
                     <div className="bg-[#1a1c23] rounded-3xl p-6 border border-white/5 shadow-xl">
                         <h4 className="font-bold text-white flex items-center gap-2 mb-4">
-                            <Award className="w-5 h-5 text-amber-500" /> Key Insights
+                            <Award className="w-5 h-5 text-amber-500" /> AI Key Insights
                         </h4>
                         <ul className="space-y-4">
                             <li className="flex gap-3 text-sm text-slate-400">
