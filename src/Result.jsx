@@ -1,15 +1,11 @@
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+
 export default function Result({ exam, answers, onRetake }) {
   // HARD SAFETY GUARD (DO NOT REMOVE)
   if (!exam || !Array.isArray(exam.questions)) {
     return (
-      <div
-        style={{
-          minHeight: "100vh",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center"
-        }}
-      >
+      <div className="min-h-screen flex items-center justify-center">
         Loading result...
       </div>
     );
@@ -33,6 +29,92 @@ export default function Result({ exam, answers, onRetake }) {
   const unattempted = total - attempted;
   const scorePercent = Math.round((correct / total) * 100);
 
+  const downloadPDF = () => {
+    const doc = new jsPDF();
+
+    // === HEADER ===
+    doc.setFontSize(22);
+    doc.setTextColor(30, 58, 138); // Blue 900
+    doc.text("StatePrep CBT - Performance Report", 105, 20, { align: "center" });
+
+    doc.setFontSize(12);
+    doc.setTextColor(100);
+    doc.text("Himachal Pradesh GK (Mock-1)", 105, 28, { align: "center" });
+    doc.line(20, 32, 190, 32);
+
+    // === SCORE SUMMARY ===
+    doc.setFontSize(16);
+    doc.setTextColor(0);
+    doc.text("Summary", 20, 45);
+
+    doc.setFontSize(12);
+    doc.text(`Total Questions: ${total}`, 20, 55);
+    doc.text(`Attempted: ${attempted}`, 20, 62);
+    doc.text(`Correct: ${correct}`, 80, 55);
+    doc.text(`Wrong: ${wrong}`, 80, 62);
+    doc.text(`Unattempted: ${unattempted}`, 140, 55);
+    doc.text(`Score: ${correct} / ${total} (${scorePercent}%)`, 140, 62);
+
+    // === WEAKNESS ANALYSIS (Rules based on sections or question types) ===
+    doc.setFontSize(16);
+    doc.text("Improvement Strategy", 20, 80);
+    doc.setFontSize(11);
+    doc.setTextColor(80);
+
+    const strategy = [
+      "• Review the questions you skipped. Was it due to time pressure or lack of concept clarity?",
+      "• Analyze your wrong answers. Did you fall for a 'distractor' option?",
+      "• Focus on accuracy. Ensure you do not guess wildly in sections with negative marking (if active).",
+      "• For HP GK, revise the 'Rivers' and 'Temples' topics as they carried high weightage."
+    ];
+
+    let yPos = 90;
+    strategy.forEach(line => {
+      doc.text(line, 20, yPos);
+      yPos += 7;
+    });
+
+    // === DETAILED QUESTION TABLE ===
+    const tableData = exam.questions.map((q, i) => {
+      const userAnswerIdx = answers[q.id];
+      const correctText = q.options[q.answer] || "N/A";
+      const userText = userAnswerIdx !== undefined ? q.options[userAnswerIdx] : "Skipped";
+      const status = userAnswerIdx === q.answer ? "Correct" : userAnswerIdx === undefined ? "Skipped" : "Wrong";
+
+      return [
+        `Q${i + 1}`,
+        q.question.substring(0, 40) + "...",
+        userText,
+        correctText,
+        status
+      ];
+    });
+
+    autoTable(doc, {
+      startY: 120,
+      head: [["#", "Question", "Your Answer", "Correct Answer", "Status"]],
+      body: tableData,
+      theme: 'grid',
+      headStyles: { fillColor: [30, 58, 138] },
+      styles: { fontSize: 8 },
+      columnStyles: {
+        0: { cellWidth: 10 },
+        1: { cellWidth: 70 },
+        4: { cellWidth: 20 }
+      },
+      didParseCell: (data) => {
+        if (data.section === 'body' && data.column.index === 4) {
+          const val = data.cell.raw;
+          if (val === 'Correct') data.cell.styles.textColor = [22, 163, 74];
+          else if (val === 'Wrong') data.cell.styles.textColor = [220, 38, 38];
+          else data.cell.styles.textColor = [100, 116, 139];
+        }
+      }
+    });
+
+    doc.save("Exam_Report.pdf");
+  };
+
   return (
     <div
       style={{
@@ -47,7 +129,7 @@ export default function Result({ exam, answers, onRetake }) {
       <div
         style={{
           width: "100%",
-          maxWidth: 520,
+          maxWidth: 600,
           background: "#ffffff",
           borderRadius: 16,
           padding: "36px 40px",
@@ -55,7 +137,7 @@ export default function Result({ exam, answers, onRetake }) {
         }}
       >
         {/* HEADER */}
-        <h1 style={{ marginTop: 0, color: "#1e3a8a" }}>
+        <h1 style={{ marginTop: 0, color: "#1e3a8a", fontSize: 32 }}>
           Exam Result
         </h1>
         <p style={{ color: "#475569", marginTop: 4 }}>
@@ -68,19 +150,19 @@ export default function Result({ exam, answers, onRetake }) {
         <div
           style={{
             textAlign: "center",
-            marginBottom: 24
+            marginBottom: 32
           }}
         >
           <div
             style={{
-              fontSize: 48,
+              fontSize: 56,
               fontWeight: 700,
               color: "#1d4ed8"
             }}
           >
             {correct} / {total}
           </div>
-          <div style={{ color: "#475569", marginTop: 4 }}>
+          <div style={{ color: "#475569", marginTop: 4, fontSize: 18 }}>
             Score ({scorePercent}%)
           </div>
         </div>
@@ -102,20 +184,42 @@ export default function Result({ exam, answers, onRetake }) {
         {/* ACTIONS */}
         <div
           style={{
-            marginTop: 32,
+            marginTop: 40,
             display: "flex",
-            justifyContent: "flex-end"
+            flexDirection: "column",
+            gap: 12
           }}
         >
           <button
-            onClick={onRetake}
+            onClick={downloadPDF}
             style={{
-              background: "#1d4ed8",
+              background: "#0f172a",
               color: "#ffffff",
-              padding: "12px 28px",
+              padding: "16px 28px",
               fontSize: 16,
               borderRadius: 8,
               border: "none",
+              cursor: "pointer",
+              fontWeight: 600,
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              gap: 8,
+              boxShadow: "0 10px 20px rgba(0,0,0,0.1)"
+            }}
+          >
+            <span>Download Detailed Report (PDF)</span>
+          </button>
+
+          <button
+            onClick={onRetake}
+            style={{
+              background: "#ffffff",
+              color: "#1d4ed8",
+              padding: "14px 28px",
+              fontSize: 16,
+              borderRadius: 8,
+              border: "1px solid #1d4ed8",
               cursor: "pointer",
               fontWeight: 600
             }}
@@ -141,7 +245,7 @@ function Stat({ label, value }) {
     >
       <div
         style={{
-          fontSize: 20,
+          fontSize: 24,
           fontWeight: 700,
           color: "#0f172a"
         }}
