@@ -269,11 +269,11 @@ export default function Result({ exam, answers, timeTaken, onRetake, candidateNa
                     <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
 
                     <div>
-                        <header className="flex items-center justify-between mb-8">
+                        <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4 sm:gap-0">
                             <div>
                                 <h1 className="text-2xl font-bold text-white tracking-tight">Performance Summary</h1>
                             </div>
-                            <div className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-bold text-slate-400">
+                            <div className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-bold text-slate-400 self-start sm:self-auto">
                                 {new Date().toLocaleDateString()}
                             </div>
                         </header>

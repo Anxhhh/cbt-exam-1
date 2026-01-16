@@ -37,10 +37,10 @@ export default function Start({ onStart }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#0f1116] text-slate-300 font-sans selection:bg-blue-500/30 flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-[#0f1116] text-slate-300 font-sans selection:bg-blue-500/30 flex items-center justify-center p-4 relative">
 
       {/* Background Ambience */}
-      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+      <div className="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <motion.div
           animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
           transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
@@ -73,7 +73,7 @@ export default function Start({ onStart }) {
               <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-ping" />
               Live Assessment System
             </motion.div>
-            <h1 className="text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-[1.1]">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-[1.1]">
               StatePrep-AI <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">Automated Computer Based Test</span>
             </h1>
@@ -103,7 +103,10 @@ export default function Start({ onStart }) {
         </motion.div>
 
         {/* Right Column: Candidate Action Card */}
-        <motion.div variants={itemVariants} className="flex flex-col gap-4 items-end">
+        <motion.div
+          variants={itemVariants}
+          className="flex flex-col gap-4 items-end sticky top-8"
+        >
           <div className="relative group w-full">
             {/* Glow backing */}
             <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200" />

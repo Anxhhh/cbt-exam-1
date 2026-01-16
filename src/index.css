@@ -4,3 +4,27 @@
 @theme {
   --font-sans: 'Inter', system-ui, sans-serif;
 }
+
+/* Fix "white screen" on hard scroll by matching background color */
+html, body {
+  background-color: #0f1116; /* Application dark background */
+  overscroll-behavior-y: none; /* Disables standard browser rubber-banding for app-like fee (optional, but requested often for 'flex scroll' feel without whitespace) */
+  scroll-behavior: smooth;
+  height: 100%;
+}
+
+/* Custom Scrollbar for Chrome/Safari/Edge */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}

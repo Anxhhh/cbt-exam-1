@@ -7,7 +7,7 @@ export default function BuyMeCoffeeBtn() {
             href="https://buymeacoffee.com/anshmatlotla"
             target="_blank"
             rel="noopener noreferrer"
-            className="fixed bottom-8 right-8 z-50 group"
+            className="fixed bottom-4 right-4 sm:bottom-8 sm:right-8 z-50 group"
             initial={{ scale: 0, rotate: 180 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ type: "spring", stiffness: 260, damping: 20, delay: 1 }}

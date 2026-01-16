@@ -303,7 +303,7 @@ export default function Exam({
                   </button>
                 </div>
 
-                <h2 className="text-xl md:text-2xl lg:text-3xl font-bold leading-relaxed">
+                <h2 className="text-xl md:text-2xl lg:text-3xl font-bold leading-relaxed break-words">
                   <span className="inline-block text-slate-300 dark:text-slate-600 min-w-[2ch] mr-2 user-select-none">
                     {index + 1}.
                   </span>
