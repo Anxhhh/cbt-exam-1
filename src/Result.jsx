@@ -3,6 +3,7 @@ import jsPDF from "jspdf";
 import { Download, RefreshCw, CheckCircle, XCircle, AlertCircle, FileText, Share2, Award, TrendingUp, Clock } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { motion } from "framer-motion";
+import BuyMeCoffeeBtn from './BuyMeCoffeeBtn';
 
 export default function Result({ exam, answers, timeTaken, onRetake, candidateName }) {
     if (!exam || !Array.isArray(exam.questions)) {
@@ -392,6 +393,7 @@ export default function Result({ exam, answers, timeTaken, onRetake, candidateNa
                 </div>
 
             </motion.div>
+            <BuyMeCoffeeBtn />
         </div>
     );
 }

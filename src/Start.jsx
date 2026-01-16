@@ -2,6 +2,7 @@ import { ArrowRight, BookOpen, Clock, ShieldCheck, Zap, User, FileText, CheckCir
 import { useState } from "react";
 import { cn } from './utils';
 import { motion } from "framer-motion";
+import BuyMeCoffeeBtn from './BuyMeCoffeeBtn';
 
 export default function Start({ onStart }) {
   const [name, setName] = useState("");
@@ -200,6 +201,7 @@ export default function Start({ onStart }) {
         </motion.div>
 
       </motion.div>
+      <BuyMeCoffeeBtn />
     </div>
   );
 }
