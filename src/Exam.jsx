@@ -26,6 +26,45 @@ export default function Exam({
 
   // Accessibility
   const [theme] = useState('dark'); // dark mode enforced
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  // ================= EFFECTS =================
+
+  // 1. Keyboard Navigation
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (Math.abs(window.innerWidth - screen.width) > 5) {
+        // Maybe warn if not fullscreen?
+      }
+
+      if (e.key === 'ArrowRight') {
+        if (index < data.questions.length - 1) setIndex(prev => prev + 1);
+      } else if (e.key === 'ArrowLeft') {
+        if (index > 0) setIndex(prev => prev - 1);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [index, data.questions.length]);
+
+  // 2. Prevent Accidental Refresh
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      e.preventDefault();
+      e.returnValue = ''; // Chrome requires this
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, []);
+
+  // 3. Fullscreen Toggle
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().then(() => setIsFullscreen(true)).catch(console.error);
+    } else {
+      document.exitFullscreen().then(() => setIsFullscreen(false)).catch(console.error);
+    }
+  };
 
   const candidate = {
     name: candidateName || "Demo Candidate",
@@ -152,6 +191,15 @@ export default function Exam({
             title="Toggle Question Palette"
           >
             {isSidebarOpen ? <LayoutGrid className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
+
+          {/* Fullscreen Toggle */}
+          <button
+            onClick={toggleFullscreen}
+            className="p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-slate-600 dark:text-slate-400 hidden sm:block"
+            title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
+          >
+            {isFullscreen ? <X className="w-5 h-5" /> : <div className="w-5 h-5 border-2 border-current rounded-sm border-dashed" />}
           </button>
 
           <div className="hidden sm:flex items-center gap-3">
