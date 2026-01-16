@@ -15,4 +15,18 @@ export default defineConfig(({ command }) => ({
       strictPort: true,
     }
     : undefined,
+
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom', 'framer-motion'],
+          'vendor-three': ['three', '@react-three/fiber', '@react-three/drei'],
+          'vendor-utils': ['lucide-react', 'clsx', 'tailwind-merge', 'papaparse', 'canvas-confetti'],
+          'vendor-pdf': ['jspdf', 'jspdf-autotable', 'html2canvas']
+        }
+      }
+    },
+    chunkSizeWarningLimit: 1000,
+  }
 }));

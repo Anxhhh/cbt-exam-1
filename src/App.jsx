@@ -1,8 +1,10 @@
-import { useEffect, useState } from "react";
-import Start from "./Start";
-import Exam from "./Exam";
-import Result from "./Result";
+import { useEffect, useState, Suspense, lazy } from "react";
 import Papa from "papaparse";
+
+// Lazy load components
+const Start = lazy(() => import("./Start"));
+const Exam = lazy(() => import("./Exam"));
+const Result = lazy(() => import("./Result"));
 
 function shuffleArray(arr) {
   return [...arr].sort(() => Math.random() - 0.5);
@@ -98,6 +100,13 @@ export default function App() {
   };
 
   /* ================= LOADING SCREEN ================= */
+  const LoadingSpinner = () => (
+    <div className="min-h-screen bg-[#0f1116] flex flex-col items-center justify-center gap-4">
+      <div className="w-12 h-12 rounded-full border-4 border-t-blue-500 border-white/10 animate-spin"></div>
+      <span className="text-slate-400 font-medium animate-pulse">Loading...</span>
+    </div>
+  );
+
   if (loading) {
     return (
       <div className="min-h-screen bg-[#0f1116] flex flex-col items-center justify-center gap-4">
@@ -109,7 +118,11 @@ export default function App() {
 
   /* ================= START SCREEN ================= */
   if (!started) {
-    return <Start onStart={loadExam} />;
+    return (
+      <Suspense fallback={<LoadingSpinner />}>
+        <Start onStart={loadExam} />
+      </Suspense>
+    );
   }
 
   /* ================= RESULT SCREEN ================= */
@@ -123,21 +136,23 @@ export default function App() {
     }
 
     return (
-      <Result
-        exam={exam}
-        answers={answers}
-        timeTaken={timeTaken}
-        candidateName={candidateName}
-        onRetake={() => {
-          setAnswers({});
-          setMarked({});
-          setSubmitted(false);
-          setStarted(false);
-          setTimeTaken(0);
-          setCandidateName("");
-          setExam(null); // Reset exam to allow re-selection
-        }}
-      />
+      <Suspense fallback={<LoadingSpinner />}>
+        <Result
+          exam={exam}
+          answers={answers}
+          timeTaken={timeTaken}
+          candidateName={candidateName}
+          onRetake={() => {
+            setAnswers({});
+            setMarked({});
+            setSubmitted(false);
+            setStarted(false);
+            setTimeTaken(0);
+            setCandidateName("");
+            setExam(null); // Reset exam to allow re-selection
+          }}
+        />
+      </Suspense>
     );
   }
 
@@ -145,17 +160,19 @@ export default function App() {
   if (!exam) return null; // Should be covered by loading/started state, but safeguard
 
   return (
-    <Exam
-      data={exam}
-      answers={answers}
-      marked={marked}
-      candidateName={candidateName}
-      setAnswers={setAnswers}
-      setMarked={setMarked}
-      onSubmit={(tt) => {
-        setTimeTaken(tt || 0);
-        setSubmitted(true);
-      }}
-    />
+    <Suspense fallback={<LoadingSpinner />}>
+      <Exam
+        data={exam}
+        answers={answers}
+        marked={marked}
+        candidateName={candidateName}
+        setAnswers={setAnswers}
+        setMarked={setMarked}
+        onSubmit={(tt) => {
+          setTimeTaken(tt || 0);
+          setSubmitted(true);
+        }}
+      />
+    </Suspense>
   );
 }
