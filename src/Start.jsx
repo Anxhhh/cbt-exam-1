@@ -157,7 +157,7 @@ export default function Start({ onStart }) {
                 <div className="relative">
                   <input
                     type="text"
-                    placeholder="Enter full candidate name"
+                    placeholder="Enter your name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     className="block w-full pl-4 pr-4 py-4 bg-[#0f1116] border border-white/10 rounded-xl text-white placeholder-slate-600 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none text-sm font-medium"
