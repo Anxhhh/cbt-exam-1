@@ -3,6 +3,7 @@ import { useState } from "react";
 import { cn } from './utils';
 import { motion } from "framer-motion";
 import BuyMeCoffeeBtn from './BuyMeCoffeeBtn';
+import ThreeBackground from './ThreeBackground';
 
 export default function Start({ onStart }) {
   const [name, setName] = useState("");
@@ -37,21 +38,10 @@ export default function Start({ onStart }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#0f1116] text-slate-300 font-sans selection:bg-blue-500/30 flex items-center justify-center p-4 relative">
+    <div className="min-h-screen text-slate-300 font-sans selection:bg-blue-500/30 flex items-center justify-center p-4 relative">
 
-      {/* Background Ambience */}
-      <div className="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-        <motion.div
-          animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
-          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/10 rounded-full blur-[100px]"
-        />
-        <motion.div
-          animate={{ scale: [1, 1.1, 1], opacity: [0.2, 0.4, 0.2] }}
-          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-          className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-600/10 rounded-full blur-[100px]"
-        />
-      </div>
+      {/* 3D Background */}
+      <ThreeBackground />
 
       <motion.div
         variants={containerVariants}
@@ -199,7 +189,7 @@ export default function Start({ onStart }) {
             </div>
           </div>
           <p className="text-slate-500 text-xs italic opacity-70 hover:opacity-100 transition-opacity">
-            Developed by Ansh Powered by Gemini 3 pro
+            Developed by Ansh Powered by Gemini 3 pro and Three.js
           </p>
         </motion.div>
 

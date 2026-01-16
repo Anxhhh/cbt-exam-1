@@ -5,6 +5,8 @@ import confetti from 'canvas-confetti';
 import { motion } from "framer-motion";
 import BuyMeCoffeeBtn from './BuyMeCoffeeBtn';
 
+import ThreeBackground from './ThreeBackground';
+
 export default function Result({ exam, answers, timeTaken, onRetake, candidateName }) {
     if (!exam || !Array.isArray(exam.questions)) {
         return (
@@ -256,9 +258,10 @@ export default function Result({ exam, answers, timeTaken, onRetake, candidateNa
     const offset = circumference - (scorePercent / 100) * circumference;
 
     return (
-        <div className="min-h-screen bg-[#0f1116] flex items-center justify-center p-4 font-sans text-slate-200">
+        <div className="min-h-screen relative flex items-center justify-center p-4 font-sans text-slate-200 overflow-hidden">
+            <ThreeBackground />
             <motion.div
-                className="w-full max-w-5xl grid lg:grid-cols-[1.2fr_0.8fr] gap-6"
+                className="w-full max-w-5xl grid lg:grid-cols-[1.2fr_0.8fr] gap-6 relative z-20"
                 variants={containerVariants}
                 initial="hidden"
                 animate="visible"
