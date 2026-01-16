@@ -2,6 +2,7 @@ import { useRef, useEffect } from "react";
 import jsPDF from "jspdf";
 import { Download, RefreshCw, CheckCircle, XCircle, AlertCircle, FileText, Share2, Award, TrendingUp, Clock } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { motion } from "framer-motion";
 
 export default function Result({ exam, answers, timeTaken, onRetake, candidateName }) {
     if (!exam || !Array.isArray(exam.questions)) {
@@ -232,12 +233,38 @@ export default function Result({ exam, answers, timeTaken, onRetake, candidateNa
         doc.save("StatePrep-Detailed-Report.pdf");
     };
 
+    // Animation Variants
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: { staggerChildren: 0.15 }
+        }
+    };
+
+    const itemVariants = {
+        hidden: { y: 20, opacity: 0 },
+        visible: {
+            y: 0,
+            opacity: 1,
+            transition: { type: "spring", stiffness: 300, damping: 24 }
+        }
+    };
+
+    const circumference = 2 * Math.PI * 88;
+    const offset = circumference - (scorePercent / 100) * circumference;
+
     return (
         <div className="min-h-screen bg-[#0f1116] flex items-center justify-center p-4 font-sans text-slate-200">
-            <div className="w-full max-w-5xl grid lg:grid-cols-[1.2fr_0.8fr] gap-6 animate-in slide-in-from-bottom-4 duration-500">
+            <motion.div
+                className="w-full max-w-5xl grid lg:grid-cols-[1.2fr_0.8fr] gap-6"
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+            >
 
                 {/* Main Card */}
-                <div className="bg-[#1a1c23] rounded-3xl p-8 border border-white/5 shadow-2xl relative overflow-hidden flex flex-col justify-between">
+                <motion.div variants={itemVariants} className="bg-[#1a1c23] rounded-3xl p-8 border border-white/5 shadow-2xl relative overflow-hidden flex flex-col justify-between">
                     <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
 
                     <div>
@@ -252,22 +279,40 @@ export default function Result({ exam, answers, timeTaken, onRetake, candidateNa
 
                         <div className="flex flex-col items-center justify-center py-8">
                             <div className="relative mb-6">
-                                {/* Simple CSS Circular Progress */}
+                                {/* Animated SVG Circular Progress */}
                                 <svg className="w-48 h-48 transform -rotate-90">
                                     <circle cx="96" cy="96" r="88" stroke="currentColor" strokeWidth="12" fill="transparent" className="text-slate-800" />
-                                    <circle cx="96" cy="96" r="88" stroke="currentColor" strokeWidth="12" fill="transparent"
-                                        strokeDasharray={2 * Math.PI * 88}
-                                        strokeDashoffset={2 * Math.PI * 88 * (1 - scorePercent / 100)}
-                                        className={`transition-all duration-1000 ease-out ${scorePercent > 70 ? 'text-emerald-500' : scorePercent > 40 ? 'text-blue-500' : 'text-rose-500'}`}
+                                    <motion.circle
+                                        cx="96" cy="96" r="88"
+                                        stroke="currentColor"
+                                        strokeWidth="12"
+                                        fill="transparent"
+                                        strokeDasharray={circumference}
+                                        initial={{ strokeDashoffset: circumference }}
+                                        animate={{ strokeDashoffset: offset }}
+                                        transition={{ duration: 1.5, ease: "easeOut", delay: 0.5 }}
+                                        className={`drop-shadow-[0_0_10px_rgba(59,130,246,0.5)] ${scorePercent > 70 ? 'text-emerald-500' : scorePercent > 40 ? 'text-blue-500' : 'text-rose-500'}`}
                                     />
                                 </svg>
                                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                    <span className="text-5xl font-bold text-white">{scorePercent}%</span>
+                                    <motion.span
+                                        initial={{ scale: 0, opacity: 0 }}
+                                        animate={{ scale: 1, opacity: 1 }}
+                                        transition={{ delay: 1, type: "spring" }}
+                                        className="text-5xl font-bold text-white"
+                                    >
+                                        {scorePercent}%
+                                    </motion.span>
                                     <span className="text-sm font-medium text-slate-400 uppercase tracking-widest mt-1">Score</span>
                                 </div>
                             </div>
 
-                            <div className="text-center space-y-1">
+                            <motion.div
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 1.2 }}
+                                className="text-center space-y-1"
+                            >
                                 <h3 className="text-xl font-bold text-white">
                                     {scorePercent > 80 ? "Outstanding Performance!" :
                                         scorePercent > 60 ? "Good Job, Keep Improving!" : "Needs More Practice"}
@@ -275,60 +320,90 @@ export default function Result({ exam, answers, timeTaken, onRetake, candidateNa
                                 <p className="text-slate-400 text-sm max-w-sm mx-auto">
                                     You answered <span className="text-white font-bold">{correct}</span> out of <span className="text-white font-bold">{total}</span> questions correctly.
                                 </p>
-                            </div>
+                            </motion.div>
                         </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-3 mt-8">
-                        <button onClick={onRetake} className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold text-sm bg-white/5 hover:bg-white/10 text-white transition-all border border-white/5">
+                        <motion.button
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            onClick={onRetake}
+                            className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold text-sm bg-white/5 hover:bg-white/10 text-white transition-all border border-white/5"
+                        >
                             <RefreshCw className="w-4 h-4" /> Retake Test
-                        </button>
-                        <button onClick={generatePDF} className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold text-sm bg-blue-600 hover:bg-blue-700 text-white transition-all shadow-lg shadow-blue-600/20">
+                        </motion.button>
+                        <motion.button
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            onClick={generatePDF}
+                            className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold text-sm bg-blue-600 hover:bg-blue-700 text-white transition-all shadow-lg shadow-blue-600/20"
+                        >
                             <Download className="w-4 h-4" /> Download AI Report
-                        </button>
+                        </motion.button>
                     </div>
-                </div>
+                </motion.div>
 
                 {/* Analysis Side */}
                 <div className="space-y-6">
                     {/* Stats Grid */}
                     <div className="grid grid-cols-2 gap-4">
-                        <StatCard label="Accuracy" value={`${Math.round((correct / (attempted || 1)) * 100)}%`} icon={<TrendingUp className="w-5 h-5 text-blue-400" />} />
-                        <StatCard label="Time Taken" value={formatTime(timeTaken || 0)} icon={<Clock className="w-5 h-5 text-amber-500" />} />
-                        <StatCard label="Correct" value={correct} icon={<CheckCircle className="w-5 h-5 text-emerald-400" />} />
-                        <StatCard label="Wrong" value={wrong} icon={<XCircle className="w-5 h-5 text-rose-400" />} />
+                        <StatCard delay={0.2} label="Accuracy" value={`${Math.round((correct / (attempted || 1)) * 100)}%`} icon={<TrendingUp className="w-5 h-5 text-blue-400" />} />
+                        <StatCard delay={0.3} label="Time Taken" value={formatTime(timeTaken || 0)} icon={<Clock className="w-5 h-5 text-amber-500" />} />
+                        <StatCard delay={0.4} label="Correct" value={correct} icon={<CheckCircle className="w-5 h-5 text-emerald-400" />} />
+                        <StatCard delay={0.5} label="Wrong" value={wrong} icon={<XCircle className="w-5 h-5 text-rose-400" />} />
                     </div>
 
                     {/* Insights Card */}
-                    <div className="bg-[#1a1c23] rounded-3xl p-6 border border-white/5 shadow-xl">
+                    <motion.div variants={itemVariants} className="bg-[#1a1c23] rounded-3xl p-6 border border-white/5 shadow-xl">
                         <h4 className="font-bold text-white flex items-center gap-2 mb-4">
                             <Award className="w-5 h-5 text-amber-500" /> AI Key Insights
                         </h4>
                         <ul className="space-y-4">
-                            <li className="flex gap-3 text-sm text-slate-400">
+                            <motion.li
+                                initial={{ x: -10, opacity: 0 }}
+                                animate={{ x: 0, opacity: 1 }}
+                                transition={{ delay: 0.8 }}
+                                className="flex gap-3 text-sm text-slate-400"
+                            >
                                 <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-2 flex-shrink-0" />
                                 <span>Your accuracy is {Math.round((correct / (attempted || 1)) * 100)}%. Focus on reducing negative marking in the next attempt.</span>
-                            </li>
-                            <li className="flex gap-3 text-sm text-slate-400">
+                            </motion.li>
+                            <motion.li
+                                initial={{ x: -10, opacity: 0 }}
+                                animate={{ x: 0, opacity: 1 }}
+                                transition={{ delay: 0.9 }}
+                                className="flex gap-3 text-sm text-slate-400"
+                            >
                                 <div className="w-1.5 h-1.5 rounded-full bg-purple-500 mt-2 flex-shrink-0" />
                                 <span>You skipped {unattempted} questions. Try to manage time better to attempt more.</span>
-                            </li>
-                            <li className="flex gap-3 text-sm text-slate-400">
+                            </motion.li>
+                            <motion.li
+                                initial={{ x: -10, opacity: 0 }}
+                                animate={{ x: 0, opacity: 1 }}
+                                transition={{ delay: 1.0 }}
+                                className="flex gap-3 text-sm text-slate-400"
+                            >
                                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-2 flex-shrink-0" />
                                 <span>Great consistency in the first half of the exam. Keep it up!</span>
-                            </li>
+                            </motion.li>
                         </ul>
-                    </div>
+                    </motion.div>
                 </div>
 
-            </div>
+            </motion.div>
         </div>
     );
 }
 
-function StatCard({ label, value, icon }) {
+function StatCard({ label, value, icon, delay }) {
     return (
-        <div className="bg-[#1a1c23] p-5 rounded-2xl border border-white/5 flex flex-col justify-between h-32 hover:border-white/10 transition-colors group">
+        <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: delay, duration: 0.3 }}
+            className="bg-[#1a1c23] p-5 rounded-2xl border border-white/5 flex flex-col justify-between h-32 hover:border-white/10 transition-colors group hover:shadow-lg hover:shadow-black/20"
+        >
             <div className="flex justify-between items-start">
                 <span className="text-slate-500 text-xs font-bold uppercase tracking-wider">{label}</span>
                 <div className="p-2 bg-white/5 rounded-lg group-hover:bg-white/10 transition-colors">
@@ -336,6 +411,6 @@ function StatCard({ label, value, icon }) {
                 </div>
             </div>
             <span className="text-3xl font-bold text-white">{value}</span>
-        </div>
+        </motion.div>
     );
 }

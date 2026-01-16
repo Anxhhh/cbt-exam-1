@@ -1,6 +1,7 @@
 import { ArrowRight, BookOpen, Clock, ShieldCheck, Zap, User, FileText, CheckCircle2, ChevronRight, Layers } from 'lucide-react';
 import { useState } from "react";
 import { cn } from './utils';
+import { motion } from "framer-motion";
 
 export default function Start({ onStart }) {
   const [name, setName] = useState("");
@@ -14,25 +15,63 @@ export default function Start({ onStart }) {
     }
   };
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.2
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: { type: "spring", stiffness: 300, damping: 24 }
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#0f1116] text-slate-300 font-sans selection:bg-blue-500/30 flex items-center justify-center p-4 relative overflow-hidden">
 
       {/* Background Ambience */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/10 rounded-full blur-[100px] animate-pulse" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-600/10 rounded-full blur-[100px] animate-pulse delay-1000" />
+        <motion.div
+          animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/10 rounded-full blur-[100px]"
+        />
+        <motion.div
+          animate={{ scale: [1, 1.1, 1], opacity: [0.2, 0.4, 0.2] }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+          className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-600/10 rounded-full blur-[100px]"
+        />
       </div>
 
-      <div className="w-full max-w-6xl relative z-10 grid lg:grid-cols-[1.2fr_0.8fr] gap-8 lg:gap-16 items-start mt-10 lg:mt-0">
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="w-full max-w-6xl relative z-10 grid lg:grid-cols-[1.2fr_0.8fr] gap-8 lg:gap-16 items-start mt-10 lg:mt-0"
+      >
 
         {/* Left Column: Branding & Value Props */}
-        <div className="space-y-10 animate-in slide-in-from-left-8 duration-700 fade-in pt-4">
+        <motion.div variants={itemVariants} className="space-y-10 pt-4">
 
           <div className="space-y-4">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold uppercase tracking-wider backdrop-blur-md">
+            <motion.div
+              initial={{ x: -20, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ delay: 0.4 }}
+              className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold uppercase tracking-wider backdrop-blur-md"
+            >
               <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-ping" />
               Live Assessment System
-            </div>
+            </motion.div>
             <h1 className="text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-[1.1]">
               StatePrep-AI <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">Automated Computer Based Test</span>
@@ -42,15 +81,15 @@ export default function Start({ onStart }) {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <motion.div variants={containerVariants} className="grid grid-cols-2 gap-4">
             <FeatureBox icon={<Clock className="w-5 h-5 text-blue-400" />} title="Timed Session" desc="90 Minutes strict limit" />
             <FeatureBox icon={<BookOpen className="w-5 h-5 text-purple-400" />} title="Comprehensive" desc="120 Questions coverage" />
             <FeatureBox icon={<ShieldCheck className="w-5 h-5 text-emerald-400" />} title="Fair Testing" desc="No Negative Marking" />
             <FeatureBox icon={<Zap className="w-5 h-5 text-amber-400" />} title="Instant Analytics" desc="Detailed Review" />
-          </div>
+          </motion.div>
 
           {/* Quick instructions inline for cleaner look */}
-          <div className="pt-4 border-t border-white/5">
+          <motion.div variants={itemVariants} className="pt-4 border-t border-white/5">
             <h4 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">Exam Guidelines</h4>
             <ul className="grid sm:grid-cols-2 gap-3 text-sm text-slate-500">
               <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-slate-600" /> No page refresh permitted</li>
@@ -58,12 +97,12 @@ export default function Start({ onStart }) {
               <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-slate-600" /> Use 'Save' to confirm answers</li>
               <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-slate-600" /> Stable internet required</li>
             </ul>
-          </div>
+          </motion.div>
 
-        </div>
+        </motion.div>
 
         {/* Right Column: Candidate Action Card */}
-        <div className="flex flex-col gap-4 items-end">
+        <motion.div variants={itemVariants} className="flex flex-col gap-4 items-end">
           <div className="relative group w-full">
             {/* Glow backing */}
             <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200" />
@@ -87,9 +126,11 @@ export default function Start({ onStart }) {
                 </label>
                 <div className="grid grid-cols-4 gap-2">
                   {["1", "2", "3", "4"].map((id) => (
-                    <button
+                    <motion.button
                       key={id}
                       onClick={() => setTestSet(id)}
+                      whileHover={{ scale: 1.05, y: -2 }}
+                      whileTap={{ scale: 0.95 }}
                       className={cn(
                         "relative h-14 rounded-lg font-bold text-sm transition-all overflow-hidden group/btn",
                         testSet === id
@@ -102,9 +143,14 @@ export default function Start({ onStart }) {
                         <span className="text-lg leading-none">{id}</span>
                       </span>
                       {testSet === id && (
-                        <div className="absolute inset-0 bg-gradient-to-tr from-blue-600 to-purple-500 opacity-100" />
+                        <motion.div
+                          layoutId="activeTab"
+                          className="absolute inset-0 bg-gradient-to-tr from-blue-600 to-purple-500 opacity-100"
+                          initial={false}
+                          transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                        />
                       )}
-                    </button>
+                    </motion.button>
                   ))}
                 </div>
               </div>
@@ -127,9 +173,11 @@ export default function Start({ onStart }) {
 
               {/* Step 3: Action */}
               <div className="pt-4">
-                <button
+                <motion.button
                   onClick={handleStart}
                   disabled={!name.trim()}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                   className="w-full relative group/start overflow-hidden rounded-xl p-[1px] focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 opacity-100 animate-gradient-x" />
@@ -138,7 +186,7 @@ export default function Start({ onStart }) {
                       Initialize Exam <ChevronRight className="w-4 h-4" />
                     </span>
                   </div>
-                </button>
+                </motion.button>
                 <p className="text-center text-[10px] text-slate-600 mt-4 uppercase tracking-widest">
                   Secure Browser Environment • Ver 2.4.0
                 </p>
@@ -149,23 +197,31 @@ export default function Start({ onStart }) {
           <p className="text-slate-500 text-xs italic opacity-70 hover:opacity-100 transition-opacity">
             Developed by Ansh Powered by Gemini 3 pro
           </p>
-        </div>
+        </motion.div>
 
-      </div>
+      </motion.div>
     </div>
   );
 }
 
 function FeatureBox({ icon, title, desc }) {
   return (
-    <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.05] transition-colors flex flex-row items-center gap-4 group">
-      <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center group-hover:scale-110 transition-transform">
+    <motion.div
+      variants={{
+        hidden: { opacity: 0, y: 10 },
+        visible: { opacity: 1, y: 0 }
+      }}
+      className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.05] transition-colors flex flex-row items-center gap-4 group cursor-default hover:border-blue-500/20"
+    >
+      <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center group-hover:scale-110 transition-transform text-white/80 group-hover:text-white group-hover:bg-blue-500/10">
         {icon}
       </div>
       <div>
         <h4 className="font-bold text-white text-sm">{title}</h4>
         <p className="text-xs text-slate-500">{desc}</p>
       </div>
-    </div>
+    </motion.div>
   );
 }
+
+
