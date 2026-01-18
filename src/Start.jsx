@@ -194,7 +194,7 @@ export default function Start({ onStart }) {
         </motion.div>
 
       </motion.div>
-      <BuyMeCoffeeBtn />
+      <BuyMeCoffeeBtn screen="start" />
     </div>
   );
 }

@@ -396,7 +396,7 @@ export default function Result({ exam, answers, timeTaken, onRetake, candidateNa
                 </div>
 
             </motion.div>
-            <BuyMeCoffeeBtn />
+            <BuyMeCoffeeBtn screen="result" score={scorePercent} />
         </div>
     );
 }
