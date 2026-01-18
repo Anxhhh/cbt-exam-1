@@ -68,7 +68,7 @@ export default function Start({ onStart }) {
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">Automated Computer Based Test</span>
             </h1>
             <p className="text-lg text-slate-400 max-w-lg leading-relaxed">
-              Experience a high-fidelity examination environment designed for Himachal Pradesh State level exams. Challenge yourself with HPPSC/HPRCA-standard questions and instant detailed feedback.
+              Experience a high-fidelity examination environment designed for Himachal Pradesh State level exams. Challenge yourself with HPPSC/HPRCA standard questions and instant detailed feedback.
             </p>
           </div>
 
