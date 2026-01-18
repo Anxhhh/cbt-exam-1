@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import profileImg from "./assets/profile.png";
 import {
   ChevronLeft, ChevronRight, Menu, X, Flag,
-  Clock, LayoutGrid, ArrowRight
+  Clock, LayoutGrid, ArrowRight, Home
 } from 'lucide-react';
 import { cn } from "./utils";
 import { toast } from 'sonner';
@@ -16,7 +16,8 @@ export default function Exam({
   setAnswers,
   setMarked,
   onSubmit,
-  candidateName
+  candidateName,
+  onBackToStart
 }) {
   // ================= STATE =================
   // Restore from localStorage if available, else default
@@ -291,8 +292,35 @@ export default function Exam({
             onClick={() => setSidebarOpen(!isSidebarOpen)}
             className="p-2 -ml-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-slate-600 dark:text-slate-400"
             title="Toggle Question Palette"
+            aria-label="Toggle Question Palette"
           >
             {isSidebarOpen ? <LayoutGrid className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
+
+          {/* Home Button */}
+          <button
+            onClick={() => {
+              // Manual save before exit just to be safe
+              const saveState = {
+                candidateName,
+                answers,
+                marked,
+                visited,
+                index,
+                timeRemaining: time,
+                examId: data.questions[0]?.id
+              };
+              localStorage.setItem("cbt_exam_state", JSON.stringify(saveState));
+
+              if (window.confirm("Are you sure you want to exit? Your progress will be saved.")) {
+                onBackToStart();
+              }
+            }}
+            className="p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-slate-600 dark:text-slate-400"
+            title="Save and Go Home"
+            aria-label="Save and Go Home"
+          >
+            <Home className="w-6 h-6" />
           </button>
 
           {/* Fullscreen Toggle */}
@@ -300,6 +328,7 @@ export default function Exam({
             onClick={toggleFullscreen}
             className="p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-slate-600 dark:text-slate-400 hidden sm:block"
             title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
+            aria-label={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
           >
             {isFullscreen ? <X className="w-5 h-5" /> : <div className="w-5 h-5 border-2 border-current rounded-sm border-dashed" />}
           </button>

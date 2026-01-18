@@ -1,9 +1,10 @@
-import { ArrowRight, BookOpen, Clock, ShieldCheck, Zap, User, FileText, CheckCircle2, ChevronRight, Layers } from 'lucide-react';
+import { ArrowRight, BookOpen, Clock, ShieldCheck, Zap, User, FileText, CheckCircle2, ChevronRight, Layers, Trash2 } from 'lucide-react';
 import { useState, useEffect } from "react";
 import { cn } from './utils';
 import { motion } from "framer-motion";
 import BuyMeCoffeeBtn from './BuyMeCoffeeBtn';
 import ThreeBackground from './ThreeBackground';
+import GlassButton from './GlassButton';
 
 export default function Start({ onStart }) {
   const [name, setName] = useState("");
@@ -45,6 +46,12 @@ export default function Start({ onStart }) {
       // But usually people pick the same one.
       onStart(resumeData.candidateName, testSet);
     }
+  };
+
+  const handleClearSession = (e) => {
+    e.stopPropagation();
+    localStorage.removeItem("cbt_exam_state");
+    setResumeData(null);
   };
 
   const containerVariants = {
@@ -198,40 +205,43 @@ export default function Start({ onStart }) {
               {/* Step 3: Action */}
               <div className="pt-4 space-y-3">
                 {resumeData && (
-                  <motion.button
+                  <GlassButton
+                    color="emerald"
                     onClick={handleResume}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="w-full relative group/resume overflow-hidden rounded-xl p-[1px] focus:outline-none"
+                    className="w-full h-auto px-6 py-4"
                   >
-                    <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-600 opacity-100 animate-gradient-x" />
-                    <div className="relative bg-[#1a1c23] hover:bg-transparent transition-colors duration-200 rounded-xl h-full px-6 py-4 flex items-center justify-center">
-                      <div className="flex flex-col items-center">
-                        <span className="font-bold text-white flex items-center gap-2">
-                          <Clock className="w-4 h-4" /> Resume Previous Session
-                        </span>
-                        <span className="text-[10px] text-emerald-200 opacity-80">
-                          {resumeData.candidateName} • {Math.floor(resumeData.timeRemaining / 60)}m left
-                        </span>
-                      </div>
+                    <div className="flex flex-col items-center justify-center w-full">
+                      <span className="font-bold text-white flex items-center gap-2">
+                        <Clock className="w-4 h-4" /> Resume Previous Session
+                      </span>
+                      <span className="text-[10px] text-emerald-200 opacity-80">
+                        {resumeData.candidateName} • {Math.floor(resumeData.timeRemaining / 60)}m left
+                      </span>
                     </div>
-                  </motion.button>
+
+                    {/* Delete Session Button (Visible on Hover) */}
+                    <button
+                      onClick={handleClearSession}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white transition-all opacity-0 group-hover:opacity-100 z-20"
+                      title="Delete saved session"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </GlassButton>
                 )}
 
-                <motion.button
+                <GlassButton
+                  color="blue"
                   onClick={handleStart}
                   disabled={!name.trim()}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="w-full relative group/start overflow-hidden rounded-xl p-[1px] focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full h-auto px-6 py-4"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 opacity-100 animate-gradient-x" />
-                  <div className="relative bg-[#1a1c23] hover:bg-transparent transition-colors duration-200 rounded-xl h-full px-6 py-4 flex items-center justify-center">
-                    <span className="font-bold text-white flex items-center gap-2 group-disabled/start:text-slate-400">
+                  <div className="flex items-center justify-center w-full">
+                    <span className="font-bold text-white flex items-center gap-2 group-disabled:text-slate-400">
                       {resumeData ? "Start New Exam" : "Initialize Exam"} <ChevronRight className="w-4 h-4" />
                     </span>
                   </div>
-                </motion.button>
+                </GlassButton>
                 <p className="text-center text-[10px] text-slate-600 mt-4 uppercase tracking-widest">
                   Secure Browser Environment • Ver 2.5.0
                 </p>

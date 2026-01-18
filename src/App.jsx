@@ -219,6 +219,7 @@ export default function App() {
           }}
           // Pass a cleaner method to clear session
           onClearSession={() => localStorage.removeItem("cbt_exam_state")}
+          onBackToStart={() => setStarted(false)}
         />
       </Suspense>
       <Toaster
