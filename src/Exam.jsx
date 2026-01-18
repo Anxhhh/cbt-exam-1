@@ -5,6 +5,9 @@ import {
   Clock, LayoutGrid, ArrowRight
 } from 'lucide-react';
 import { cn } from "./utils";
+import { toast } from 'sonner';
+import { sounds } from './utils/sound';
+import { AnimatePresence, motion } from "framer-motion";
 
 export default function Exam({
   data,
@@ -16,9 +19,12 @@ export default function Exam({
   candidateName
 }) {
   // ================= STATE =================
-  const [index, setIndex] = useState(0);
-  const [time, setTime] = useState(data.duration * 60);
-  const [visited, setVisited] = useState({});
+  // Restore from localStorage if available, else default
+  const savedState = JSON.parse(localStorage.getItem("cbt_exam_state") || "{}");
+
+  const [index, setIndex] = useState(savedState.index || 0);
+  const [time, setTime] = useState(savedState.timeRemaining || data.duration * 60);
+  const [visited, setVisited] = useState(savedState.visited || {});
 
   // UI States
   const [isSidebarOpen, setSidebarOpen] = useState(true);
@@ -30,22 +36,81 @@ export default function Exam({
 
   // ================= EFFECTS =================
 
+  const currentQ = data.questions[index];
+
+  const shuffledOptions = useMemo(() => {
+    if (!currentQ || !currentQ.options) return [];
+    return currentQ.options
+      .map((text, originalIndex) => ({ text, originalIndex }))
+      .sort(() => Math.random() - 0.5);
+  }, [currentQ?.id]);
+
+  const handleAnswer = (originalIndex) => {
+    setAnswers(prev => ({ ...prev, [currentQ.id]: originalIndex }));
+    sounds.click();
+  };
+
+  const toggleReview = () => {
+    if (currentQ) {
+      const isMarking = !marked[currentQ.id];
+      setMarked(prev => ({ ...prev, [currentQ.id]: isMarking }));
+      if (isMarking) {
+        toast.success("Marked for Review", { icon: '🚩' });
+        sounds.mark();
+      } else {
+        sounds.click();
+      }
+    }
+  };
+
   // 1. Keyboard Navigation
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (Math.abs(window.innerWidth - screen.width) > 5) {
-        // Maybe warn if not fullscreen?
+      // Keys
+      if (e.key === 'ArrowRight') {
+        if (index < data.questions.length - 1) {
+          setIndex(prev => prev + 1);
+          sounds.hover();
+        }
+      } else if (e.key === 'ArrowLeft') {
+        if (index > 0) {
+          setIndex(prev => prev - 1);
+          sounds.hover();
+        }
       }
 
-      if (e.key === 'ArrowRight') {
-        if (index < data.questions.length - 1) setIndex(prev => prev + 1);
-      } else if (e.key === 'ArrowLeft') {
-        if (index > 0) setIndex(prev => prev - 1);
+      // Option Selection (A, B, C, D)
+      const options = ['a', 'b', 'c', 'd', '1', '2', '3', '4'];
+      const optIndex = options.indexOf(e.key.toLowerCase()) % 4; // Map 1->A, etc.
+      if (optIndex !== -1 && currentQ) {
+        // Find the original index of this shuffled option? 
+        // currentQ.options is the shuffled one? NO. 
+        // `shuffledOptions` is the view. We need to select based on VISUAL position.
+        if (shuffledOptions[optIndex]) {
+          const originalIdx = shuffledOptions[optIndex].originalIndex;
+          handleAnswer(originalIdx);
+        }
+      }
+
+      // Mark for Review (M)
+      if (e.key.toLowerCase() === 'm') {
+        toggleReview();
+      }
+
+      // Enter to Save & Next (if answered)
+      if (e.key === 'Enter') {
+        if (index < data.questions.length - 1) {
+          setIndex(prev => prev + 1);
+          sounds.click();
+        } else {
+          // Submit? Maybe too dangerous for Enter key. Let's just create a toast.
+          toast.info("This is the last question.");
+        }
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [index, data.questions.length]);
+  }, [index, data.questions.length, shuffledOptions]);
 
   // 2. Prevent Accidental Refresh
   useEffect(() => {
@@ -72,19 +137,44 @@ export default function Exam({
     photo: profileImg
   };
 
-  const currentQ = data.questions[index];
+
 
   // ================= EFFECTS =================
 
   // Timer
+  // Persistence & Timer
   useEffect(() => {
     if (time <= 0) {
-      handleSubmit(); // Use wrapper
+      handleSubmit();
       return;
     }
+
+    // Critical: Save state every second (throttling handled by interval naturally)
+    // We save EVERYTHING needed to restore
+    const saveState = {
+      candidateName,
+      answers, // This comes from props, make sure it's up to date
+      marked,
+      visited,
+      index,
+      timeRemaining: time,
+      examId: data.questions[0]?.id // simple fingerprint
+    };
+    localStorage.setItem("cbt_exam_state", JSON.stringify(saveState));
+
     const t = setInterval(() => setTime(prev => prev - 1), 1000);
+
+    // Low time warning
+    if (time === 300) { // 5 mins
+      toast.warning("5 Minutes Remaining!", { duration: 5000 });
+      sounds.tick();
+    }
+    if (time <= 10 && time > 0) {
+      sounds.tick();
+    }
+
     return () => clearInterval(t);
-  }, [time]); // removed onSubmit dependency to avoid loop if it changes
+  }, [time, index, visited, answers, marked]);
 
   const handleSubmit = () => {
     const timeTaken = (data.duration * 60) - time;
@@ -111,18 +201,9 @@ export default function Exam({
 
   // ================= HELPERS =================
 
-  const shuffledOptions = useMemo(() => {
-    if (!currentQ || !currentQ.options) return [];
-    return currentQ.options
-      .map((text, originalIndex) => ({ text, originalIndex }))
-      .sort(() => Math.random() - 0.5);
-  }, [currentQ?.id]);
 
-  const toggleReview = () => {
-    if (currentQ) {
-      setMarked(prev => ({ ...prev, [currentQ.id]: !prev[currentQ.id] }));
-    }
-  };
+
+
 
   const stats = useMemo(() => {
     if (!data || !data.questions) return { total: 0, answeredCount: 0, markedCount: 0, visitedCount: 0, skipped: 0 };
@@ -133,8 +214,29 @@ export default function Exam({
     return { total, answeredCount, markedCount, visitedCount, skipped: total - answeredCount };
   }, [data, answers, marked, visited]);
 
-  // If data is invalid, don't crash
-  if (!currentQ) return <div className="p-10 flex items-center justify-center">Loading Question...</div>;
+  // If data is invalid or loading, show Skeleton
+  if (!currentQ) {
+    return (
+      <div className={containerClasses}>
+        <div className="h-1.5 w-full bg-slate-800 animate-pulse" />
+        <div className="flex-1 flex overflow-hidden relative">
+          <aside className="w-80 border-r border-white/5 bg-[#1a1c23] hidden lg:block p-4 space-y-4">
+            <div className="h-8 w-32 bg-white/5 rounded animate-pulse" />
+            <div className="grid grid-cols-5 gap-2">
+              {[...Array(20)].map((_, i) => <div key={i} className="aspect-square rounded bg-white/5 animate-pulse" />)}
+            </div>
+          </aside>
+          <main className="flex-1 p-10 space-y-8">
+            <div className="h-8 w-64 bg-white/5 rounded animate-pulse" />
+            <div className="h-32 w-full bg-white/5 rounded-xl animate-pulse" />
+            <div className="space-y-4">
+              {[...Array(4)].map((_, i) => <div key={i} className="h-20 w-full bg-white/5 rounded-xl animate-pulse" />)}
+            </div>
+          </main>
+        </div>
+      </div>
+    );
+  }
 
   // ================= RENDER HELPERS =================
 
@@ -367,7 +469,7 @@ export default function Exam({
                   return (
                     <div
                       key={i}
-                      onClick={() => setAnswers({ ...answers, [currentQ.id]: opt.originalIndex })}
+                      onClick={() => handleAnswer(opt.originalIndex)}
                       className={cn(
                         "relative group cursor-pointer rounded-xl border-2 p-5 flex items-start gap-4 transition-all duration-200 select-none",
                         "bg-white dark:bg-white/5 border-slate-200 dark:border-[#2a2d36] hover:border-blue-300 dark:hover:border-blue-700", // Base

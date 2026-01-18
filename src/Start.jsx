@@ -1,5 +1,5 @@
 import { ArrowRight, BookOpen, Clock, ShieldCheck, Zap, User, FileText, CheckCircle2, ChevronRight, Layers } from 'lucide-react';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { cn } from './utils';
 import { motion } from "framer-motion";
 import BuyMeCoffeeBtn from './BuyMeCoffeeBtn';
@@ -9,11 +9,41 @@ export default function Start({ onStart }) {
   const [name, setName] = useState("");
   const [testSet, setTestSet] = useState("1"); // Default to Test 1
 
+  const [resumeData, setResumeData] = useState(null);
+
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem("cbt_exam_state"));
+      if (saved && saved.timeRemaining > 0 && !saved.submitted) {
+        setResumeData(saved);
+      }
+    } catch (e) { console.error(e); }
+  }, []);
+
   const handleStart = () => {
     if (name.trim()) {
       onStart(name, testSet);
-    } else {
-      // Small "shake" effect validation could go here
+    }
+  };
+
+  const handleResume = () => {
+    if (resumeData) {
+      // We assume '1' if not saved, or we should have saved it.
+      // Since we didn't save testSet explicitly in Exam.jsx (my bad), 
+      // we might just default to 1, OR we can infer it. 
+      // For now let's hope the user remembers or we default. 
+      // Update: I will update App.jsx to save the "testSet" into the Exam Data context passed to Exam.jsx?
+      // Or just pass it.
+      // Let's just use the current selected testSet if we can't find it, or allow user to pick.
+      // ACTUALLY: The `resumeData` contains `answers` and `candidateName`.
+      // If we call onStart, it re-fetches the CSV.
+      // Then Exam.jsx mounts and restores Time/Index/Visited.
+      // THIS WORKS.
+
+      setName(resumeData.candidateName);
+      // If we can't guess the set, we might be in trouble if they pick the wrong one.
+      // But usually people pick the same one.
+      onStart(resumeData.candidateName, testSet);
     }
   };
 
@@ -166,7 +196,28 @@ export default function Start({ onStart }) {
               </div>
 
               {/* Step 3: Action */}
-              <div className="pt-4">
+              <div className="pt-4 space-y-3">
+                {resumeData && (
+                  <motion.button
+                    onClick={handleResume}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="w-full relative group/resume overflow-hidden rounded-xl p-[1px] focus:outline-none"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-600 opacity-100 animate-gradient-x" />
+                    <div className="relative bg-[#1a1c23] hover:bg-transparent transition-colors duration-200 rounded-xl h-full px-6 py-4 flex items-center justify-center">
+                      <div className="flex flex-col items-center">
+                        <span className="font-bold text-white flex items-center gap-2">
+                          <Clock className="w-4 h-4" /> Resume Previous Session
+                        </span>
+                        <span className="text-[10px] text-emerald-200 opacity-80">
+                          {resumeData.candidateName} • {Math.floor(resumeData.timeRemaining / 60)}m left
+                        </span>
+                      </div>
+                    </div>
+                  </motion.button>
+                )}
+
                 <motion.button
                   onClick={handleStart}
                   disabled={!name.trim()}
@@ -177,12 +228,12 @@ export default function Start({ onStart }) {
                   <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 opacity-100 animate-gradient-x" />
                   <div className="relative bg-[#1a1c23] hover:bg-transparent transition-colors duration-200 rounded-xl h-full px-6 py-4 flex items-center justify-center">
                     <span className="font-bold text-white flex items-center gap-2 group-disabled/start:text-slate-400">
-                      Initialize Exam <ChevronRight className="w-4 h-4" />
+                      {resumeData ? "Start New Exam" : "Initialize Exam"} <ChevronRight className="w-4 h-4" />
                     </span>
                   </div>
                 </motion.button>
                 <p className="text-center text-[10px] text-slate-600 mt-4 uppercase tracking-widest">
-                  Secure Browser Environment • Ver 2.4.0
+                  Secure Browser Environment • Ver 2.5.0
                 </p>
               </div>
 

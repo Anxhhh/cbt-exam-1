@@ -9,8 +9,12 @@ if (!rootElement) {
   throw new Error("Root element (#root) not found in index.html");
 }
 
+import ErrorBoundary from "./ErrorBoundary";
+
 ReactDOM.createRoot(rootElement).render(
   <React.StrictMode>
-    <App />
+    <ErrorBoundary>
+      <App />
+    </ErrorBoundary>
   </React.StrictMode>
 );

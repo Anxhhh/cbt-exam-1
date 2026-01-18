@@ -361,36 +361,60 @@ export default function Result({ exam, answers, timeTaken, onRetake, candidateNa
                     {/* Insights Card */}
                     <motion.div variants={itemVariants} className="bg-[#1a1c23] rounded-3xl p-6 border border-white/5 shadow-xl">
                         <h4 className="font-bold text-white flex items-center gap-2 mb-4">
-                            <Award className="w-5 h-5 text-amber-500" /> AI Key Insights
+                            <Award className="w-5 h-5 text-amber-500" /> Smart Performance Analysis
                         </h4>
                         <ul className="space-y-4">
-                            <motion.li
-                                initial={{ x: -10, opacity: 0 }}
-                                animate={{ x: 0, opacity: 1 }}
-                                transition={{ delay: 0.8 }}
-                                className="flex gap-3 text-sm text-slate-400"
-                            >
-                                <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-2 flex-shrink-0" />
-                                <span>Your accuracy is {Math.round((correct / (attempted || 1)) * 100)}%. Focus on reducing negative marking in the next attempt.</span>
-                            </motion.li>
-                            <motion.li
-                                initial={{ x: -10, opacity: 0 }}
-                                animate={{ x: 0, opacity: 1 }}
-                                transition={{ delay: 0.9 }}
-                                className="flex gap-3 text-sm text-slate-400"
-                            >
-                                <div className="w-1.5 h-1.5 rounded-full bg-purple-500 mt-2 flex-shrink-0" />
-                                <span>You skipped {unattempted} questions. Try to manage time better to attempt more.</span>
-                            </motion.li>
-                            <motion.li
-                                initial={{ x: -10, opacity: 0 }}
-                                animate={{ x: 0, opacity: 1 }}
-                                transition={{ delay: 1.0 }}
-                                className="flex gap-3 text-sm text-slate-400"
-                            >
-                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-2 flex-shrink-0" />
-                                <span>Great consistency in the first half of the exam. Keep it up!</span>
-                            </motion.li>
+                            {/* Dynamic Section Analysis */}
+                            {(() => {
+                                // 1. Calculate Section Performance
+                                const sections = {};
+                                exam.questions.forEach(q => {
+                                    if (!sections[q.section]) sections[q.section] = { total: 0, correct: 0 };
+                                    sections[q.section].total++;
+                                    if (answers[q.id] === q.answer) sections[q.section].correct++;
+                                });
+
+                                // 2. Generate Insights
+                                const insights = [];
+
+                                // Accuracy Insight
+                                const accuracy = Math.round((correct / (attempted || 1)) * 100);
+                                if (accuracy > 80) {
+                                    insights.push({ color: 'bg-emerald-500', text: "High Precision: Your accuracy is excellent. You avoided guessing." });
+                                } else if (accuracy < 50) {
+                                    insights.push({ color: 'bg-rose-500', text: "High Negative Impact: Many wrong attempts. Try to skip if unsure." });
+                                } else {
+                                    insights.push({ color: 'bg-blue-500', text: `Balanced Approach: ${accuracy}% accuracy. Room for improvement.` });
+                                }
+
+                                // Strongest Section
+                                const sortedSections = Object.entries(sections).sort(([, a], [, b]) => (b.correct / b.total) - (a.correct / a.total));
+                                const best = sortedSections[0];
+                                const worst = sortedSections[sortedSections.length - 1];
+
+                                if (best) {
+                                    const bestPct = Math.round((best[1].correct / best[1].total) * 100);
+                                    insights.push({ color: 'bg-purple-500', text: `Strong Domain: ${best[0]} (${bestPct}%). Capitalize on this.` });
+                                }
+
+                                if (worst && worst !== best) {
+                                    const worstPct = Math.round((worst[1].correct / worst[1].total) * 100);
+                                    insights.push({ color: 'bg-amber-500', text: `Weak Area: ${worst[0]} (${worstPct}%). Focus your revision here.` });
+                                }
+
+                                return insights.slice(0, 3).map((insight, idx) => (
+                                    <motion.li
+                                        key={idx}
+                                        initial={{ x: -10, opacity: 0 }}
+                                        animate={{ x: 0, opacity: 1 }}
+                                        transition={{ delay: 0.8 + (idx * 0.1) }}
+                                        className="flex gap-3 text-sm text-slate-400 items-start"
+                                    >
+                                        <div className={`w-1.5 h-1.5 rounded-full ${insight.color} mt-1.5 flex-shrink-0`} />
+                                        <span>{insight.text}</span>
+                                    </motion.li>
+                                ));
+                            })()}
                         </ul>
                     </motion.div>
                 </div>

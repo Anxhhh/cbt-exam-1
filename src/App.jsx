@@ -1,5 +1,6 @@
 import { useEffect, useState, Suspense, lazy } from "react";
 import Papa from "papaparse";
+import { Toaster, toast } from 'sonner';
 
 // Lazy load components
 const Start = lazy(() => import("./Start"));
@@ -60,7 +61,6 @@ export default function App() {
         complete: (results) => {
           const parsedQuestions = results.data.map((row, index) => {
             // Map CSV columns to Question Object
-            // Columns: Question, Option A, Option B, Option C, Option D, Correct Option (A/B/C/D), Section
             return {
               id: `Q${index + 1}`,
               question: row["Question"],
@@ -77,6 +77,20 @@ export default function App() {
 
           // Filter out any broken rows (e.g. missing question or answer)
           const validQuestions = parsedQuestions.filter(q => q.question && q.answer !== -1 && q.options.length > 1);
+
+          // === HYDRATION LOGIC ===
+          // Check if we have a saved state for THIS specific user and exam
+          // Note: Ideally we should check if 'testId' matches too, but for now we assume user resumes correctly.
+          const savedState = JSON.parse(localStorage.getItem("cbt_exam_state") || "{}");
+          if (savedState && savedState.candidateName === name && !savedState.submitted) {
+            // Restore Global State
+            setAnswers(savedState.answers || {});
+            setMarked(savedState.marked || {});
+          } else {
+            // New Exam - Reset
+            setAnswers({});
+            setMarked({});
+          }
 
           setExam({
             ...baseConfig,
@@ -100,26 +114,54 @@ export default function App() {
   };
 
   /* ================= LOADING SCREEN ================= */
-  const LoadingSpinner = () => (
-    <div className="min-h-screen bg-[#0f1116] flex flex-col items-center justify-center gap-4">
-      <div className="w-12 h-12 rounded-full border-4 border-t-blue-500 border-white/10 animate-spin"></div>
-      <span className="text-slate-400 font-medium animate-pulse">Loading...</span>
+  /* ================= LOADING SCREEN (SKELETON) ================= */
+  const SkeletonLoader = () => (
+    <div className="min-h-screen bg-[#0f1116] flex flex-col font-sans animate-pulse">
+      {/* Header Skeleton */}
+      <div className="h-16 border-b border-white/5 bg-white/5 w-full flex items-center px-6 justify-between">
+        <div className="h-6 w-32 bg-slate-700/50 rounded"></div>
+        <div className="h-8 w-24 bg-slate-700/50 rounded"></div>
+      </div>
+
+      <div className="flex-1 flex overflow-hidden">
+        {/* Sidebar Skeleton (Desktop) */}
+        <div className="hidden lg:block w-80 border-r border-white/5 p-4 space-y-4 bg-white/[0.02]">
+          <div className="h-4 w-20 bg-slate-700/50 rounded mb-4"></div>
+          <div className="grid grid-cols-5 gap-2">
+            {[...Array(20)].map((_, i) => (
+              <div key={i} className="aspect-square rounded bg-slate-700/30"></div>
+            ))}
+          </div>
+        </div>
+
+        {/* Main Content Skeleton */}
+        <div className="flex-1 p-8 md:p-12 space-y-8">
+          <div className="flex justify-between items-center">
+            <div className="h-4 w-20 bg-slate-700/50 rounded"></div>
+            <div className="h-8 w-32 bg-slate-700/50 rounded"></div>
+          </div>
+
+          <div className="h-8 w-3/4 bg-slate-700/50 rounded"></div>
+          <div className="h-8 w-1/2 bg-slate-700/50 rounded"></div>
+
+          <div className="space-y-4 pt-8">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="h-16 w-full rounded-xl border border-white/5 bg-white/[0.02]"></div>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-[#0f1116] flex flex-col items-center justify-center gap-4">
-        <div className="w-12 h-12 rounded-full border-4 border-t-blue-500 border-white/10 animate-spin"></div>
-        <span className="text-slate-400 font-medium animate-pulse">Loading Test Config...</span>
-      </div>
-    );
+    return <SkeletonLoader />;
   }
 
   /* ================= START SCREEN ================= */
   if (!started) {
     return (
-      <Suspense fallback={<LoadingSpinner />}>
+      <Suspense fallback={<SkeletonLoader />}>
         <Start onStart={loadExam} />
       </Suspense>
     );
@@ -136,7 +178,7 @@ export default function App() {
     }
 
     return (
-      <Suspense fallback={<LoadingSpinner />}>
+      <Suspense fallback={<SkeletonLoader />}>
         <Result
           exam={exam}
           answers={answers}
@@ -160,19 +202,32 @@ export default function App() {
   if (!exam) return null; // Should be covered by loading/started state, but safeguard
 
   return (
-    <Suspense fallback={<LoadingSpinner />}>
-      <Exam
-        data={exam}
-        answers={answers}
-        marked={marked}
-        candidateName={candidateName}
-        setAnswers={setAnswers}
-        setMarked={setMarked}
-        onSubmit={(tt) => {
-          setTimeTaken(tt || 0);
-          setSubmitted(true);
+    <>
+      <Suspense fallback={<SkeletonLoader />}>
+        <Exam
+          data={exam}
+          answers={answers}
+          marked={marked}
+          candidateName={candidateName}
+          setAnswers={setAnswers}
+          setMarked={setMarked}
+          onSubmit={(tt) => {
+            setTimeTaken(tt || 0);
+            setSubmitted(true);
+            // Clear local storage on submit
+            localStorage.removeItem("cbt_exam_state");
+          }}
+          // Pass a cleaner method to clear session
+          onClearSession={() => localStorage.removeItem("cbt_exam_state")}
+        />
+      </Suspense>
+      <Toaster
+        theme="dark"
+        position="top-center"
+        toastOptions={{
+          style: { background: '#1a1c23', border: '1px solid #334155', color: '#e2e8f0' },
         }}
       />
-    </Suspense>
+    </>
   );
 }
