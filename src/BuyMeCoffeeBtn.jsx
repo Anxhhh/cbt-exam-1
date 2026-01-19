@@ -45,7 +45,7 @@ export default function BuyMeCoffeeBtn({ screen = 'start', score = 0 }) {
                                     <X className="w-3 h-3 text-slate-400" />
                                 </button>
                                 <p className="font-bold mb-1 flex items-center gap-1.5 text-blue-600 dark:text-blue-400">
-                                    <Sparkles className="w-3 h-3" /> Hp Exam Special
+                                    <Sparkles className="w-3 h-3" /> Patwari Exam Special
                                 </p>
                                 <p className="leading-relaxed opacity-90">
                                     Get the ultimate preparation guide. <span className="font-bold text-rose-500">80% OFF</span> today!
