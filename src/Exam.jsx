@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import profileImg from "./assets/profile.png";
 import {
   ChevronLeft, ChevronRight, Menu, X, Flag,
-  Clock, LayoutGrid, ArrowRight, Home
+  Clock, LayoutGrid, ArrowRight, Home, Eye, EyeOff
 } from 'lucide-react';
 import { cn } from "./utils";
 import { toast } from 'sonner';
@@ -34,6 +34,7 @@ export default function Exam({
   // Accessibility
   const [theme] = useState('dark'); // dark mode enforced
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isInstantFeedback, setIsInstantFeedback] = useState(true);
 
   // ================= EFFECTS =================
 
@@ -47,6 +48,8 @@ export default function Exam({
   }, [currentQ?.id]);
 
   const handleAnswer = (originalIndex) => {
+    // Lock only if instant feedback is enabled and already answered
+    if (isInstantFeedback && answers[currentQ.id] !== undefined) return;
     setAnswers(prev => ({ ...prev, [currentQ.id]: originalIndex }));
     sounds.click();
   };
@@ -333,6 +336,24 @@ export default function Exam({
             {isFullscreen ? <X className="w-5 h-5" /> : <div className="w-5 h-5 border-2 border-current rounded-sm border-dashed" />}
           </button>
 
+          {/* Instant Feedback Toggle */}
+          <button
+            onClick={() => {
+              setIsInstantFeedback(!isInstantFeedback);
+              toast.success(!isInstantFeedback ? "Instant Feedback Enabled" : "Instant Feedback Disabled");
+            }}
+            className={cn(
+              "p-2 rounded-lg transition-colors hidden sm:block",
+              isInstantFeedback
+                ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20"
+                : "text-slate-600 dark:text-slate-400 hover:bg-black/5 dark:hover:bg-white/10"
+            )}
+            title={isInstantFeedback ? "Disable Instant Feedback" : "Enable Instant Feedback"}
+            aria-label="Toggle Instant Feedback"
+          >
+            {isInstantFeedback ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
+          </button>
+
           <div className="hidden sm:flex items-center gap-3">
             <img src={candidate.photo} alt="User" className="w-10 h-10 rounded-full border border-slate-200 dark:border-slate-700 object-cover shadow-sm" />
             <div className="leading-tight">
@@ -493,24 +514,53 @@ export default function Exam({
               {/* Options Grid */}
               <div className="grid gap-3 pt-2">
                 {shuffledOptions.map((opt, i) => {
-                  const isSelected = answers[currentQ.id] === opt.originalIndex;
+                  const currentAnswer = answers[currentQ.id];
+                  const hasAnswered = currentAnswer !== undefined;
+                  const isSelected = currentAnswer === opt.originalIndex;
+                  const isCorrect = opt.originalIndex === currentQ.answer;
+
+                  // Feedback Logic: Only active if isInstantFeedback is TRUE
+                  const showFeedback = isInstantFeedback;
+
+                  const isRight = showFeedback && isSelected && isCorrect;
+                  const isWrong = showFeedback && isSelected && !isCorrect;
+                  const isMissed = showFeedback && !isSelected && isCorrect && hasAnswered;
+
+                  // Standard selection styling (Exam Mode)
+                  const isJustSelected = !showFeedback && isSelected;
 
                   return (
                     <div
                       key={i}
                       onClick={() => handleAnswer(opt.originalIndex)}
                       className={cn(
-                        "relative group cursor-pointer rounded-xl border-2 p-5 flex items-start gap-4 transition-all duration-200 select-none",
-                        "bg-white dark:bg-white/5 border-slate-200 dark:border-[#2a2d36] hover:border-blue-300 dark:hover:border-blue-700", // Base
-                        isSelected && "ring-2 ring-blue-500 border-blue-500 bg-blue-50 dark:bg-blue-900/20 z-10", // Selected
+                        "relative group rounded-xl border-2 p-5 flex items-start gap-4 transition-all duration-200 select-none",
+                        (showFeedback && hasAnswered) ? "cursor-default" : "cursor-pointer",
+                        "bg-white dark:bg-white/5 border-slate-200 dark:border-[#2a2d36]", // Base
+
+                        // Hover Logic
+                        (!hasAnswered || !showFeedback) && "hover:border-blue-300 dark:hover:border-blue-700",
+
+                        // Feedback Mode Styling
+                        isRight && "ring-2 ring-blue-500 border-blue-500 bg-blue-50 dark:bg-blue-900/20 z-10",
+                        isMissed && "ring-2 ring-emerald-500 border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 z-10",
+                        isWrong && "ring-2 ring-red-500 border-red-500 bg-red-50 dark:bg-red-900/20 z-10",
+
+                        // Standard Mode Styling (No feedback, just selected)
+                        isJustSelected && "ring-2 ring-blue-500 border-blue-500 bg-blue-50 dark:bg-blue-900/20 z-10",
+
+                        showFeedback && hasAnswered && !isSelected && !isMissed && "opacity-50 grayscale" // Dim irrelevant options in feedback mode
                       )}
                     >
                       {/* Selection Indicator */}
                       <div className={cn(
                         "mt-0.5 min-w-6 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all flex-shrink-0",
-                        isSelected ? "border-blue-500 bg-blue-500 text-white" : "border-slate-300 dark:border-slate-600 group-hover:border-blue-400"
+                        (isRight || isJustSelected) ? "border-blue-500 bg-blue-500 text-white" :
+                          isMissed ? "border-emerald-500 bg-emerald-500 text-white" :
+                            isWrong ? "border-red-500 bg-red-500 text-white" :
+                              "border-slate-300 dark:border-slate-600 group-hover:border-blue-400"
                       )}>
-                        {isSelected && <div className="w-2.5 h-2.5 bg-white rounded-full" />}
+                        {(isSelected || isMissed) && <div className="w-2.5 h-2.5 bg-white rounded-full" />}
                       </div>
 
                       <div className="flex-1">
@@ -519,8 +569,17 @@ export default function Exam({
                         </span>
 
                         {/* Helper text appearing on hover */}
-                        <span className="block text-xs text-slate-400 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                          {isSelected ? "Selected" : "Click to select"}
+                        <span className={cn(
+                          "block text-xs mt-1 transition-opacity",
+                          (isSelected || isMissed) ? "opacity-100 font-semibold" : "opacity-0 group-hover:opacity-100 text-slate-400",
+                          isRight ? "text-blue-600 dark:text-blue-400" :
+                            isMissed ? "text-emerald-600 dark:text-emerald-400" :
+                              isWrong ? "text-red-600 dark:text-red-400" :
+                                isJustSelected ? "text-blue-600 dark:text-blue-400" : ""
+                        )}>
+                          {(isRight || isMissed) ? "Correct Answer" :
+                            isWrong ? "Incorrect Answer" :
+                              isJustSelected ? "Selected" : "Click to select"}
                         </span>
                       </div>
                     </div>
@@ -534,6 +593,17 @@ export default function Exam({
           <div className="md:hidden p-4 border-t border-black/5 bg-white dark:bg-[#1a1c23] flex justify-between items-center text-xs text-slate-500">
             <span>Swipe or use top buttons to navigate</span>
             <button onClick={() => setShowReviewModal(true)} className="underline font-bold text-blue-600">Review All</button>
+          </div>
+          {/* Attribution Footer */}
+          <div className="absolute bottom-4 right-6 hidden md:block z-10 opacity-60 hover:opacity-100 transition-opacity">
+            <a
+              href="https://www.youtube.com/@stateprep"
+              target="_blank"
+              rel="noreferrer"
+              className="text-xs font-light italic text-slate-500 hover:text-blue-500 dark:text-slate-600 dark:hover:text-blue-400 transition-colors"
+            >
+              Subscribe to StatePrep
+            </a>
           </div>
         </main>
       </div>

@@ -43,35 +43,11 @@ const playTone = (freq, type, duration, vol = 0.1) => {
 };
 
 export const sounds = {
-    hover: () => {
-        // Very subtle high frequency tick
-        // playTone(800, 'sine', 0.05, 0.02); 
-    },
-    click: () => {
-        // Soft woodblock-like click
-        playTone(600, 'sine', 0.1, 0.05);
-    },
-    submit: () => {
-        // Success marking sound
-        playTone(800, 'sine', 0.1, 0.05);
-        setTimeout(() => playTone(1200, 'sine', 0.2, 0.05), 100);
-    },
-    success: () => {
-        // Ascending major triad
-        playTone(440, 'sine', 0.2, 0.1);
-        setTimeout(() => playTone(554, 'sine', 0.2, 0.1), 100);
-        setTimeout(() => playTone(659, 'sine', 0.4, 0.1), 200);
-    },
-    error: () => {
-        // Low buzzer
-        playTone(150, 'sawtooth', 0.3, 0.05);
-    },
-    tick: () => {
-        // Clock tick
-        playTone(1000, 'square', 0.03, 0.01);
-    },
-    mark: () => {
-        // Paper crunch / distinct notification
-        playTone(300, 'triangle', 0.1, 0.05);
-    }
+    hover: () => { },
+    click: () => { },
+    submit: () => { },
+    success: () => { },
+    error: () => { },
+    tick: () => { },
+    mark: () => { }
 };
