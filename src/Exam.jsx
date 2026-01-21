@@ -343,7 +343,7 @@ export default function Exam({
               toast.success(!isInstantFeedback ? "Instant Feedback Enabled" : "Instant Feedback Disabled");
             }}
             className={cn(
-              "p-2 rounded-lg transition-colors hidden sm:block",
+              "p-2 rounded-lg transition-colors",
               isInstantFeedback
                 ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20"
                 : "text-slate-600 dark:text-slate-400 hover:bg-black/5 dark:hover:bg-white/10"
