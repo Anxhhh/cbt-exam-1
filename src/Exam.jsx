@@ -2,9 +2,10 @@ import { useEffect, useMemo, useState } from "react";
 import profileImg from "./assets/profile.png";
 import {
   ChevronLeft, ChevronRight, Menu, X, Flag,
-  Clock, LayoutGrid, ArrowRight, Home, Eye, EyeOff
+  Clock, LayoutGrid, ArrowRight, Home, Eye, EyeOff,
+  Save, Trash2
 } from 'lucide-react';
-import { cn } from "./utils";
+import { cn, smartShuffle } from "./utils";
 import { toast } from 'sonner';
 import { sounds } from './utils/sound';
 import { AnimatePresence, motion } from "framer-motion";
@@ -17,7 +18,8 @@ export default function Exam({
   setMarked,
   onSubmit,
   candidateName,
-  onBackToStart
+  onBackToStart,
+  onClearSession
 }) {
   // ================= STATE =================
   // Restore from localStorage if available, else default
@@ -30,6 +32,7 @@ export default function Exam({
   // UI States
   const [isSidebarOpen, setSidebarOpen] = useState(true);
   const [showReviewModal, setShowReviewModal] = useState(false);
+  const [showExitModal, setShowExitModal] = useState(false);
 
   // Accessibility
   const [theme] = useState('dark'); // dark mode enforced
@@ -42,9 +45,8 @@ export default function Exam({
 
   const shuffledOptions = useMemo(() => {
     if (!currentQ || !currentQ.options) return [];
-    return currentQ.options
-      .map((text, originalIndex) => ({ text, originalIndex }))
-      .sort(() => Math.random() - 0.5);
+    const opts = currentQ.options.map((text, originalIndex) => ({ text, originalIndex }));
+    return smartShuffle(opts);
   }, [currentQ?.id]);
 
   const handleAnswer = (originalIndex) => {
@@ -302,26 +304,10 @@ export default function Exam({
 
           {/* Home Button */}
           <button
-            onClick={() => {
-              // Manual save before exit just to be safe
-              const saveState = {
-                candidateName,
-                answers,
-                marked,
-                visited,
-                index,
-                timeRemaining: time,
-                examId: data.questions[0]?.id
-              };
-              localStorage.setItem("cbt_exam_state", JSON.stringify(saveState));
-
-              if (window.confirm("Are you sure you want to exit? Your progress will be saved.")) {
-                onBackToStart();
-              }
-            }}
+            onClick={() => setShowExitModal(true)}
             className="p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-slate-600 dark:text-slate-400"
-            title="Save and Go Home"
-            aria-label="Save and Go Home"
+            title="Exit Exam"
+            aria-label="Exit Exam"
           >
             <Home className="w-6 h-6" />
           </button>
@@ -680,6 +666,78 @@ export default function Exam({
                   className="px-8 py-2.5 rounded-lg bg-blue-600 text-white font-bold hover:bg-blue-700 shadow-lg shadow-blue-500/20"
                 >
                   Submit Final Exam
+                </button>
+              </div>
+            </div>
+          </div>
+        )
+      }
+
+      {/* ================= EXIT CONFIRMATION MODAL ================= */}
+      {
+        showExitModal && (
+          <div
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-200 p-4"
+            onClick={() => setShowExitModal(false)}
+          >
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white dark:bg-[#1e2028] w-full max-w-sm rounded-2xl shadow-2xl p-6 border border-white/10 animate-in zoom-in-95 duration-200 space-y-6 relative overflow-hidden"
+            >
+              {/* Decorative background element */}
+              <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-blue-500 opacity-50" />
+
+              <div className="text-center space-y-2 pt-2">
+                <div className="w-14 h-14 rounded-full bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center mx-auto text-blue-600 dark:text-blue-400 ring-4 ring-blue-50 dark:ring-blue-500/5">
+                  <Home className="w-7 h-7" />
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white">Terminate Session?</h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed px-2">
+                  You can save your progress and resume later, or discard this session entirely.
+                </p>
+              </div>
+
+              <div className="space-y-3">
+                <button
+                  onClick={() => {
+                    const saveState = {
+                      candidateName,
+                      answers,
+                      marked,
+                      visited,
+                      index,
+                      timeRemaining: time,
+                      examId: data.questions[0]?.id
+                    };
+                    localStorage.setItem("cbt_exam_state", JSON.stringify(saveState));
+                    toast.success("Session Saved Successfully");
+                    onBackToStart();
+                  }}
+                  className="w-full group flex items-center justify-center gap-3 px-4 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white font-bold transition-all shadow-lg shadow-blue-500/25"
+                >
+                  <Save className="w-5 h-5 group-hover:-translate-y-0.5 transition-transform" />
+                  Save & Exit
+                </button>
+
+                <button
+                  onClick={() => {
+                    if (window.confirm("This will permanently delete your progress. Continue?")) {
+                      onClearSession();
+                      toast.success("Session Discarded");
+                      onBackToStart();
+                    }
+                  }}
+                  className="w-full flex items-center justify-center gap-3 px-4 py-3.5 rounded-xl bg-slate-100 hover:bg-red-50 text-slate-700 hover:text-red-600 dark:bg-white/5 dark:hover:bg-red-900/20 dark:text-slate-300 dark:hover:text-red-400 font-bold transition-all border border-transparent hover:border-red-200 dark:hover:border-red-800"
+                >
+                  <Trash2 className="w-5 h-5" />
+                  Delete Session
+                </button>
+
+                <button
+                  onClick={() => setShowExitModal(false)}
+                  className="w-full px-4 py-3 text-sm font-semibold text-slate-500 hover:text-slate-800 dark:text-slate-500 dark:hover:text-slate-300 transition-colors"
+                >
+                  Return to Exam
                 </button>
               </div>
             </div>

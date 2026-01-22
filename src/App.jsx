@@ -1,15 +1,15 @@
 import { useEffect, useState, Suspense, lazy } from "react";
 import Papa from "papaparse";
 import { Toaster, toast } from 'sonner';
+import { smartShuffle } from "./utils";
 
 // Lazy load components
 const Start = lazy(() => import("./Start"));
 const Exam = lazy(() => import("./Exam"));
 const Result = lazy(() => import("./Result"));
 
-function shuffleArray(arr) {
-  return [...arr].sort(() => Math.random() - 0.5);
-}
+// function shuffleArray removed in favor of smartShuffle utils
+
 
 // Function to map letter to index
 const getAnswerIndex = (letter) => {
@@ -94,7 +94,7 @@ export default function App() {
 
           setExam({
             ...baseConfig,
-            questions: shuffleArray(validQuestions) // ✅ SHUFFLE ONCE
+            questions: smartShuffle(validQuestions) // ✅ SMART SHUFFLE
           });
           setStarted(true);
           setLoading(false);
