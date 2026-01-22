@@ -110,7 +110,7 @@ export default function Start({ onStart }) {
           </div>
 
           <motion.div variants={containerVariants} className="grid grid-cols-2 gap-4">
-            <FeatureBox icon={<Clock className="w-5 h-5 text-blue-400" />} title="Timed Session" desc="90 Minutes strict limit" />
+            <FeatureBox icon={<Clock className="w-5 h-5 text-blue-400" />} title="Timed Session" desc="30 Minutes strict limit" />
             <FeatureBox icon={<BookOpen className="w-5 h-5 text-purple-400" />} title="Comprehensive" desc="120 Questions coverage" />
             <FeatureBox icon={<ShieldCheck className="w-5 h-5 text-emerald-400" />} title="Fair Testing" desc="No Negative Marking" />
             <FeatureBox icon={<Zap className="w-5 h-5 text-amber-400" />} title="Instant Analytics" desc="Detailed Review" />

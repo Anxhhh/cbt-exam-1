@@ -150,6 +150,9 @@ export default function Exam({
   // Timer
   // Persistence & Timer
   useEffect(() => {
+    // Pause timer if exit modal is open
+    if (showExitModal) return;
+
     if (time <= 0) {
       handleSubmit();
       return;
@@ -180,7 +183,7 @@ export default function Exam({
     }
 
     return () => clearInterval(t);
-  }, [time, index, visited, answers, marked]);
+  }, [time, index, visited, answers, marked, showExitModal]);
 
   const handleSubmit = () => {
     const timeTaken = (data.duration * 60) - time;
