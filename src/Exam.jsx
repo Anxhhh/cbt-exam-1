@@ -45,8 +45,9 @@ export default function Exam({
 
   const currentOptions = useMemo(() => {
     if (!currentQ || !currentQ.options) return [];
-    // Return options in original order, mapped to maintain structure
-    return currentQ.options.map((text, originalIndex) => ({ text, originalIndex }));
+    // Return options shuffled, but mapped to maintain original index for correctness
+    const mapped = currentQ.options.map((text, originalIndex) => ({ text, originalIndex }));
+    return smartShuffle(mapped);
   }, [currentQ?.id, currentQ?.options]);
 
   const handleAnswer = (originalIndex) => {
