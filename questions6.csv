@@ -1,0 +1,120 @@
+Question,Option A,Option B,Option C,Option D,Correct Option (A/B/C/D),Section
+Which is an example of secondary storage device?,RAM,Pen drive,ROM,Cache Memory,B,JOA IT
+Which of the following memory types has highest speed and minimum latency?,CPU register,Primary Memory,Secondary Memory,Cache Memory,A,JOA IT
+Cache memory works on the principle of,Read operations,Locality of reference,Write operations,All of the above,B,JOA IT
+The two cache memory write policies are write back and,Write through,Write once,Write in,Write out,A,JOA IT
+"The programs stored in ROM, P-ROM and EPROM are called",Compiler,Interpreter,Operating system,Firmware,D,JOA IT
+The ______ key is QWERTY keyboard have small bumps on them to help position the fingers without looking at the keyboard.,F and J,G and H,F and K,J and L,A,JOA IT
+Combine multiple physical disk drives to achieve speed and redundancy. What is the full form of RAID here?,Redundant Array of Independent Disk,Random Access of Independent Disk,Redundant Array of Inexpensive Disk,Random Access of Inexpensive Disk,A,JOA IT
+Which of the following optical media storage has the highest capacity?,CD,DVD,Blue Ray Disk,CD-RW,C,JOA IT
+Which component of a laser printer melts the toner particles to form permanent impression on the page?,Drum,Roller,Fuser,Cleaner,C,JOA IT
+Which of the following storage media uses Flash memory?,Solid State Disk,Hard Disk,Floppy Disk,Magnetic Tape,A,JOA IT
+Arithmetic Logic Unit is a fundamental part of ______ a computer.,CPU,Memory,Input devices,Output devices,A,JOA IT
+The ______ in a computer provides the option to change the priority of booting or booting option in the computer system.,BIOS setting,POST,Hard drive,Operating system,A,JOA IT
+Which is wireless technology that uses multiple transmitters and receivers to transfer more data at the same time?,WAP,MIMO,WEP,SSID,B,JOA IT
+Which of the following layer in ISO OSI Reference Network Model lies between Physical and Network layer?,Data Link,Transport,Session,Presentation,A,JOA IT
+Which layer in ISO OSI Reference Network Model is responsible for routing of packets over the network?,Transport,Session,Network,Physical,C,JOA IT
+A web based information repository that is collaboratively edited by the member of concerned community is called a,Wiki,Blog,Forum,Social Network,A,JOA IT
+The frequency band of the spectrum reserved for unlicensed usage is called ______ band.,ISM,GSM,CDMA,LTE,A,JOA IT
+A computer can capture all packets being transmitted over the shared transmission medium by setting the network interface in ______ mode.,Promiscuous,Monitor,Ad-Hoc,Infrastructure,A,JOA IT
+Which of the following is an invalid IPv4 address?,192.168.1.1,10.0.0.1,172.16.0.1,192.168.1.270,D,JOA IT
+Which of the following IPv4 address series is reserved by IANA for private use?,192.168.0.0 to 192.168.255.255,10.0.0.0 to 10.255.255.255,172.16.0.0 to 172.31.255.255,All of the above,A,JOA IT
+Which of the following is a type of optical fiber cable?,Coaxial,Twisted Pair,Multi-Mode,Single Mode,C,JOA IT
+What is full form of the term WEP used for Wi-Fi security?,Wireless Encryption Protocol,Wired Equivalence Privacy,Wireless Equivalent Privacy,Wired Encryption Protocol,B,JOA IT
+Which of the following is generally not a function of an operating system?,Process Management,Protection and Security,Word Processor,Memory Management,C,JOA IT
+Which of the following CPU scheduling algorithm may not cause starvation?,First Come First Serve,Shortest Job First,Priority Scheduling,Round Robin,D,JOA IT
+A ______ is a memory area that stores the data while it is being transferred between two devices or between a device and an application.,Cache,Register,Buffer,Heap,C,JOA IT
+Which of the following is not a major version of Microsoft Window operating system?,Windows Vista,Windows ME,Windows XP,Windows XE,D,JOA IT
+"In Windows 10, how can one sneak a peek at the desktop without closing or minimizing all the open windows?","By clicking on the ""Show Desktop"" icon",By pressing the Windows key + D,By moving the mouse cursor to the end of the taskbar,By shaking the active window,C,JOA IT
+What is the short method to minimize all other windows except the one you wish to keep visible in Windows 10?,By dragging the window to the side of the screen,"By clicking the ""Minimize All Other Windows"" button",By grabbing the window's title bar using the mouse and shaking it,By pressing the Windows key + M,C,JOA IT
+In Windows 10 the ______ provides quick access to notification toggle battery saver mode close a network and access table mode.,Start Menu,Taskbar,Action Center,Control Panel,C,JOA IT
+Which of these describes a situation when a computer does not respond to any input from the user?,Crash,Freeze,Hang,Loop,C,JOA IT
+A ______ is a situation that arises when two threads access a shared variable simultaneously and the final value in the variable depends upon the order of execution of thread instruction.,Deadlock,Race condition,Starvation,Livelock,B,JOA IT
+What is the format of an Android application package file?,.exe,.zip,.apk,.jar,C,JOA IT
+Red Hat is an example of,Windows Distribution,Linux Distribution,Mac OS Distribution,Unix Distribution,B,JOA IT
+What is Linux command to delete a file?,del,remove,rm,delete,C,JOA IT
+"A ______ reads one statement at a time, translates it into machine codes, executes it, and then goes to the next statement of the program.",Compiler,Interpreter,Assembler,Debugger,B,JOA IT
+The minimum number of rows and columns in MS Word document is,1,2,3,4,A,JOA IT
+"In MS Word, what does Control + = key affect?",Superscript,Subscript,Underline,Strikethrough,B,JOA IT
+"In MS Word, which key is used to increase the left indent?",Control + L,Control + M,Control + I,Control + Shift + M,B,JOA IT
+Which option in file pull-down menu is used to close a file in MS Word?,New,Open,Close,Exit,C,JOA IT
+Hyperlinks can be created between a Word document and,Another Word Document,A Web Page,A Web Page on a company intranet,All of these,D,JOA IT
+Right clicking on something in Word,Deletes the object,Opens the shortcut list,Displays the properties of the object,Moves the object,B,JOA IT
+We can send the Word document to,MS PowerPoint,MS Excel,MS Access,MS Outlook,A,JOA IT
+Which toolbar is displayed in the Word application window by default?,Standard,Formatting,Drawing,All of these,D,JOA IT
+MS Word comes under,Document Production,Desktop Publishing,Spreadsheet Software,Presentation Software,A,JOA IT
+Indentation in computer word processing is used to,Make the text readable,Adjust the margins,Add special effects,All of these,A,JOA IT
+Set of buttons that invoke commands in a computer word processing document is called,Menu bar,Status bar,Scroll bar,Toolbar,D,JOA IT
+Feature in computer word processing that lets you divide page in portion is called,Page break,Section break,Column,Header/Footer,C,JOA IT
+Amount of vertical space between lines of computer text is determined by,Font size,Line spacing,Page margins,Paragraph spacing,C,JOA IT
+"In a computer, Redo command",Appears on the standard toolbar,Restores the last action that was undone,Both A and B,None of these,C,JOA IT
+Computer word processing includes the process of,Entering text,Editing text,Formatting document,All of these,D,JOA IT
+"In a computer, the tool used to find a similar or alternative word in a document is called",Spell checker,Grammar checker,Thesaurus,Dictionary,B,JOA IT
+"In a computer, Page Setup option is present in a menu of",Edit,View,Tools,File,D,JOA IT
+"In a computer, direction of paper in printing is referred to as",Orientation,Size,Margins,Layout,B,JOA IT
+Computer command which is used to move selected text to another part of a document is,Copy,Drag and Drop,Cut,Paste,B,JOA IT
+A ____ is a situation that arises when two threads access a shared variable simultaneously and the final value in the variable depends upon the order of executions of a thread instructions.,Deadlock,Race Condition,Starvation,Livelock,B,JOA IT
+What is the format of an Android application package file?,.apk,.exe,.zip,.rar,C,JOA IT
+Red Hat is an example of,Operating System,Linux Distribution,Web Browser,Antivirus Software,B,JOA IT
+What is the Linux command to delete the file?,del,rm,erase,remove,B,JOA IT
+"A ____ reads one statement at a time, translates it into machine code, executes it, and then goes to the next statement of the problem.",Compiler,Interpreter,Assembler,Debugger,B,JOA IT
+Which uses mnemonics for machine instruction and names for CPU register and memory location?,High-level language,Machine language,Object-oriented language,Assembly language,D,JOA IT
+Which of the following programming language was invented by Guido van Rossum?,C,Java,C++,Python,D,JOA IT
+Which of the following programming languages uses the concept of classes?,Procedural,Object-Oriented,Functional,Logical,B,JOA IT
+How will you create a perfect circle using Oval tool in MS PowerPoint?,By clicking on the oval tool,By dragging the mouse,By holding the Shift key while dragging the mouse,By double-clicking the oval tool,C,JOA IT
+Which of the following is not a type of animation in MS PowerPoint?,Entrance,Emphasis,Exit,Rotation,D,JOA IT
+"The ____ view shows the current slide, the next slide, speaker notes, and a timer to help presenter.",Normal,Presenter,Outline,Slide Sorter,B,JOA IT
+What is the correct character sequence to be typed in Equation Editor MS Word to insert the mathematical formula?,(Equation Not Provided),(Equation Not Provided),(Equation Not Provided),(Equation Not Provided),B,JOA IT
+What are the names of two fictional characters commonly depicted as users to demonstrate cryptographic systems and protocols?,Alice and Bob,John and Mary,David and Sarah,Peter and Jane,D,JOA IT
+Plaintext is transformed into ____ by applying an encryption algorithm.,Ciphertext,Hash,Key,Digital Signature,A,JOA IT
+Bitcoin and Ethereum are examples of,Digital currencies,Cryptocurrencies,Blockchain platforms,All of the above,C,JOA IT
+Which of the following tags in HTML does not require a closing tag?,,,,,C,JOA IT
+Which of the following is not a valid tag in HTML5?,,,,,C,JOA IT
+Which language is mainly used for client-side scripting in HTML documents?,Java,Python,JavaScript,PHP,A,JOA IT
+Which of the following is not a valid type for a table field in MS Access 2013?,Email,Hyperlink,Long Text,Memo,A,JOA IT
+Two types of table view in MS Access are ______ and Design View.,Table View,Split View,Datasheet View,Print View,C,JOA IT
+How will you find the data fields beginning with the letter A and B by using the Find and Replace dialog box in the database view of a table in MS Access?,[A_B]*,[AB]*,[A-B]*,"[A,B]*",D,JOA IT
+Which of the following field type in MS Access table is Read Only?,Short Text,Long Text,Auto Number,Calculated,D,JOA IT
+What is the full form of ODBC?,Open Database Connectivity,Object Database Connectivity,Optical Database Connection,Open Data Broadcasting Connection,A,JOA IT
+A ______ key consists of one or more attributes of a table that is a primary key of some other table in a database.,Candidate,Alternate,Primary,Foreign,D,JOA IT
+What is the decimal number represented by 10101010 number in Binary number?,180,160,170,175,C,JOA IT
+What will be the representation of -25 in Two's Complement form?,11100110,11100111,11100100,11100010,B,JOA IT
+Which data structure is also known as First In First Out?,Stack,Tree,Queue,Graph,C,JOA IT
+"Consider the following data in MS Excel Sheet: A1=1, B1=6, C1=Empty, A2=2, B2=Empty, C2=3, A3=Empty, B3=4, C3=5, A4=Empty, B4=Empty, C4=Empty, A5=7, B5=Empty, C5=8. What will be the value returned by Excel formula =COUNT(A1:C5)?",6,7,9,8,D,JOA IT
+"A ______ is a powerful tool in Excel to calculate, summarize and analyze data to find out patterns and trends.",Pivot Table,Data Validation,Scenario Manager,Goal Seek,A,JOA IT
+"If cell A2 contains the value '10 December 2021', what will be the value returned by the formula =TEXT(A2,""dddd"")?",Monday,Friday,Wednesday,Tuesday,B,JOA IT
+"The cell A1 in a certain MS Excel sheet contains the value 212. What will be the value returned by the formula =CEILING(A1,5)?",210,212,220,215,D,JOA IT
+"What will be the value returned by MS Excel formula =BASE(212,8)?",10010110,10101010,11010100,11010100,D,JOA IT
+"What will be the value returned by MS Excel formula =CONVERT(102,""in"",""ft"")?",8 feet 8 inch,8 feet 4 inch,8 feet 6 inch,8 feet 10 inch,C,JOA IT
+"In MS Excel, a ______ is a sequence of recorded keystrokes and mouse events that can be replayed as many times as one wants.",Function,Formula,Macro,Command,B,JOA IT
+Which of the following is not a valid cell address in MS Excel?,A,A1,1A,AA1,A,JOA IT
+How many cells are there in cell range A10 to D30 in MS Excel?,63,70,84,91,C,JOA IT
+The concept of ______ was developed by J.M. Jacquard in the 18th century to control the textile looms.,Abacus,Napier's Bones,Punch Card,Slide Rule,C,JOA IT
+Fourth-generation computers used microprocessors which were designed using ______ technology.,SSI,VLSI,LSI,MSI,B,JOA IT
+FLOPS is a unit to measure the processing speed of a computer. What is the full form of FLOPS?,Floating Point Operations Per Second,Floating Point Orders Per System,Floating Point Output Per Second,Floating Point Operations Parallel System,A,JOA IT
+"B2B (Business-to-Business), B2C (Business-to-Customer), G2C (Government-to-Citizen), and C2C (Consumer-to-Consumer) are the forms of ______.",Traditional Commerce,E-Commerce,Social Commerce,Mobile Commerce,B,JOA IT
+The ______ sensor in mobile devices tracks the orientation whenever the device is rotated.,Accelerometer,Gyroscope,Compass,Proximity,B,JOA IT
+Microsoft ______ is a cloud storage service that lets users store and back up their files.,OneDrive,Google Drive,Dropbox,iCloud,A,JOA IT
+"In a mobile phone system, a geographic region is divided up into ______ to implement the concept of frequency reuse.",Towers,Areas,Cells,Sectors,C,JOA IT
+What is the full form of IoT?,Internet of Tasks,Internet of Things,Internal of Things,International of Things,B,JOA IT
+______ is a platform provided by Amazon that provides scalable and cost-effective cloud computing services.,AWS,Azure,Google Cloud,IBM Cloud,A,JOA IT
+A ______ is a register in CPU that stores the intermediate result of arithmetic and logic operations.,Program Counter,Accumulator,Instruction Register,Memory Buffer Register,B,JOA IT
+"In CPU ______ addressing mode, the operand is included in the instruction itself.",Direct,Immediate,Indirect,Register,B,JOA IT
+Which is an example of a secondary storage device?,RAM,ROM,Hard Disk,Cache Memory,C,JOA IT
+What is the full form of HTTP?,Hyper Text Test Protocol,Hyper Text Transfer Project,Hyper Text Transfer Protocol,Hyper Text Transfer Program,C,JOA IT
+.NET is a _______ technology.,Oracle,IBM,Sun,Microsoft,D,JOA IT
+How many number of home pages a website can contain?,One,Two,Three,Four,A,JOA IT
+Which of the following is not the function of OS?,Memory Management,Process Management,File Management,Database Management,D,JOA IT
+Which of the following is not an OS?,Unix,Windows,Oracle,Linux,C,JOA IT
+Which of the following is a web browser?,MS-Excel,Internet Explorer,Google Chrome,All of these,B,JOA IT
+System Software is an interface between?,Hardware and Application Software,Hardware and User,Hardware and Operating System,Application Software and User,A,JOA IT
+Which of the following is not a Microsoft Windows version?,Windows 7,Windows 8,Windows XP,Windows 6,D,JOA IT
+Which of the following is the keyboard shortcut to undo the last operation performed in MS Office?,Ctrl + X,Ctrl + Z,Ctrl + C,Ctrl + V,B,JOA IT
+There are ______ reserved words in C.,32,64,128,256,A,JOA IT
+Which of the following is not an arithmetic operator in C?,#ERROR!,-,*,#,D,JOA IT
+Any statement in C language that starts with the character # is called a _______.,Pre-processor Statement,Compiler Directive,Linker Command,Macro,A,JOA IT
+What is the full form of RAM?,Random Access Memory,Read Access Memory,Read Only Memory,Random Only Memory,A,JOA IT
+Speed of operation of cache memory used in computer is slower than that of _______.,Main Memory,Secondary Memory,Registers in CPU,Hard Disk,C,JOA IT
+"While entering a formula in a cell in MS Excel, the entry must begin with _______.",#ERROR!,#ERROR!,-,*,A,JOA IT
+A compiler is _______.,A hardware device that translates high-level language into machine language.,A software utility that translates a program written in high-level language into machine language.,A software utility that translates a program written in low-level language into high-level language.,A hardware device that translates low-level language into high-level language.,B,JOA IT
+A byte consists of ______ bits.,4,6,8,16,C,JOA IT
