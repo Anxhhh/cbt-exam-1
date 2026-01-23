@@ -455,21 +455,32 @@ export default function Exam({
             <h2 className="text-sm font-bold opacity-50 uppercase tracking-widest hidden md:block">Question {index + 1} of {data.questions.length}</h2>
 
             <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end">
+              {/* Mobile: Review/Submit moved here */}
               <button
-                disabled={index === 0}
-                onClick={() => setIndex(index - 1)}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-slate-600 border border-slate-200 hover:bg-slate-50 dark:text-slate-300 dark:border-slate-700 dark:hover:bg-white/5 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                onClick={() => setShowReviewModal(true)}
+                className="md:hidden ml-auto flex items-center justify-center gap-2 px-6 py-2 rounded-lg font-bold bg-blue-600 text-white hover:bg-blue-700 active:scale-95 transition-all shadow-md shadow-blue-600/20 opacity-90"
               >
-                <ChevronLeft className="w-4 h-4" /> Previous
+                Review / Submit
               </button>
 
-              <button
-                disabled={index === data.questions.length - 1}
-                onClick={() => setIndex(index + 1)}
-                className="flex items-center gap-2 px-6 py-2 rounded-lg font-bold bg-blue-600 text-white hover:bg-blue-700 active:scale-95 transition-all shadow-md shadow-blue-600/20 disabled:opacity-50 disabled:scale-100"
-              >
-                Save & Next <ChevronRight className="w-4 h-4" />
-              </button>
+              {/* Desktop: Previous & Save/Next */}
+              <div className="hidden md:flex items-center gap-3">
+                <button
+                  disabled={index === 0}
+                  onClick={() => setIndex(index - 1)}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-slate-600 border border-slate-200 hover:bg-slate-50 dark:text-slate-300 dark:border-slate-700 dark:hover:bg-white/5 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                >
+                  <ChevronLeft className="w-4 h-4" /> Previous
+                </button>
+
+                <button
+                  disabled={index === data.questions.length - 1}
+                  onClick={() => setIndex(index + 1)}
+                  className="flex items-center gap-2 px-6 py-2 rounded-lg font-bold bg-blue-600 text-white hover:bg-blue-700 active:scale-95 transition-all shadow-md shadow-blue-600/20 disabled:opacity-50 disabled:scale-100"
+                >
+                  Save & Next <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           </div>
 
@@ -593,13 +604,21 @@ export default function Exam({
           </div>
 
           {/* Mobile Only Bottom Bar (redundant but kept for small screens as per conventional UX) */}
-          <div className="md:hidden p-4 border-t border-black/5 bg-white dark:bg-[#1a1c23] flex justify-between items-center text-xs text-slate-500">
-            <span>Swipe to navigate</span>
+          <div className="md:hidden p-4 border-t border-black/5 bg-white dark:bg-[#1a1c23] flex items-center gap-3">
             <button
-              onClick={() => setShowReviewModal(true)}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg font-bold shadow-md shadow-blue-500/20 active:scale-95 transition-all"
+              disabled={index === 0}
+              onClick={() => setIndex(index - 1)}
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-semibold text-slate-600 border border-slate-200 hover:bg-slate-50 dark:text-slate-300 dark:border-slate-700 dark:hover:bg-white/5 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
             >
-              Review / Submit
+              <ChevronLeft className="w-4 h-4" /> Previous
+            </button>
+
+            <button
+              disabled={index === data.questions.length - 1}
+              onClick={() => setIndex(index + 1)}
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-bold bg-blue-600 text-white hover:bg-blue-700 active:scale-95 transition-all shadow-md shadow-blue-600/20 disabled:opacity-50 disabled:scale-100"
+            >
+              Save & Next <ChevronRight className="w-4 h-4" />
             </button>
           </div>
 
@@ -610,8 +629,8 @@ export default function Exam({
       {
         showReviewModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-200 p-4">
-            <div className="bg-white dark:bg-[#252830] w-full max-w-4xl max-h-[90vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
-              <div className="p-6 border-b border-black/5 dark:border-white/5 flex items-center justify-between bg-slate-50/50 dark:bg-white/5">
+            <div className="bg-white dark:bg-[#252830] w-[95%] max-w-sm md:max-w-lg max-h-[85vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-200 border border-white/10">
+              <div className="p-4 md:p-6 border-b border-black/5 dark:border-white/5 flex items-center justify-between bg-slate-50/50 dark:bg-white/5">
                 <div>
                   <h2 className="text-xl font-bold">Review Exam Status</h2>
                 </div>
@@ -620,8 +639,8 @@ export default function Exam({
                 </button>
               </div>
 
-              <div className="flex-1 overflow-y-auto p-6 lg:p-10">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-2">
+              <div className="flex-1 overflow-y-auto p-4 md:p-6">
+                <div className="grid grid-cols-2 gap-3 mb-4">
                   <div className="bg-emerald-50 dark:bg-emerald-900/20 p-4 rounded-xl border border-emerald-100 dark:border-emerald-800 flex flex-col items-center justify-center text-center">
                     <span className="text-3xl font-bold text-emerald-600 dark:text-emerald-400 mb-1">{stats.answeredCount}</span>
                     <span className="text-xs font-bold text-emerald-800 dark:text-emerald-300 opacity-70 uppercase tracking-wide">Answered</span>
@@ -641,7 +660,7 @@ export default function Exam({
                 </div>
 
                 <h3 className="font-bold text-lg mt-8 mb-4 border-b border-black/5 pb-2">Question Matrix</h3>
-                <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12 gap-2">
+                <div className="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-8 gap-2">
                   {data.questions.map((q, i) => (
                     <button
                       key={q.id}
@@ -664,7 +683,7 @@ export default function Exam({
                 </div>
               </div>
 
-              <div className="p-6 border-t border-black/5 dark:border-white/5 bg-slate-50 dark:bg-white/5 flex items-center justify-end gap-3">
+              <div className="p-4 md:p-6 border-t border-black/5 dark:border-white/5 bg-slate-50 dark:bg-white/5 flex items-center justify-end gap-3">
                 <button
                   onClick={() => setShowReviewModal(false)}
                   className="px-5 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5"
