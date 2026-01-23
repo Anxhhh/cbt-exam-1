@@ -401,6 +401,28 @@ export default function Result({ exam, answers, timeTaken, onRetake, candidateNa
                                             text: `Technical Core (${name}): ${pct}%. ${pct > 70 ? 'Strong command over IT concepts.' : 'Critical for JOA. Focus revision here.'}`
                                         });
                                     }
+
+                                    // NEW: Non-Technical Balance
+                                    const nonTechSections = Object.entries(sections).filter(([name]) =>
+                                        !name.toLowerCase().includes("computer") &&
+                                        !name.toLowerCase().includes("it") &&
+                                        !name.toLowerCase().includes("tech")
+                                    );
+
+                                    if (nonTechSections.length > 0) {
+                                        let ntTotal = 0;
+                                        let ntCorrect = 0;
+                                        nonTechSections.forEach(([_, s]) => { ntTotal += s.total; ntCorrect += s.correct; });
+
+                                        if (ntTotal > 0) {
+                                            const ntPct = Math.round((ntCorrect / ntTotal) * 100);
+                                            const color = ntPct > 60 ? 'bg-blue-500' : 'bg-purple-500'; // Blue for good, Purple for needs balance
+                                            insights.push({
+                                                color,
+                                                text: `General Aptitude: ${ntPct}%. ${ntPct > 60 ? 'Good balance between Tech & GK.' : 'Don\'t ignore GK/Lang sections.'}`
+                                            });
+                                        }
+                                    }
                                 } else if (exam.type === "Himachal GK") {
                                     const hpSection = Object.entries(sections).find(([name]) =>
                                         name.toLowerCase().includes("hp") || name.toLowerCase().includes("himachal")

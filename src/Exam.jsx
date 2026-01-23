@@ -103,6 +103,11 @@ export default function Exam({
         toggleReview();
       }
 
+      // Fullscreen (F)
+      if (e.key.toLowerCase() === 'f') {
+        toggleFullscreen();
+      }
+
       // Enter to Save & Next (if answered)
       if (e.key === 'Enter') {
         if (index < data.questions.length - 1) {
@@ -138,12 +143,10 @@ export default function Exam({
   };
 
   const candidate = {
-    name: candidateName || "Demo Candidate",
+    name: candidateName || savedState.candidateName || "Guest",
     rollNo: "HPGK-2026-001",
     photo: profileImg
   };
-
-
 
   // ================= EFFECTS =================
 
@@ -159,7 +162,6 @@ export default function Exam({
     }
 
     // Critical: Save state every second (throttling handled by interval naturally)
-    // We save EVERYTHING needed to restore
     const saveState = {
       candidateName,
       answers, // This comes from props, make sure it's up to date
@@ -169,7 +171,13 @@ export default function Exam({
       timeRemaining: time,
       examId: data.questions[0]?.id // simple fingerprint
     };
-    localStorage.setItem("cbt_exam_state", JSON.stringify(saveState));
+
+    try {
+      localStorage.setItem("cbt_exam_state", JSON.stringify(saveState));
+    } catch (e) {
+      console.error("Storage Save Error:", e);
+      // Optional: toast.error("Storage Warning: Progress not saving locally");
+    }
 
     const t = setInterval(() => setTime(prev => prev - 1), 1000);
 
@@ -183,7 +191,7 @@ export default function Exam({
     }
 
     return () => clearInterval(t);
-  }, [time, index, visited, answers, marked, showExitModal]);
+  }, [time, index, visited, answers, marked, showExitModal, candidateName, data.questions]);
 
   const handleSubmit = () => {
     const timeTaken = (data.duration * 60) - time;
@@ -205,14 +213,6 @@ export default function Exam({
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-
-  // ================= HELPERS =================
-
-  // ================= HELPERS =================
-
-
-
-
 
   const stats = useMemo(() => {
     if (!data || !data.questions) return { total: 0, answeredCount: 0, markedCount: 0, visitedCount: 0, skipped: 0 };
@@ -282,7 +282,12 @@ export default function Exam({
   );
 
   return (
-    <div className={containerClasses}>
+    <motion.div
+      className={containerClasses}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
       {/* ================= SUPER HEADER (Progress + Zen) ================= */}
       {/* Pulse Timer Bar */}
       <div className="h-1.5 w-full bg-slate-200 dark:bg-slate-800/50 relative overflow-hidden">
@@ -468,134 +473,138 @@ export default function Exam({
             </div>
           </div>
 
-          {/* Question Area */}
-          <div className="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-10 lg:p-16 w-full mx-auto max-w-5xl">
-            <div key={currentQ.id} className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
 
-              {/* Question Header */}
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="inline-flex items-center px-3 py-1 rounded-full bg-black/5 dark:bg-white/10 text-xs font-bold uppercase tracking-wider opacity-60">
-                    {currentQ.section || "General"}
-                  </span>
-                  <button
-                    onClick={toggleReview}
-                    className={cn(
-                      "flex items-center gap-2 px-3 py-1.5 rounded-lg border text-sm font-medium transition-all",
-                      marked[currentQ.id]
-                        ? "bg-purple-100 border-purple-200 text-purple-700 dark:bg-purple-900/40 dark:border-purple-800 dark:text-purple-300"
-                        : "bg-transparent border-black/10 dark:border-white/10 text-slate-400 hover:text-slate-600 hover:border-black/20"
-                    )}
-                  >
-                    <Flag className={cn("w-4 h-4", marked[currentQ.id] && "fill-current")} />
-                    {marked[currentQ.id] ? "Marked for Review" : "Mark for Review"}
-                  </button>
-                </div>
+          <div className="flex-1 overflow-y-auto custom-scrollbar p-3 md:p-10 lg:p-16 w-full mx-auto max-w-5xl">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentQ.id}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.2 }}
+                className="space-y-8"
+              >
 
-                <h2 className="text-xl md:text-2xl lg:text-3xl font-bold leading-relaxed break-words">
-                  <span className="inline-block text-slate-300 dark:text-slate-600 min-w-[2ch] mr-2 user-select-none">
-                    {index + 1}.
-                  </span>
-                  {currentQ.question}
-                </h2>
-              </div>
-
-              {/* Options Grid */}
-              <div className="grid gap-3 pt-2">
-                {currentOptions.map((opt, i) => {
-                  const currentAnswer = answers[currentQ.id];
-                  const hasAnswered = currentAnswer !== undefined;
-                  const isSelected = currentAnswer === opt.originalIndex;
-                  const isCorrect = opt.originalIndex === currentQ.answer;
-
-                  // Feedback Logic: Only active if isInstantFeedback is TRUE
-                  const showFeedback = isInstantFeedback;
-
-                  const isRight = showFeedback && isSelected && isCorrect;
-                  const isWrong = showFeedback && isSelected && !isCorrect;
-                  const isMissed = showFeedback && !isSelected && isCorrect && hasAnswered;
-
-                  // Standard selection styling (Exam Mode)
-                  const isJustSelected = !showFeedback && isSelected;
-
-                  return (
-                    <div
-                      key={i}
-                      onClick={() => handleAnswer(opt.originalIndex)}
+                {/* Question Header */}
+                <div className="space-y-2 md:space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="inline-flex items-center px-3 py-1 rounded-full bg-black/5 dark:bg-white/10 text-xs font-bold uppercase tracking-wider opacity-60">
+                      {currentQ.section || "General"}
+                    </span>
+                    <button
+                      onClick={toggleReview}
                       className={cn(
-                        "relative group rounded-xl border-2 p-5 flex items-start gap-4 transition-all duration-200 select-none",
-                        (showFeedback && hasAnswered) ? "cursor-default" : "cursor-pointer",
-                        "bg-white dark:bg-white/5 border-slate-200 dark:border-[#2a2d36]", // Base
-
-                        // Hover Logic
-                        (!hasAnswered || !showFeedback) && "hover:border-blue-300 dark:hover:border-blue-700",
-
-                        // Feedback Mode Styling
-                        isRight && "ring-2 ring-blue-500 border-blue-500 bg-blue-50 dark:bg-blue-900/20 z-10",
-                        isMissed && "ring-2 ring-emerald-500 border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 z-10",
-                        isWrong && "ring-2 ring-red-500 border-red-500 bg-red-50 dark:bg-red-900/20 z-10",
-
-                        // Standard Mode Styling (No feedback, just selected)
-                        isJustSelected && "ring-2 ring-blue-500 border-blue-500 bg-blue-50 dark:bg-blue-900/20 z-10",
-
-                        showFeedback && hasAnswered && !isSelected && !isMissed && "opacity-50 grayscale" // Dim irrelevant options in feedback mode
+                        "flex items-center gap-2 px-3 py-1.5 rounded-lg border text-sm font-medium transition-all",
+                        marked[currentQ.id]
+                          ? "bg-purple-100 border-purple-200 text-purple-700 dark:bg-purple-900/40 dark:border-purple-800 dark:text-purple-300"
+                          : "bg-transparent border-black/10 dark:border-white/10 text-slate-400 hover:text-slate-600 hover:border-black/20"
                       )}
                     >
-                      {/* Selection Indicator */}
-                      <div className={cn(
-                        "mt-0.5 min-w-6 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all flex-shrink-0",
-                        (isRight || isJustSelected) ? "border-blue-500 bg-blue-500 text-white" :
-                          isMissed ? "border-emerald-500 bg-emerald-500 text-white" :
-                            isWrong ? "border-red-500 bg-red-500 text-white" :
-                              "border-slate-300 dark:border-slate-600 group-hover:border-blue-400"
-                      )}>
-                        {(isSelected || isMissed) && <div className="w-2.5 h-2.5 bg-white rounded-full" />}
-                      </div>
+                      <Flag className={cn("w-4 h-4", marked[currentQ.id] && "fill-current")} />
+                      {marked[currentQ.id] ? "Marked for Review" : "Mark for Review"}
+                    </button>
+                  </div>
 
-                      <div className="flex-1">
-                        <span className="text-lg font-medium opacity-90 block leading-snug">
-                          {opt.text}
-                        </span>
+                  <h2 className="text-base md:text-2xl lg:text-3xl font-bold leading-relaxed break-words">
+                    <span className="inline-block text-slate-300 dark:text-slate-600 min-w-[2ch] mr-1 md:mr-2 user-select-none">
+                      {index + 1}.
+                    </span>
+                    {currentQ.question}
+                  </h2>
+                </div>
 
-                        {/* Helper text appearing on hover */}
-                        <span className={cn(
-                          "block text-xs mt-1 transition-opacity",
-                          (isSelected || isMissed) ? "opacity-100 font-semibold" : "opacity-0 group-hover:opacity-100 text-slate-400",
-                          isRight ? "text-blue-600 dark:text-blue-400" :
-                            isMissed ? "text-emerald-600 dark:text-emerald-400" :
-                              isWrong ? "text-red-600 dark:text-red-400" :
-                                isJustSelected ? "text-blue-600 dark:text-blue-400" : ""
+                {/* Options Grid */}
+                <div className="grid gap-2 md:gap-3 pt-2">
+                  {currentOptions.map((opt, i) => {
+                    const currentAnswer = answers[currentQ.id];
+                    const hasAnswered = currentAnswer !== undefined;
+                    const isSelected = currentAnswer === opt.originalIndex;
+                    const isCorrect = opt.originalIndex === currentQ.answer;
+
+                    // Feedback Logic: Only active if isInstantFeedback is TRUE
+                    const showFeedback = isInstantFeedback;
+
+                    const isRight = showFeedback && isSelected && isCorrect;
+                    const isWrong = showFeedback && isSelected && !isCorrect;
+                    const isMissed = showFeedback && !isSelected && isCorrect && hasAnswered;
+
+                    // Standard selection styling (Exam Mode)
+                    const isJustSelected = !showFeedback && isSelected;
+
+                    return (
+                      <div
+                        key={i}
+                        onClick={() => handleAnswer(opt.originalIndex)}
+                        className={cn(
+                          "relative group rounded-xl border-2 p-3 md:p-5 flex items-start gap-3 md:gap-4 transition-all duration-200 select-none",
+                          (showFeedback && hasAnswered) ? "cursor-default" : "cursor-pointer",
+                          "bg-white dark:bg-white/5 border-slate-200 dark:border-[#2a2d36]", // Base
+
+                          // Hover Logic
+                          (!hasAnswered || !showFeedback) && "hover:border-blue-300 dark:hover:border-blue-700",
+
+                          // Feedback Mode Styling
+                          isRight && "ring-2 ring-blue-500 border-blue-500 bg-blue-50 dark:bg-blue-900/20 z-10",
+                          isMissed && "ring-2 ring-emerald-500 border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 z-10",
+                          isWrong && "ring-2 ring-red-500 border-red-500 bg-red-50 dark:bg-red-900/20 z-10",
+
+                          // Standard Mode Styling (No feedback, just selected)
+                          isJustSelected && "ring-2 ring-blue-500 border-blue-500 bg-blue-50 dark:bg-blue-900/20 z-10",
+
+                          showFeedback && hasAnswered && !isSelected && !isMissed && "opacity-50 grayscale" // Dim irrelevant options in feedback mode
+                        )}
+                      >
+                        {/* Selection Indicator */}
+                        <div className={cn(
+                          "mt-0.5 min-w-6 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all flex-shrink-0",
+                          (isRight || isJustSelected) ? "border-blue-500 bg-blue-500 text-white" :
+                            isMissed ? "border-emerald-500 bg-emerald-500 text-white" :
+                              isWrong ? "border-red-500 bg-red-500 text-white" :
+                                "border-slate-300 dark:border-slate-600 group-hover:border-blue-400"
                         )}>
-                          {(isRight || isMissed) ? "Correct Answer" :
-                            isWrong ? "Incorrect Answer" :
-                              isJustSelected ? "Selected" : "Click to select"}
-                        </span>
+                          {(isSelected || isMissed) && <div className="w-2.5 h-2.5 bg-white rounded-full" />}
+                        </div>
+
+                        <div className="flex-1">
+                          <span className="text-sm md:text-lg font-medium opacity-90 block leading-snug">
+                            {opt.text}
+                          </span>
+
+                          {/* Helper text appearing on hover */}
+                          <span className={cn(
+                            "block text-xs mt-1 transition-opacity",
+                            (isSelected || isMissed) ? "opacity-100 font-semibold" : "opacity-0 group-hover:opacity-100 text-slate-400",
+                            isRight ? "text-blue-600 dark:text-blue-400" :
+                              isMissed ? "text-emerald-600 dark:text-emerald-400" :
+                                isWrong ? "text-red-600 dark:text-red-400" :
+                                  isJustSelected ? "text-blue-600 dark:text-blue-400" : ""
+                          )}>
+                            {(isRight || isMissed) ? "Correct Answer" :
+                              isWrong ? "Incorrect Answer" :
+                                isJustSelected ? "Selected" : "Click to select"}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
+                    );
+                  })}
+                </div>
+              </motion.div>
+            </AnimatePresence>
           </div>
 
           {/* Mobile Only Bottom Bar (redundant but kept for small screens as per conventional UX) */}
           <div className="md:hidden p-4 border-t border-black/5 bg-white dark:bg-[#1a1c23] flex justify-between items-center text-xs text-slate-500">
-            <span>Swipe or use top buttons to navigate</span>
-            <button onClick={() => setShowReviewModal(true)} className="underline font-bold text-blue-600">Review All</button>
-          </div>
-          {/* Attribution Footer */}
-          <div className="absolute bottom-4 right-6 hidden md:block z-10 opacity-60 hover:opacity-100 transition-opacity">
-            <a
-              href="https://www.youtube.com/@stateprep"
-              target="_blank"
-              rel="noreferrer"
-              className="text-xs font-light italic text-slate-500 hover:text-blue-500 dark:text-slate-600 dark:hover:text-blue-400 transition-colors"
+            <span>Swipe to navigate</span>
+            <button
+              onClick={() => setShowReviewModal(true)}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg font-bold shadow-md shadow-blue-500/20 active:scale-95 transition-all"
             >
-              Subscribe to StatePrep
-            </a>
+              Review / Submit
+            </button>
           </div>
+
         </main>
-      </div>
+      </div >
 
       {/* ================= REVIEW DASHBOARD MODAL ================= */}
       {
@@ -747,6 +756,6 @@ export default function Exam({
           </div>
         )
       }
-    </div >
+    </motion.div>
   );
 }

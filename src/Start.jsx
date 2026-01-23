@@ -64,6 +64,28 @@ export default function Start({ onStart }) {
     setResumeData(null);
   };
 
+  // Keyboard Shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Enter to Start
+      if (e.key === 'Enter') {
+        if (name.trim()) handleStart();
+      }
+
+      // F for Fullscreen (ignore if typing)
+      if (e.key.toLowerCase() === 'f' && document.activeElement.tagName !== 'INPUT') {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen().catch(e => console.error(e));
+        } else {
+          document.exitFullscreen().catch(e => console.error(e));
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [name, testSet, examType]);
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -76,11 +98,11 @@ export default function Start({ onStart }) {
   };
 
   const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
+    hidden: { y: 30, opacity: 0 },
     visible: {
       y: 0,
       opacity: 1,
-      transition: { type: "spring", stiffness: 300, damping: 24 }
+      transition: { duration: 0.6, ease: "easeOut" }
     }
   };
 
@@ -90,15 +112,17 @@ export default function Start({ onStart }) {
       {/* 3D Background */}
       <ThreeBackground />
 
-      <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
+      <div
         className="w-full max-w-6xl relative z-10 grid lg:grid-cols-[1.2fr_0.8fr] gap-8 lg:gap-16 items-start mt-10 lg:mt-0"
       >
 
         {/* Left Column: Branding & Value Props */}
-        <motion.div variants={itemVariants} className="space-y-10 pt-4">
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="space-y-10 pt-4"
+        >
 
           <div className="space-y-4">
             <motion.div
@@ -119,7 +143,13 @@ export default function Start({ onStart }) {
             </p>
           </div>
 
-          <motion.div variants={containerVariants} className="grid grid-cols-2 gap-4">
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="grid grid-cols-2 gap-4"
+          >
             <FeatureBox icon={<Clock className="w-5 h-5 text-blue-400" />} title="Timed Session" desc="30 Minutes strict limit" />
             <FeatureBox icon={<BookOpen className="w-5 h-5 text-purple-400" />} title="Comprehensive" desc="120 Questions coverage" />
             <FeatureBox icon={<ShieldCheck className="w-5 h-5 text-emerald-400" />} title="Fair Testing" desc="No Negative Marking" />
@@ -142,6 +172,9 @@ export default function Start({ onStart }) {
         {/* Right Column: Candidate Action Card */}
         <motion.div
           variants={itemVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-50px" }}
           className="flex flex-col gap-4 items-end sticky top-8"
         >
           <div className="relative group w-full">
@@ -152,7 +185,7 @@ export default function Start({ onStart }) {
 
               <div className="flex items-center justify-between border-b border-white/5 pb-6">
                 <div>
-                  <h3 className="text-xl font-bold text-white">Candidate Portal</h3>
+                  <h3 className="text-xl font-bold text-white max-w-[200px] truncate">{name.trim() || "Candidate Portal"}</h3>
                   <p className="text-xs text-slate-500 mt-1">Configure your session</p>
                 </div>
                 <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center">
@@ -289,7 +322,7 @@ export default function Start({ onStart }) {
           </p>
         </motion.div>
 
-      </motion.div>
+      </div>
       <BuyMeCoffeeBtn screen="start" />
     </div>
   );
