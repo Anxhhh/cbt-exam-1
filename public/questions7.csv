@@ -1,0 +1,120 @@
+Question,Option A,Option B,Option C,Option D,Correct Option (A/B/C/D),Section
+The term Gigabyte refers to _______.,1024 Kilobytes,1024 Megabytes,1024 Terabytes,1024 Bytes,B,JOA IT
+The full form of BCD is _______.,Binary Coded Decimal,Binary Coded Digit,Binary Coded Data,Binary Coded Division,A,JOA IT
+Instructions and memory addresses in RAM of a computer are stored using _______.,Binary Digits,Decimal Digits,Hexadecimal Digits,Octal Digits,A,JOA IT
+A computer on internet is uniquely identified by its _______.,Domain Name,IP Address,MAC Address,Host Name,B,JOA IT
+"On the internet, moving from one website to another is known as _______.",Downloading,Uploading,Browsing,Surfing,C,JOA IT
+"In Internet terminology, IP means _______.",Internet Protocol,Internet Provider,Internet Point,Internet Process,A,JOA IT
+The output printed by a computer through a printer on the paper is called _______.,Soft Copy,Hard Copy,Digital Copy,Physical Copy,B,JOA IT
+"Arrange in ascending order the unit of memory: TB, KB, GB, MB.","KB, MB, GB, TB","TB, GB, MB, KB","MB, KB, GB, TB","KB, GB, MB, TB",A,JOA IT
+Which of the following component of CPU (Central Processing Unit) are correct?,"ALU, CU, Registers","ALU, CU, Primary/Main Memory","ALU, CU, Secondary Memory",All of the above,B,JOA IT
+What is the full form of URL?,Uniform Resource Link,Uniform Resource Locator,Universal Resource Link,Universal Resource Locator,B,JOA IT
+"In which of the following, documents, movies, images, photographs, etc. are stored?",File Cabinet,File System,File Server,File Manager,C,JOA IT
+What is the full form of GUI in reference to computer?,Graphical User Interface,Graphical Universal Interface,General User Interface,General Universal Interface,A,JOA IT
+Which are operations that are performed on RAM?,Read,Write,Read and Write Both,Execute,C,JOA IT
+Which of the following is the outcome of data processing?,Data,Information,Instructions,Programs,B,JOA IT
+DNS in Internet terminology stands for _______.,Domain Name System,Data Name System,Dynamic Name System,Digital Name System,A,JOA IT
+Which of the following operation is not performed by a computer?,Control,Outputting,Inputting,Understanding,D,JOA IT
+The folders in an operating system are based on _______ structure.,Linear,Circular,Inverted Tree,Hierarchical,C,JOA IT
+Which of the following alignment will apply by default when some text is entered in a cell in a worksheet of MS Excel?,Left,Right,Center,Justify,A,JOA IT
+Which of the following types of references can be used for writing formulas in a cell in a worksheet in MS Excel?,Relative,Absolute,Mixed,All of these,D,JOA IT
+What is Hyperlink?,It is used to link webpages.,It is a special type of text.,It is a graphic that links to another document.,All of the above,A,JOA IT
+Which of the following is not a component in multimedia?,Audio,Video,Data,Pen Drive,D,JOA IT
+IPR stands for _______.,Intellectual Property Right,International Property Right,Indian Property Right,Intellectual Property Regulation,A,JOA IT
+Which of the following is not true for Microsoft PowerPoint Presentation?,It can contain audio and video clips.,It can contain images and graphics.,The transition speed of the slides can be adjusted before running the slide.,The transition speed of the slides cannot be adjusted before running the slide.,D,JOA IT
+SQL full form is _______.,Standard Query Language,Structured Query List,Simple Query Language,Structured Query Language,D,JOA IT
+An attribute in a table is a foreign key if _______ the key from another table is used as an attribute in that table.,Primary,Secondary,Candidate,Super,A,JOA IT
+Which of the following attribute can be used as a primary key?,Name,Address,Phone Number,Aadhaar Card Number,D,JOA IT
+Under what condition the subset of Super Key is a Candidate Key?,If it is a Super Key itself.,If it has at least one attribute.,No proper subset is a Super Key.,All of the above,C,JOA IT
+"CREATE TABLE Employee (name varchar, id integer); What type of statement is this?",DML,DCL,TCL,DDL,D,JOA IT
+Which of the following devices can be used to connect a computer to internet through a telephone line?,Modem,Router,Hub,Switch,A,JOA IT
+Which of the following does not work on the principle of magnetization?,Floppy Disk,Hard Disk,Magnetic Tape,Pen Drive,D,JOA IT
+Which of the following statement is false?,Monitor is an output device.,Keyboard can be used as an output device.,Printer is an output device.,Mouse is an input device.,B,JOA IT
+Which of the following is not a key on keyboard of a normal PC?,Alt,Tab,Ctrl,Sys,D,JOA IT
+Internet is an example of _______.,LAN,MAN,WAN,PAN,C,JOA IT
+Which data structure is used to implement recursion?,Queue,Stack,Linked List,Tree,B,JOA IT
+"In MS Excel, which function is used to count only numeric values?",COUNT,COUNTA,COUNTIF,SUM,A,JOA IT
+Binary number system is based on which radix?,2,8,10,16,A,JOA IT
+Which of the following is not an operating system?,Windows,Linux,Oracle,macOS X,C,JOA IT
+What is the full form of URL?,Uniform Resource Locator,Universal Resource Link,Unified Resource Locator,Unique Resource Link,A,JOA IT
+Which memory is volatile in nature?,ROM,Hard Disk,RAM,Pen Drive,C,JOA IT
+"In computer networks, TCP stands for:",Transmission Control Protocol,Transfer Control Protocol,Technical Control Protocol,Terminal Control Protocol,A,JOA IT
+Which key is used to refresh a web page?,F2,F5,F7,F12,B,JOA IT
+Which software is used for presentation?,MS Word,MS Excel,MS PowerPoint,MS Access,C,JOA IT
+Which number system is used for computers internally?,Decimal,Binary,Octal,Hexadecimal,B,JOA IT
+What does ALU stand for?,Arithmetic Logic Unit,Advanced Logic Unit,Application Logic Unit,Auxiliary Logic Unit,A,JOA IT
+Which of the following is an input device?,Monitor,Printer,Keyboard,Plotter,C,JOA IT
+Which protocol is used for sending emails?,FTP,SMTP,HTTP,POP3,B,JOA IT
+The brain of the computer is:,Monitor,Keyboard,CPU,Mouse,C,JOA IT
+Which extension is used for MS Word file?,.ppt,.xls,.doc or .docx,.pdf,C,JOA IT
+Which one is an example of system software?,MS Word,Photoshop,Windows,Tally,C,JOA IT
+What is the decimal representation of 1010101 (Two's Compliment number)?,21,-121,-21,-128,C,JOA IT
+Which of the following is not a valid Octal number?,125,1001,678,134,C,JOA IT
+How many bits are used for the fractional part in an IEEE 754 floating-point single precision representation?,8,16,23,32,C,JOA IT
+How many bytes are there in one MiB?,1024,"1,048,576","1,073,741,824","1,099,511,627,776",B,JOA IT
+Which of the following is the correct ordering of memory capacity units in increasing order?,"GB, TB, PB, EB","GB, TB, PB, EB","EB, PB, TB, GB","PB, EB, GB, TB",B,JOA IT
+Which of the following is not a valid Hexadecimal number?,A,F,12,G,D,JOA IT
+What is the Binary equivalent of 187 (Base 10),10101011,10111011,11010101,11101101,B,JOA IT
+What is the addition of two binary numbers 110110 and 10100?,1001010,1101010,1101000,1001010,A,JOA IT
+What is the Hexadecimal representation of 64 (Base 10)?,40,4C,4D,64,A,JOA IT
+Which of the following logic gates are known as Universal Gates?,"NOT, XOR","AND, OR","NAND, NOR","XOR, XNOR",C,JOA IT
+0.25 (Base 10) in Binary Number System is:,0.01,0.001,0.1,0.11,A,JOA IT
+Logical multiplication refers to the operation of:,OR Gate,AND Gate,NOT Gate,XOR Gate,B,JOA IT
+How many different patterns can be generated using 5 bits?,16,32,64,128,B,JOA IT
+After converting 111010 in Octal is:,72,65,76,73,A,JOA IT
+"In 8-bit two’s complement representation, the decimal number -28 is:",11100000,11100100,11000100,11101000,B,JOA IT
+Convert Octal number 7432 (Base 8) to Binary number (Base 2):,111100011010,111100110010,11110011010,111100011001,B,JOA IT
+Convert the binary number 1101011000 into decimal.,856,850,855,860,A,JOA IT
+OR Gate can be imagined as:,Switches connected in series,Switches connected in parallel,NOT gate,XOR Gate,B,JOA IT
+Which logic gate is represented by the symbol shown below: (Symbol of a NOR gate with two inputs and one output),OR Gate,AND Gate,NOR Gate,XOR Gate,C,JOA IT
+"Which logic operation is represented by the following truth table: (Truth table with inputs A, B, and output Y: 0,0->1; 0,1->1; 1,0->1; 1,1->0)",OR Gate,NAND Gate,NOR Gate,XOR Gate,B,JOA IT
+Which of the following is not a built-in section break in MS Word?,Continuous Section Break,Previous Page Section Break,Next Page Section Break,Even Page Section Break,B,JOA IT
+"In MS Word, the list of recipients in Mail Merge is known as",Data Source,Mail Source,Recipient Source,Data List,A,JOA IT
+What is the wildcard that matches one or more occurrences of a pattern in MS Word search?,?,*,@,#,C,JOA IT
+What is the shortcut key in MS Word for a manual line break?,Shift + Enter,Ctrl + Enter,Alt + Enter,Ctrl + Shift + Enter,A,JOA IT
+What key combination is used to go back to the previous level of numbering or bulleting in MS Word?,Shift + Tab,Ctrl + Tab,Alt + Tab,Tab,A,JOA IT
+Font size is generally measured in points. One point is equal to what fraction of an inch?,1/27,1/72,1/36,1/144,B,JOA IT
+What is the size of an A4 paper sheet?,210 mm x 297 mm,210 mm x 287 mm,200 mm x 297 mm,200 mm x 287 mm,A,JOA IT
+A computer can perform complex calculations with the same speed and accuracy from the start and end without getting tired. This characteristic of computer systems is called,Versatility,Reliability,Diligence,Accuracy,C,JOA IT
+Which of the following is not a secondary storage device?,Hard Disk,Random Access Memory,Solid State Drive,USB Flash Drive,B,JOA IT
+Which of the following is the cloud-based file storage service provided by Google?,Google Docs,Google Sheets,Google Drive,Google Photos,C,JOA IT
+Desktop and Laptop computers are also known as,Minicomputers,Mainframe Computers,Supercomputers,Microcomputers,D,JOA IT
+Which of the following is the correct increasing order of memory capacity?,"Kilobyte, Megabyte, Gigabyte, Terabyte","Megabyte, Kilobyte, Gigabyte, Terabyte","Megabyte, Gigabyte, Terabyte, Petabyte","Terabyte, Gigabyte, Megabyte, Kilobyte",C,JOA IT
+Who among the following proposed the concept of stored program execution?,Charles Babbage,Ada Lovelace,John Von Neumann,Alan Turing,C,JOA IT
+Which component of the computer system replaced Vacuum Tubes in the second generation of computers?,Transistors,Integrated Circuits,Microprocessors,Vacuum Tubes,A,JOA IT
+Which of the following is not a characteristic of a CD-ROM?,CD-ROM is a read-only memory,CD-ROM is a random access memory,CD-ROM is an optical storage device,CD-ROM can be written multiple times,D,JOA IT
+What is the register used as a working area in a CPU called?,Program Counter,Instruction Register,Accumulator,Memory Address Register,C,JOA IT
+What is the full form of SEO?,Search Engine Optimization,Search Engine Operation,Search Engine Organization,Search Engine Output,A,JOA IT
+"Which technology provides mobile users with position, navigation, and timing services?",GPS,GSM,CDMA,LTE,A,JOA IT
+A mouse is a pointing device. Is it an input or output device?,Input device,Output device,Both input and output device,Neither input nor output device,A,JOA IT
+What is the shortcut key to enter a page break?,Ctrl + Enter,Shift + Enter,Alt + Enter,Ctrl + Shift + Enter,A,JOA IT
+The decorative line or text added at the beginning and/or end of a letterform is called,Sans-serif,Serif,Monospace,Script,B,JOA IT
+CMOS is a small amount of memory on a computer motherboard that stores the BIOS settings. What is the full form of CMOS?,Complementary Metal Oxide Semiconductor,Common Metal Oxide Semiconductor,Central Metal Oxide Semiconductor,Computer Metal Oxide Semiconductor,A,JOA IT
+"When power of a computer system is turned on, a diagnostic test is carried out to check the keyboard, RAM, disk drive, and other hardware. This test is known as",POST,BIOS,CMOS,RAM,A,JOA IT
+Which comprises of a series of RAM integrated circuits that can be installed in motherboard memory slots?,DIMM,SIMM,ROM,PROM,A,JOA IT
+Which of the following is a Non-Impact Printer?,Dot Matrix Printer,Daisy Wheel Printer,Inkjet Printer,Drum Printer,C,JOA IT
+What does the letter 'M' stand for in CMYK?,Magenta,Cyan,Yellow,Black,A,JOA IT
+Which of the following is not a unit for measuring speed?,MIPS,FLOPS,DPI,Hertz,C,JOA IT
+"CAT5, CAT6, CAT7 are types of",Coaxial Cable,Fiber Optic Cable,UTP Cable,STP Cable,C,JOA IT
+Which connectors are used with UTP cables?,RJ-11,RJ-45,BNC,VGA,B,JOA IT
+Which layer exists between Application Layer and Session Layer in ISO/OSI network reference model?,Transport Layer,Network Layer,Data Link Layer,Presentation Layer,D,JOA IT
+HTTP operates in which layer of the network?,Application Layer,Presentation Layer,Session Layer,Transport Layer,A,JOA IT
+Which of the following IP addresses is reserved for private use and is not allowed to be transmitted through the internet?,192.168.1.1,8.8.8.8,172.217.160.142,208.67.222.222,A,JOA IT
+"GSM, LTE, CDMA are which technologies?",Wireless Technologies,Wired Technologies,Satellite Technologies,Fiber Optic Technologies,A,JOA IT
+Which of the following Operating Systems is free and open source?,Windows,Linux,macOS,UNIX,B,JOA IT
+Program in execution is called,Application,Process,Thread,Task,B,JOA IT
+"When a file is deleted in Windows, it is moved to",Recycle Bin,My Documents,Desktop,Downloads,A,JOA IT
+Which of the following characters is not allowed in a file name in Windows?,$,@,#,/,D,JOA IT
+What is the shortcut key to open Run Dialog Box in Windows?,Windows Key + R,Ctrl + R,Alt + R,Shift + R,A,JOA IT
+Which of the following is the default web browser in Windows 10 after installation?,Google Chrome,Mozilla Firefox,Microsoft Edge,Internet Explorer,C,JOA IT
+What is the shortcut key to run Snipping Tool in Windows?,Shift + Windows Key + S,Ctrl + Shift + S,Alt + Shift + S,Windows Key + S,A,JOA IT
+Which command in Windows 10 provides options to manage your computer's drives?,Chkdsk,Diskpart,Format,Defrag,B,JOA IT
+"Which command in Windows 10 displays IP Address, Subnet Mask, and Default Gateway for all network adapters?",Ping,Tracert,Ipconfig,Netstat,C,JOA IT
+How many different heading elements are supported by HTML?,5,4,3,6,D,JOA IT
+A large capital letter used as a decorative element at the beginning of a paragraph in MS Word is called?,Superscript,Mail Merge,Drop Cap,Footnote,C,JOA IT
+What is the full form of CSS?,Cascading Style Sheets,Computer Style Sheets,Creative Style Sheets,Colorful Style Sheets,A,JOA IT
+What is the correct C expression for the formula b^2 - 4ac / 2a?,(bb - 4ac) / 2a,(bb - 4ac) / (2a),(bb - 4ac) / 2a,(bb - 4ac) / (2a),D,JOA IT
+Which of the following is NOT a valid cell reference in MS Excel?,A1,$A$1,A$1,A:A,D,JOA IT
+Which of the following is a type of port?,USB,Serial,Parallel,All of these,D,JOA IT
+Which of the following is considered a limitation of High-Level Language?,Low Efficiency,Machine Independence,Machine Level Coding,All of these,A,JOA IT
+The operating system of a computer serves as a software between the user and the __________.,Hardware,Peripheral,Memory,Software,A,JOA IT

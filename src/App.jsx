@@ -92,9 +92,15 @@ export default function App() {
             setMarked({});
           }
 
+          // Determine Exam Type
+          const numericId = parseInt(testId) || 1;
+          const examType = numericId >= 5 ? "JOA IT" : "Himachal GK";
+
           setExam({
             ...baseConfig,
-            questions: smartShuffle(validQuestions) // ✅ SMART SHUFFLE
+            questions: smartShuffle(validQuestions), // ✅ SMART SHUFFLE
+            id: testId,
+            type: examType
           });
           setStarted(true);
           setLoading(false);

@@ -361,7 +361,7 @@ export default function Result({ exam, answers, timeTaken, onRetake, candidateNa
                     {/* Insights Card */}
                     <motion.div variants={itemVariants} className="bg-[#1a1c23] rounded-3xl p-6 border border-white/5 shadow-xl">
                         <h4 className="font-bold text-white flex items-center gap-2 mb-4">
-                            <Award className="w-5 h-5 text-amber-500" /> Smart Performance Analysis
+                            <Award className="w-5 h-5 text-amber-500" /> Smart Performance Analysis {exam.type && <span className="text-xs opacity-50 bg-white/10 px-2 py-1 rounded-full">{exam.type}</span>}
                         </h4>
                         <ul className="space-y-4">
                             {/* Dynamic Section Analysis */}
@@ -387,10 +387,47 @@ export default function Result({ exam, answers, timeTaken, onRetake, candidateNa
                                     insights.push({ color: 'bg-blue-500', text: `Balanced Approach: ${accuracy}% accuracy. Room for improvement.` });
                                 }
 
-                                // Strongest Section
+                                // 3. Exam Specific Insights
+                                if (exam.type === "JOA IT") {
+                                    const compSection = Object.entries(sections).find(([name]) =>
+                                        name.toLowerCase().includes("computer") || name.toLowerCase().includes("it") || name.toLowerCase().includes("tech")
+                                    );
+                                    if (compSection) {
+                                        const [name, stats] = compSection;
+                                        const pct = Math.round((stats.correct / stats.total) * 100);
+                                        const color = pct > 70 ? 'bg-emerald-500' : pct > 40 ? 'bg-amber-500' : 'bg-rose-500';
+                                        insights.push({
+                                            color,
+                                            text: `Technical Core (${name}): ${pct}%. ${pct > 70 ? 'Strong command over IT concepts.' : 'Critical for JOA. Focus revision here.'}`
+                                        });
+                                    }
+                                } else if (exam.type === "Himachal GK") {
+                                    const hpSection = Object.entries(sections).find(([name]) =>
+                                        name.toLowerCase().includes("hp") || name.toLowerCase().includes("himachal")
+                                    );
+                                    if (hpSection) {
+                                        const [name, stats] = hpSection;
+                                        const pct = Math.round((stats.correct / stats.total) * 100);
+                                        const color = pct > 70 ? 'bg-emerald-500' : pct > 40 ? 'bg-amber-500' : 'bg-rose-500';
+                                        insights.push({
+                                            color,
+                                            text: `State GK (${name}): ${pct}%. ${pct > 70 ? 'Excellent state knowledge.' : 'Focus on Himachal specific topics.'}`
+                                        });
+                                    }
+                                }
+
+                                // Strongest Section (Generic)
                                 const sortedSections = Object.entries(sections).sort(([, a], [, b]) => (b.correct / b.total) - (a.correct / a.total));
-                                const best = sortedSections[0];
-                                const worst = sortedSections[sortedSections.length - 1];
+
+                                // Filter out the one we just mentioned if any
+                                const otherSections = sortedSections.filter(([name]) => {
+                                    if (exam.type === "JOA IT") return !name.toLowerCase().includes("computer") && !name.toLowerCase().includes("it");
+                                    if (exam.type === "Himachal GK") return !name.toLowerCase().includes("hp") && !name.toLowerCase().includes("himachal");
+                                    return true;
+                                });
+
+                                const best = otherSections[0];
+                                const worst = otherSections[otherSections.length - 1];
 
                                 if (best) {
                                     const bestPct = Math.round((best[1].correct / best[1].total) * 100);

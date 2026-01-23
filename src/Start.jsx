@@ -9,6 +9,7 @@ import GlassButton from './GlassButton';
 export default function Start({ onStart }) {
   const [name, setName] = useState("");
   const [testSet, setTestSet] = useState("1"); // Default to Test 1
+  const [examType, setExamType] = useState("Himachal GK"); // Default to Himachal GK
 
   const [resumeData, setResumeData] = useState(null);
 
@@ -23,7 +24,11 @@ export default function Start({ onStart }) {
 
   const handleStart = () => {
     if (name.trim()) {
-      onStart(name, testSet);
+      let finalId = parseInt(testSet);
+      if (examType === "JOA IT") {
+        finalId += 4;
+      }
+      onStart(name, finalId.toString());
     }
   };
 
@@ -42,9 +47,14 @@ export default function Start({ onStart }) {
       // THIS WORKS.
 
       setName(resumeData.candidateName);
-      // If we can't guess the set, we might be in trouble if they pick the wrong one.
-      // But usually people pick the same one.
-      onStart(resumeData.candidateName, testSet);
+
+      // Calculate ID based on current selection logic
+      let finalId = parseInt(testSet);
+      if (examType === "JOA IT") {
+        finalId += 4;
+      }
+
+      onStart(resumeData.candidateName, finalId.toString());
     }
   };
 
@@ -150,7 +160,32 @@ export default function Start({ onStart }) {
                 </div>
               </div>
 
-              {/* Step 1: Set Selection */}
+              {/* Step 1: Exam Type Selection */}
+              <div className="space-y-3">
+                <label className="text-xs font-bold text-blue-400 uppercase tracking-wider flex items-center gap-2">
+                  <BookOpen className="w-3 h-3" /> Select Exam
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  {["Himachal GK", "JOA IT"].map((type) => (
+                    <motion.button
+                      key={type}
+                      onClick={() => setExamType(type)}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      className={cn(
+                        "relative h-12 rounded-lg font-bold text-xs transition-all overflow-hidden border",
+                        examType === type
+                          ? "bg-blue-600 text-white border-blue-500 shadow-lg shadow-blue-900/20"
+                          : "bg-[#0f1116] text-slate-500 border-white/5 hover:bg-white/5"
+                      )}
+                    >
+                      {type}
+                    </motion.button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Step 2: Set Selection */}
               <div className="space-y-3">
                 <label className="text-xs font-bold text-blue-400 uppercase tracking-wider flex items-center gap-2">
                   <Layers className="w-3 h-3" /> Select Module
@@ -186,7 +221,7 @@ export default function Start({ onStart }) {
                 </div>
               </div>
 
-              {/* Step 2: Name Input */}
+              {/* Step 3: Name Input */}
               <div className="space-y-3">
                 <label className="text-xs font-bold text-blue-400 uppercase tracking-wider flex items-center gap-2">
                   <User className="w-3 h-3" /> Identification
@@ -202,7 +237,7 @@ export default function Start({ onStart }) {
                 </div>
               </div>
 
-              {/* Step 3: Action */}
+              {/* Step 4: Action */}
               <div className="pt-4 space-y-3">
                 {resumeData && (
                   <GlassButton
