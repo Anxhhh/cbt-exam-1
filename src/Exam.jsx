@@ -43,11 +43,11 @@ export default function Exam({
 
   const currentQ = data.questions[index];
 
-  const shuffledOptions = useMemo(() => {
+  const currentOptions = useMemo(() => {
     if (!currentQ || !currentQ.options) return [];
-    const opts = currentQ.options.map((text, originalIndex) => ({ text, originalIndex }));
-    return smartShuffle(opts);
-  }, [currentQ?.id]);
+    // Return options in original order, mapped to maintain structure
+    return currentQ.options.map((text, originalIndex) => ({ text, originalIndex }));
+  }, [currentQ?.id, currentQ?.options]);
 
   const handleAnswer = (originalIndex) => {
     // Lock only if instant feedback is enabled and already answered
@@ -91,9 +91,9 @@ export default function Exam({
       if (optIndex !== -1 && currentQ) {
         // Find the original index of this shuffled option? 
         // currentQ.options is the shuffled one? NO. 
-        // `shuffledOptions` is the view. We need to select based on VISUAL position.
-        if (shuffledOptions[optIndex]) {
-          const originalIdx = shuffledOptions[optIndex].originalIndex;
+        // `currentOptions` is the view. We need to select based on VISUAL position.
+        if (currentOptions[optIndex]) {
+          const originalIdx = currentOptions[optIndex].originalIndex;
           handleAnswer(originalIdx);
         }
       }
@@ -116,7 +116,7 @@ export default function Exam({
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [index, data.questions.length, shuffledOptions]);
+  }, [index, data.questions.length, currentOptions]);
 
   // 2. Prevent Accidental Refresh
   useEffect(() => {
@@ -502,7 +502,7 @@ export default function Exam({
 
               {/* Options Grid */}
               <div className="grid gap-3 pt-2">
-                {shuffledOptions.map((opt, i) => {
+                {currentOptions.map((opt, i) => {
                   const currentAnswer = answers[currentQ.id];
                   const hasAnswered = currentAnswer !== undefined;
                   const isSelected = currentAnswer === opt.originalIndex;
