@@ -29,6 +29,7 @@ export default function App() {
   const [timeTaken, setTimeTaken] = useState(0);
   const [candidateName, setCandidateName] = useState("");
   const [loading, setLoading] = useState(false);
+  const [tensionLoading, setTensionLoading] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
 
   const [answers, setAnswers] = useState({});
@@ -60,77 +61,95 @@ export default function App() {
   // ... (keep loadExam logic same)
   /* ================= LOAD EXAM DATA ================= */
   const loadExam = async (name, testId) => {
-    setLoading(true);
+    // Start "Tension" Mode (Fake Loading 1..2..3)
+    setTensionLoading(true);
     setCandidateName(name);
 
     try {
-      // 1. Load base exam configuration (for duration etc.)
-      const baseConfigResponse = await fetch(import.meta.env.BASE_URL + "exam.json");
-      if (!baseConfigResponse.ok) throw new Error("Failed to load base config");
-      const baseConfig = await baseConfigResponse.json();
+      // Create a promise for fetching and parsing the exam data
+      const fetchPromise = (async () => {
+        // 1. Load base exam configuration
+        const baseConfigResponse = await fetch(import.meta.env.BASE_URL + "exam.json");
+        if (!baseConfigResponse.ok) throw new Error("Failed to load base config");
+        const baseConfig = await baseConfigResponse.json();
 
-      // 2. Load the specific CSV based on selection
-      const csvFile = testId ? `questions${testId}.csv` : `questions1.csv`;
+        // 2. Load the specific CSV
+        const csvFile = testId ? `questions${testId}.csv` : `questions1.csv`;
+        const csvResponse = await fetch(import.meta.env.BASE_URL + csvFile);
+        if (!csvResponse.ok) throw new Error(`Failed to load ${csvFile}`);
+        const csvText = await csvResponse.text();
 
-      const csvResponse = await fetch(import.meta.env.BASE_URL + csvFile);
-      if (!csvResponse.ok) throw new Error(`Failed to load ${csvFile}`);
-      const csvText = await csvResponse.text();
+        // 3. Parse CSV (Wrapped in Promise)
+        return new Promise((resolve, reject) => {
+          Papa.parse(csvText, {
+            header: true,
+            skipEmptyLines: true,
+            complete: (results) => {
+              const parsedQuestions = results.data.map((row, index) => {
+                return {
+                  id: `Q${index + 1}`,
+                  question: row["Question"],
+                  options: [
+                    row["Option A"],
+                    row["Option B"],
+                    row["Option C"],
+                    row["Option D"]
+                  ].filter(opt => opt),
+                  answer: getAnswerIndex(row["Correct Option (A/B/C/D)"]),
+                  section: row["Section"] || "General"
+                };
+              });
 
-      // 3. Parse CSV
-      Papa.parse(csvText, {
-        header: true,
-        skipEmptyLines: true,
-        complete: (results) => {
-          const parsedQuestions = results.data.map((row, index) => {
-            return {
-              id: `Q${index + 1}`,
-              question: row["Question"],
-              options: [
-                row["Option A"],
-                row["Option B"],
-                row["Option C"],
-                row["Option D"]
-              ].filter(opt => opt),
-              answer: getAnswerIndex(row["Correct Option (A/B/C/D)"]),
-              section: row["Section"] || "General"
-            };
+              // Filter valid
+              const validQuestions = parsedQuestions.filter(q => q.question && q.answer !== -1 && q.options.length > 1);
+
+              // Prep hydration data
+              const savedState = JSON.parse(localStorage.getItem("cbt_exam_state") || "{}");
+              let initialAnswers = {};
+              let initialMarked = {};
+
+              if (savedState && savedState.candidateName === name && !savedState.submitted) {
+                initialAnswers = savedState.answers || {};
+                initialMarked = savedState.marked || {};
+              }
+
+              const numericId = parseInt(testId) || 1;
+              const examType = numericId >= 5 ? "JOA IT" : "Himachal GK";
+
+              resolve({
+                exam: {
+                  ...baseConfig,
+                  questions: smartShuffle(validQuestions),
+                  id: testId,
+                  type: examType
+                },
+                answers: initialAnswers,
+                marked: initialMarked
+              });
+            },
+            error: (err) => reject(err)
           });
+        });
+      })();
 
-          // Filter out any broken rows
-          const validQuestions = parsedQuestions.filter(q => q.question && q.answer !== -1 && q.options.length > 1);
+      // Create a promise for the Fake Loading Delay (1..2..3 sequence)
+      // Duration: ~3.5 seconds to allow the user to see 1, 2, and 3 fully.
+      const tensionPromise = new Promise(resolve => setTimeout(resolve, 3500));
 
-          // === HYDRATION LOGIC ===
-          const savedState = JSON.parse(localStorage.getItem("cbt_exam_state") || "{}");
-          if (savedState && savedState.candidateName === name && !savedState.submitted) {
-            setAnswers(savedState.answers || {});
-            setMarked(savedState.marked || {});
-          } else {
-            setAnswers({});
-            setMarked({});
-          }
+      // Wait for BOTH to finish
+      const [data] = await Promise.all([fetchPromise, tensionPromise]);
 
-          const numericId = parseInt(testId) || 1;
-          const examType = numericId >= 5 ? "JOA IT" : "Himachal GK";
-
-          setExam({
-            ...baseConfig,
-            questions: smartShuffle(validQuestions),
-            id: testId,
-            type: examType
-          });
-          setStarted(true);
-          setLoading(false);
-        },
-        error: (err) => {
-          console.error("CSV PARSE ERROR:", err);
-          alert("Failed to parse question data.");
-          setLoading(false);
-        }
-      });
+      // Apply Data
+      setAnswers(data.answers);
+      setMarked(data.marked);
+      setExam(data.exam);
+      setStarted(true);
+      setTensionLoading(false);
 
     } catch (err) {
       console.error("EXAM LOAD ERROR:", err);
       alert(`Failed to load exam data: ${err.message}`);
+      setTensionLoading(false);
       setLoading(false);
     }
   };
@@ -250,20 +269,29 @@ export default function App() {
   const StartSkeleton = () => (
     <div className="min-h-screen bg-[#0b0f19] flex items-center justify-center p-4 relative font-sans">
       <div className="w-full max-w-6xl grid lg:grid-cols-[1.2fr_0.8fr] gap-8 lg:gap-16 items-start mt-10 lg:mt-0">
-        <div className="space-y-10 pt-4 hidden lg:block">
+
+        {/* Left Column: Branding - Now visible on mobile to match minimal layout shift */}
+        <div className="space-y-10 pt-4">
           <div className="space-y-4">
+            {/* Pill */}
             <div className="w-40 h-8 bg-blue-500/10 rounded-full animate-pulse border border-blue-500/10" />
+            {/* Title */}
             <div className="space-y-2">
               <div className="w-3/4 h-14 bg-white/5 rounded-xl animate-pulse" />
               <div className="w-1/2 h-14 bg-white/5 rounded-xl animate-pulse" />
             </div>
+            {/* Description */}
             <div className="w-full h-24 bg-white/5 rounded-xl animate-pulse" />
           </div>
+          {/* Feature Grid */}
           <div className="grid grid-cols-2 gap-4">
             {[...Array(4)].map((_, i) => <div key={i} className="h-20 bg-white/5 rounded-2xl animate-pulse border border-white/5" />)}
           </div>
         </div>
+
+        {/* Right Column: Form */}
         <div className="w-full bg-[#1a1c23] border border-white/10 rounded-xl p-8 space-y-8 animate-pulse shadow-2xl">
+          {/* Header */}
           <div className="flex justify-between items-center pb-6 border-b border-white/5">
             <div className="space-y-2">
               <div className="w-32 h-6 bg-white/10 rounded" />
@@ -271,6 +299,8 @@ export default function App() {
             </div>
             <div className="w-12 h-12 rounded-full bg-white/5" />
           </div>
+
+          {/* Exam Type (Grid 2) */}
           <div className="space-y-4">
             <div className="w-24 h-4 bg-white/5 rounded" />
             <div className="grid grid-cols-2 gap-2">
@@ -278,11 +308,23 @@ export default function App() {
               <div className="h-12 bg-white/5 rounded" />
             </div>
           </div>
+
+          {/* Module Selection (Grid 4) */}
           <div className="space-y-4">
             <div className="w-24 h-4 bg-white/5 rounded" />
-            <div className="h-14 bg-white/5 rounded" />
+            <div className="grid grid-cols-4 gap-2">
+              {[...Array(4)].map((_, i) => <div key={i} className="h-14 bg-white/5 rounded" />)}
+            </div>
           </div>
-          <div className="h-32 bg-white/5 rounded-xl" />
+
+          {/* Name Input */}
+          <div className="space-y-4">
+            <div className="w-24 h-4 bg-white/5 rounded" />
+            <div className="h-14 bg-white/5 rounded-xl" />
+          </div>
+
+          {/* Action Button */}
+          <div className="h-16 bg-blue-600/20 rounded-xl" />
         </div>
       </div>
     </div>
@@ -328,6 +370,87 @@ export default function App() {
   if (loading) {
     return <ExamSkeleton />;
   }
+
+  /* ================= TENSION SCREEN (ANALYZING CORE STYLE) ================= */
+  const TensionScreen = () => {
+    const [count, setCount] = useState(1);
+
+    useEffect(() => {
+      // 1 -> 2 -> 3 Sequence
+      const interval = setInterval(() => {
+        setCount(c => c < 3 ? c + 1 : 3);
+      }, 1000);
+      return () => clearInterval(interval);
+    }, []);
+
+    return (
+      <div className="fixed inset-0 z-[100] bg-[#0b0f19] text-white font-sans overflow-hidden select-none flex flex-col items-center justify-center">
+
+        {/* Same Background as Analyzing Screen */}
+        <ThreeBackground />
+
+        <div className="relative z-10 flex flex-col items-center gap-10">
+
+          {/* Main Visual: Processing Core (Standard Size) */}
+          <div className="relative">
+            {/* Outer Rings (Matches AnalyzingScreen) */}
+            <div className="absolute inset-[-20%] border border-blue-500/10 rounded-full animate-[spin_10s_linear_infinite]" />
+            <div className="absolute inset-[-10%] border border-dashed border-cyan-500/20 rounded-full animate-[spin_20s_linear_infinite_reverse]" />
+
+            {/* Center Pulse Container (Matches AnalyzingScreen but holds Number) */}
+            <div className="relative w-20 h-20 md:w-24 md:h-24 bg-[#0f172a] rounded-xl md:rounded-2xl rotate-45 border border-blue-500/30 flex items-center justify-center shadow-[0_0_40px_-5px_rgba(59,130,246,0.3)] animate-pulse">
+              <div className="w-12 h-12 md:w-16 md:h-16 bg-blue-500/10 rounded-lg flex items-center justify-center -rotate-45 overflow-hidden">
+
+                {/* The Countdown Number */}
+                <span
+                  key={count}
+                  className="text-xl md:text-2xl font-bold text-cyan-400 animate-[bounce_1s_infinite_paused]"
+                  style={{ animation: 'ping 0.8s cubic-bezier(0,0,0.2,1) reverse backwards' }}
+                >
+                  {count}
+                </span>
+
+              </div>
+            </div>
+
+            {/* Orbiting particles (Matches AnalyzingScreen) */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 md:w-40 md:h-40 animate-[spin_3s_linear_infinite]">
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 bg-blue-400 rounded-full shadow-[0_0_10px_#60a5fa]" />
+            </div>
+          </div>
+
+          {/* Text & Progress (Matches AnalyzingScreen Layout) */}
+          <div className="flex flex-col items-center gap-3">
+            <div className="h-6 overflow-hidden flex flex-col items-center">
+              <span
+                key={count}
+                className="text-blue-400 font-mono text-xs md:text-sm tracking-widest uppercase animate-pulse"
+              >
+                {count === 1 && "INITIALIZING..."}
+                {count === 2 && "LOADING EXAM..."}
+                {count === 3 && "READY"}
+              </span>
+            </div>
+
+            {/* Techy Progress Line (Identical to AnalyzingScreen) */}
+            <div className="flex items-center gap-1">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="w-6 md:w-8 h-1 bg-slate-800 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full bg-cyan-500 transition-all duration-300 ${i < ((count / 3) * 5) ? 'opacity-100' : 'opacity-0'}`}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+
+        </div>
+      </div>
+    );
+  };
+
+  if (tensionLoading) return <TensionScreen />;
+
   /* ================= ANALYZING SCREEN ================= */
   const AnalyzingScreen = () => {
     const [statusText, setStatusText] = useState("Initializing Analysis Engine...");
