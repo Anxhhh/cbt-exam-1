@@ -14,6 +14,14 @@ body {
   /* Disables standard browser rubber-banding for app-like fee (optional, but requested often for 'flex scroll' feel without whitespace) */
   scroll-behavior: smooth;
   height: 100%;
+  -webkit-user-select: none;
+  /* Chrome/Safari/Opera */
+  -moz-user-select: none;
+  /* Firefox */
+  -ms-user-select: none;
+  /* Internet Explorer/Edge */
+  user-select: none;
+  /* Non-prefixed version, currently supported by Chrome, Edge, and Firefox */
 }
 
 /* Custom Scrollbar for Chrome/Safari/Edge */

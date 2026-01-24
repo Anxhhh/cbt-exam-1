@@ -34,6 +34,29 @@ export default function App() {
   const [answers, setAnswers] = useState({});
   const [marked, setMarked] = useState({});
 
+  useEffect(() => {
+    // 1. Disable Right Click
+    const handleContextMenu = (e) => {
+      e.preventDefault();
+    };
+
+    // 2. Disable Copy Shortcuts (Ctrl+C, Cmd+C)
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'c' || e.key === 'C')) {
+        e.preventDefault();
+        toast.error("Copying content is disabled.");
+      }
+    };
+
+    document.addEventListener("contextmenu", handleContextMenu);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("contextmenu", handleContextMenu);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
   // ... (keep loadExam logic same)
   /* ================= LOAD EXAM DATA ================= */
   const loadExam = async (name, testId) => {

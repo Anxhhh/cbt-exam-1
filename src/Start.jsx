@@ -138,7 +138,7 @@ export default function Start({ onStart }) {
               StatePrep-AI <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">Automated Computer Based Test</span>
             </h1>
-            <p className="text-lg text-slate-400 max-w-lg leading-relaxed">
+            <p className="text-lg text-slate-400 max-w-lg leading-relaxed text-justify">
               Experience a high-fidelity examination environment designed for Himachal Pradesh State level exams. Challenge yourself with HPPSC/HPRCA standard questions and instant detailed feedback.
             </p>
           </div>
@@ -317,9 +317,24 @@ export default function Start({ onStart }) {
 
             </div>
           </div>
-          <p className="text-slate-500 text-xs italic opacity-70 hover:opacity-100 transition-opacity">
-            Developed by Ansh Powered by Gemini 3 pro and Three.js
-          </p>
+
+          <div className="w-full flex flex-col sm:flex-row items-center justify-between gap-4 mt-2">
+            <p className="text-slate-500 text-xs italic opacity-70 hover:opacity-100 transition-opacity text-center sm:text-left order-2 sm:order-1 w-full sm:w-auto">
+              Developed by Ansh Powered by Gemini 3 pro and Three.js
+            </p>
+
+            <a
+              href="https://x.com/anshmatlotia"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black/20 border border-white/5 hover:bg-black/40 hover:border-white/10 text-slate-500 hover:text-white transition-all duration-300 group backdrop-blur-sm shadow-sm hover:shadow-md order-1 sm:order-2"
+            >
+              <span className="text-[10px] font-bold tracking-wide uppercase">Follow</span>
+              <svg viewBox="0 0 24 24" aria-hidden="true" className="w-3 h-3 fill-current opacity-70 group-hover:opacity-100 transition-opacity">
+                <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z" />
+              </svg>
+            </a>
+          </div>
         </motion.div>
 
       </div>
