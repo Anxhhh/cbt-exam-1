@@ -1,12 +1,12 @@
 import { ArrowRight, BookOpen, Clock, ShieldCheck, Zap, User, FileText, CheckCircle2, ChevronRight, Layers, Trash2 } from 'lucide-react';
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { cn } from './utils';
 import { motion } from "framer-motion";
 import BuyMeCoffeeBtn from './BuyMeCoffeeBtn';
 import ThreeBackground from './ThreeBackground';
 import GlassButton from './GlassButton';
 
-export default function Start({ onStart }) {
+export default function Start({ onStart, isRetake }) {
   const [name, setName] = useState("");
   const [testSet, setTestSet] = useState("1"); // Default to Test 1
   const [examType, setExamType] = useState("Himachal GK"); // Default to Himachal GK
@@ -21,6 +21,17 @@ export default function Start({ onStart }) {
       }
     } catch (e) { console.error(e); }
   }, []);
+
+  // Retake Auto-Scroll
+  const portalRef = useRef(null);
+  useEffect(() => {
+    if (isRetake && portalRef.current) {
+      // slight delay to allow animations to start
+      setTimeout(() => {
+        portalRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 500);
+    }
+  }, [isRetake]);
 
   const handleStart = () => {
     if (name.trim()) {
@@ -120,34 +131,47 @@ export default function Start({ onStart }) {
         <motion.div
           variants={containerVariants}
           initial="hidden"
-          animate="visible"
+          whileInView="visible"
+          viewport={{ once: false, amount: 0.2 }} // Re-trigger animation on scroll
           className="space-y-10 pt-4"
         >
 
           <div className="space-y-4">
             <motion.div
-              initial={{ x: -20, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: 0.4 }}
+              initial={{ x: -20, opacity: 0, scale: 0.8 }}
+              whileInView={{ x: 0, opacity: 1, scale: 1 }}
+              viewport={{ once: false }}
               className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold uppercase tracking-wider backdrop-blur-md"
             >
               <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-ping" />
               Live Assessment System
             </motion.div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-[1.1]">
+            <motion.h1
+              initial={{ y: 50, opacity: 0, rotateX: -20, filter: "blur(10px)" }}
+              whileInView={{ y: 0, opacity: 1, rotateX: 0, filter: "blur(0px)" }}
+              viewport={{ once: false, margin: "-10%" }}
+              transition={{ duration: 0.8, ease: "circOut" }}
+              className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-[1.1]"
+            >
               StatePrep-AI <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">Automated Computer Based Test</span>
-            </h1>
-            <p className="text-lg text-slate-400 max-w-lg leading-relaxed text-justify">
+            </motion.h1>
+            <motion.p
+              initial={{ y: 20, opacity: 0 }}
+              whileInView={{ y: 0, opacity: 1 }}
+              viewport={{ once: false }}
+              transition={{ delay: 0.1 }}
+              className="text-lg text-slate-400 max-w-lg leading-relaxed text-justify"
+            >
               Experience a high-fidelity examination environment designed for Himachal Pradesh State level exams. Challenge yourself with HPPSC/HPRCA standard questions and instant detailed feedback.
-            </p>
+            </motion.p>
           </div>
 
           <motion.div
             variants={containerVariants}
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true }}
+            viewport={{ once: false, amount: 0.2 }}
             className="grid grid-cols-2 gap-4"
           >
             <FeatureBox icon={<Clock className="w-5 h-5 text-blue-400" />} title="Timed Session" desc="30 Minutes strict limit" />
@@ -157,7 +181,13 @@ export default function Start({ onStart }) {
           </motion.div>
 
           {/* Quick instructions inline for cleaner look */}
-          <motion.div variants={itemVariants} className="pt-4 border-t border-white/5">
+          <motion.div
+            initial={{ y: 30, opacity: 0, scale: 0.95 }}
+            whileInView={{ y: 0, opacity: 1, scale: 1 }}
+            viewport={{ once: false, margin: "-50px" }}
+            transition={{ duration: 0.5 }}
+            className="pt-4 border-t border-white/5"
+          >
             <h4 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">Exam Guidelines</h4>
             <ul className="grid sm:grid-cols-2 gap-3 text-sm text-slate-500">
               <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-slate-600" /> No page refresh permitted</li>
@@ -171,11 +201,12 @@ export default function Start({ onStart }) {
 
         {/* Right Column: Candidate Action Card */}
         <motion.div
-          variants={itemVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-50px" }}
+          initial={{ opacity: 0, x: 100, rotateY: -10, filter: "blur(10px)" }}
+          whileInView={{ opacity: 1, x: 0, rotateY: 0, filter: "blur(0px)" }}
+          viewport={{ once: false, margin: "-10%" }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
           className="flex flex-col gap-4 items-end sticky top-8"
+          ref={portalRef}
         >
           <div className="relative group w-full">
             {/* Glow backing */}
@@ -347,17 +378,20 @@ function FeatureBox({ icon, title, desc }) {
   return (
     <motion.div
       variants={{
-        hidden: { opacity: 0, y: 10 },
-        visible: { opacity: 1, y: 0 }
+        hidden: { opacity: 0, y: 20, filter: 'blur(10px)' },
+        visible: { opacity: 1, y: 0, filter: 'blur(0px)' }
       }}
-      className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.05] transition-colors flex flex-row items-center gap-4 group cursor-default hover:border-blue-500/20"
+      className="relative p-5 rounded-2xl bg-white/[0.03] border border-white/5 overflow-hidden group hover:border-white/10 transition-colors"
     >
-      <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center group-hover:scale-110 transition-transform text-white/80 group-hover:text-white group-hover:bg-blue-500/10">
-        {icon}
-      </div>
-      <div>
-        <h4 className="font-bold text-white text-sm">{title}</h4>
-        <p className="text-xs text-slate-500">{desc}</p>
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      <div className="relative z-10 flex flex-col gap-3">
+        <div className="p-2 w-fit rounded-lg bg-white/5 text-blue-400 group-hover:text-white group-hover:bg-blue-500/20 transition-colors">
+          {icon}
+        </div>
+        <div>
+          <h4 className="font-bold text-white text-sm tracking-tight">{title}</h4>
+          <p className="text-xs text-slate-500 font-medium">{desc}</p>
+        </div>
       </div>
     </motion.div>
   );

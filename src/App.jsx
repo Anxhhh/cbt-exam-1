@@ -34,6 +34,7 @@ export default function App() {
 
   const [answers, setAnswers] = useState({});
   const [marked, setMarked] = useState({});
+  const [isRetake, setIsRetake] = useState(false);
 
   useEffect(() => {
     // 1. Disable Right Click
@@ -64,6 +65,7 @@ export default function App() {
     // Start "Tension" Mode (Fake Loading 1..2..3)
     setTensionLoading(true);
     setCandidateName(name);
+    setIsRetake(false); // Reset retake flag on start
 
     try {
       // Create a promise for fetching and parsing the exam data
@@ -528,7 +530,7 @@ export default function App() {
   if (!started) {
     return (
       <Suspense fallback={<StartSkeleton />}>
-        <Start onStart={loadExam} />
+        <Start onStart={loadExam} isRetake={isRetake} />
       </Suspense>
     );
   }
@@ -558,6 +560,7 @@ export default function App() {
             setTimeTaken(0);
             setCandidateName("");
             setExam(null); // Reset exam to allow re-selection
+            setIsRetake(true);
           }}
         />
       </Suspense>

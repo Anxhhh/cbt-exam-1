@@ -264,7 +264,8 @@ export default function Result({ exam, answers, timeTaken, onRetake, candidateNa
                 className="w-full max-w-5xl grid lg:grid-cols-[1.2fr_0.8fr] gap-6 relative z-20"
                 variants={containerVariants}
                 initial="hidden"
-                animate="visible"
+                whileInView="visible" // Use whileInView instead of animate to trigger on scroll
+                viewport={{ once: false, amount: 0.1 }}
             >
 
                 {/* Main Card */}
@@ -359,7 +360,13 @@ export default function Result({ exam, answers, timeTaken, onRetake, candidateNa
                     </div>
 
                     {/* Insights Card */}
-                    <motion.div variants={itemVariants} className="bg-[#1a1c23] rounded-3xl p-6 border border-white/5 shadow-xl">
+                    <motion.div
+                        initial={{ opacity: 0, y: 60, rotateX: -10, filter: "blur(8px)" }}
+                        whileInView={{ opacity: 1, y: 0, rotateX: 0, filter: "blur(0px)" }}
+                        viewport={{ once: false, margin: "-10%" }}
+                        transition={{ duration: 0.7, ease: "easeOut" }}
+                        className="bg-[#1a1c23] rounded-3xl p-6 border border-white/5 shadow-xl"
+                    >
                         <h4 className="font-bold text-white flex items-center gap-2 mb-4">
                             <Award className="w-5 h-5 text-amber-500" /> Smart Performance Analysis {exam.type && <span className="text-xs opacity-50 bg-white/10 px-2 py-1 rounded-full">{exam.type}</span>}
                         </h4>
@@ -487,18 +494,23 @@ export default function Result({ exam, answers, timeTaken, onRetake, candidateNa
 function StatCard({ label, value, icon, delay }) {
     return (
         <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: delay, duration: 0.3 }}
-            className="bg-[#1a1c23] p-5 rounded-2xl border border-white/5 flex flex-col justify-between h-32 hover:border-white/10 transition-colors group hover:shadow-lg hover:shadow-black/20"
+            initial={{ opacity: 0, y: 20, filter: 'blur(10px)' }}
+            whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+            viewport={{ once: false, margin: "-20px" }}
+            transition={{ delay: delay, duration: 0.5, ease: "easeOut" }}
+            className="relative bg-[#1a1c23] p-6 rounded-3xl border border-white/5 overflow-hidden group hover:border-white/10 transition-all"
         >
-            <div className="flex justify-between items-start">
-                <span className="text-slate-500 text-xs font-bold uppercase tracking-wider">{label}</span>
-                <div className="p-2 bg-white/5 rounded-lg group-hover:bg-white/10 transition-colors">
-                    {icon}
+            <div className="absolute -right-6 -top-6 w-24 h-24 bg-blue-500/10 rounded-full blur-2xl group-hover:bg-blue-500/20 transition-all" />
+
+            <div className="relative z-10 flex flex-col justify-between h-full gap-4">
+                <div className="flex justify-between items-center">
+                    <span className="text-slate-500 text-[10px] font-bold uppercase tracking-widest">{label}</span>
+                    <div className="text-slate-400 group-hover:text-white transition-colors group-hover:scale-110 duration-300">
+                        {icon}
+                    </div>
                 </div>
+                <span className="text-3xl md:text-4xl font-bold text-white tracking-tighter">{value}</span>
             </div>
-            <span className="text-3xl font-bold text-white">{value}</span>
         </motion.div>
     );
 }
