@@ -42,3 +42,56 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #475569;
 }
+
+/* iOS Specifics */
+@supports (-webkit-touch-callout: none) {
+  .min-h-screen {
+    min-height: -webkit-fill-available;
+  }
+}
+
+/* Safe Area Utilities */
+:root {
+  --sat: env(safe-area-inset-top);
+  --sab: env(safe-area-inset-bottom);
+  --sal: env(safe-area-inset-left);
+  --sar: env(safe-area-inset-right);
+}
+
+.pt-safe {
+  padding-top: var(--sat);
+}
+
+.pb-safe {
+  padding-bottom: var(--sab);
+}
+
+.pl-safe {
+  padding-left: var(--sal);
+}
+
+.pr-safe {
+  padding-right: var(--sar);
+}
+
+/* Remove tap highlight on iOS */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Ensure inputs don't auto-zoom on focus (safeguard) */
+input,
+select,
+textarea {
+  font-size: 16px !important;
+}
+
+@media screen and (min-width: 768px) {
+
+  input,
+  select,
+  textarea {
+    font-size: 1rem !important;
+    /* Reset for desktop if needed, though 16px is 1rem usually */
+  }
+}

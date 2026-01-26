@@ -20,7 +20,7 @@ export default function BuyMeCoffeeBtn({ screen = 'start', score = 0 }) {
     }, []);
 
     return (
-        <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 flex flex-row items-end gap-3 sm:gap-4 pointer-events-none font-sans">
+        <div className="fixed bottom-[calc(1rem+env(safe-area-inset-bottom))] right-4 sm:bottom-6 sm:right-6 z-50 flex flex-row items-end gap-3 sm:gap-4 pointer-events-none font-sans">
 
             <div className="relative flex flex-col items-end pointer-events-auto max-w-[90vw] sm:max-w-auto">
 

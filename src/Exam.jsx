@@ -298,7 +298,7 @@ export default function Exam({
         />
       </div>
 
-      <header className="flex-shrink-0 px-4 md:px-6 py-3 border-b border-black/5 dark:border-white/5 flex items-center justify-between backdrop-blur-md bg-opacity-95 z-30 shadow-sm transition-colors duration-300 bg-white/80 dark:bg-[#1a1c23]/90 sepia:bg-[#f4ecd8]/90">
+      <header className="flex-shrink-0 px-4 md:px-6 pt-[calc(0.75rem+env(safe-area-inset-top))] pb-3 border-b border-black/5 dark:border-white/5 flex items-center justify-between backdrop-blur-md bg-opacity-95 z-30 shadow-sm transition-colors duration-300 bg-white/80 dark:bg-[#1a1c23]/90 sepia:bg-[#f4ecd8]/90">
 
         {/* Left: Branding & User */}
         <div className="flex items-center gap-4">
@@ -610,7 +610,7 @@ export default function Exam({
           </div>
 
           {/* Mobile Only Bottom Bar (redundant but kept for small screens as per conventional UX) */}
-          <div className="md:hidden p-4 border-t border-black/5 bg-white dark:bg-[#1a1c23] flex items-center gap-3">
+          <div className="md:hidden p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] border-t border-black/5 bg-white dark:bg-[#1a1c23] flex items-center gap-3">
             <button
               disabled={index === 0}
               onClick={() => setIndex(index - 1)}

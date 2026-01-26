@@ -1,6 +1,7 @@
 import { ArrowRight, BookOpen, Clock, ShieldCheck, Zap, User, FileText, CheckCircle2, ChevronRight, Layers, Trash2 } from 'lucide-react';
 import { useState, useEffect, useRef } from "react";
 import { cn } from './utils';
+import { sounds } from './utils/sound'; // Import sounds
 import { motion } from "framer-motion";
 import BuyMeCoffeeBtn from './BuyMeCoffeeBtn';
 import ThreeBackground from './ThreeBackground';
@@ -34,6 +35,9 @@ export default function Start({ onStart, isRetake }) {
   }, [isRetake]);
 
   const handleStart = () => {
+    // Unlock Audio Context for iOS
+    try { sounds.click(); } catch (e) { }
+
     if (name.trim()) {
       let finalId = parseInt(testSet);
       if (examType === "JOA IT") {
@@ -44,6 +48,9 @@ export default function Start({ onStart, isRetake }) {
   };
 
   const handleResume = () => {
+    // Unlock Audio Context for iOS
+    try { sounds.click(); } catch (e) { }
+
     if (resumeData) {
       // We assume '1' if not saved, or we should have saved it.
       // Since we didn't save testSet explicitly in Exam.jsx (my bad), 
@@ -118,7 +125,7 @@ export default function Start({ onStart, isRetake }) {
   };
 
   return (
-    <div className="min-h-screen text-slate-300 font-sans selection:bg-blue-500/30 flex items-center justify-center p-4 relative">
+    <div className="min-h-screen text-slate-300 font-sans selection:bg-blue-500/30 flex items-center justify-center p-4 pr-[calc(1rem+env(safe-area-inset-right))] pl-[calc(1rem+env(safe-area-inset-left))] pt-[calc(1rem+env(safe-area-inset-top))] pb-[calc(1rem+env(safe-area-inset-bottom))] relative">
 
       {/* 3D Background */}
       <ThreeBackground />
