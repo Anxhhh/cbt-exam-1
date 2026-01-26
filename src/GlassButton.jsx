@@ -60,9 +60,9 @@ export default function GlassButton({
             whileTap={!disabled ? { scale: 0.98 } : {}}
             disabled={disabled}
             className={cn(
-                "relative group w-full overflow-hidden rounded-xl border border-white/10 bg-white/[0.02] backdrop-blur-xl transition-all duration-300",
-                "shadow-[0_4px_30px_rgba(0,0,0,0.1)]", // Subtle glass shadow
-                disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:bg-white/[0.04]",
+                "relative group w-full overflow-hidden rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-3xl transition-all duration-300",
+                "shadow-[0_8px_30px_rgba(0,0,0,0.1)]", // Deeper shadow
+                disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:bg-white/[0.1]",
                 borderColors,
                 className
             )}
