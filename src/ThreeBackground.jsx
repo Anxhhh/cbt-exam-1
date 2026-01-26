@@ -181,16 +181,33 @@ const PlexusNodes = ({ count = 220, maxDistance = 3 }) => {
     );
 };
 
-export default function ThreeBackground() {
+export default function ThreeBackground({ intensity = 1 }) {
     return (
-        <div className="fixed inset-0 z-0 pointer-events-none bg-[#0b0f19]">
+        <div
+            className="fixed inset-0 z-0 pointer-events-none bg-[#0b0f19] transition-all duration-1000 ease-in-out"
+        >
             {/* 
-         Background: Deepest App Background (#0b0f19)
-         Matches StartSkeleton and general dark theme.
-      */}
-            <Canvas camera={{ position: [0, 0, 12], fov: 50 }} dpr={[1, 2]}> {/* High DPI for sharpness */}
+                Background: Deepest App Background (#0b0f19).
+                We use an overlay div to dim the scene instead of unmounting, preserving the WebGL context.
+            */}
+            <Canvas camera={{ position: [0, 0, 12], fov: 50 }} dpr={[1, 2]}>
                 <PlexusNodes count={220} />
             </Canvas>
+
+            {/* Focus Mode Overlay: Dims the background when intensity < 1 */}
+            <div
+                className="absolute inset-0 bg-[#0b0f19] transition-opacity duration-1000 pointer-events-none"
+                style={{ opacity: 1 - intensity }}
+            />
+
+            {/* Focus Mode Blur: Blurs the background when intensity < 1 */}
+            <div
+                className="absolute inset-0 backdrop-blur-sm transition-all duration-1000 pointer-events-none"
+                style={{
+                    opacity: intensity < 0.5 ? 1 : 0,
+                    backdropFilter: `blur(${10 * (1 - intensity)}px)`
+                }}
+            />
         </div>
     );
 }

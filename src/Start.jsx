@@ -2,10 +2,11 @@ import { ArrowRight, BookOpen, Clock, ShieldCheck, Zap, User, FileText, CheckCir
 import { useState, useEffect, useRef } from "react";
 import { cn } from './utils';
 import { sounds } from './utils/sound'; // Import sounds
-import { motion } from "framer-motion";
+import { motion, useMotionValue, useTransform, useSpring } from "framer-motion";
 import BuyMeCoffeeBtn from './BuyMeCoffeeBtn';
 import ThreeBackground from './ThreeBackground';
 import GlassButton from './GlassButton';
+import { TiltCard } from './TiltCard';
 
 export default function Start({ onStart, isRetake }) {
   const [name, setName] = useState("");
@@ -128,7 +129,7 @@ export default function Start({ onStart, isRetake }) {
     <div className="min-h-screen text-slate-300 font-sans selection:bg-blue-500/30 flex items-center justify-center p-4 pr-[calc(1rem+env(safe-area-inset-right))] pl-[calc(1rem+env(safe-area-inset-left))] pt-[calc(1rem+env(safe-area-inset-top))] pb-[calc(1rem+env(safe-area-inset-bottom))] relative">
 
       {/* 3D Background */}
-      <ThreeBackground />
+      {/* 3D Background lifted to App.jsx */}
 
       <div
         className="w-full max-w-6xl relative z-10 grid lg:grid-cols-[1.2fr_0.8fr] gap-8 lg:gap-16 items-start mt-10 lg:mt-0"
@@ -215,11 +216,13 @@ export default function Start({ onStart, isRetake }) {
           className="flex flex-col gap-4 items-end sticky top-8"
           ref={portalRef}
         >
-          <div className="relative group w-full">
+          <TiltCard className="w-full relative group">
             {/* Glow backing */}
             <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-[2.5rem] blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200" />
 
-            <div className="relative bg-black/30 backdrop-blur-3xl border border-white/10 rounded-[2.5rem] p-8 shadow-[0_8px_40px_-12px_rgba(0,0,0,0.5)] ring-1 ring-white/5 flex flex-col gap-8">
+            <div className="relative bg-black/30 backdrop-blur-3xl border border-white/10 rounded-[2.5rem] p-8 shadow-[0_8px_40px_-12px_rgba(0,0,0,0.5)] ring-1 ring-white/5 flex flex-col gap-8 overflow-hidden">
+              {/* Internal Ambient Glow (Match Result Card) */}
+              <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
 
               <div className="flex items-center justify-between border-b border-white/5 pb-6">
                 <div>
@@ -241,13 +244,17 @@ export default function Start({ onStart, isRetake }) {
                     <motion.button
                       key={type}
                       onClick={() => setExamType(type)}
-                      whileHover={{ scale: 1.02 }}
+                      whileHover={{
+                        scale: 1.05,
+                        y: -2,
+                        transition: { type: "spring", stiffness: 400, damping: 15 }
+                      }}
                       whileTap={{ scale: 0.98 }}
                       className={cn(
-                        "relative h-12 rounded-2xl font-bold text-xs transition-all overflow-hidden border backdrop-blur-md",
+                        "relative h-12 rounded-2xl font-bold text-xs transition-all overflow-hidden border backdrop-blur-md z-0 hover:z-10",
                         examType === type
-                          ? "bg-blue-500/20 text-blue-200 border-blue-500/30 shadow-lg shadow-blue-500/10"
-                          : "bg-white/5 text-slate-400 border-white/5 hover:bg-white/10"
+                          ? "bg-blue-500/20 text-blue-100 border-blue-400/30 shadow-[0_0_20px_-5px_rgba(59,130,246,0.5)]"
+                          : "bg-white/5 text-slate-400 border-white/5 hover:bg-white/10 hover:border-white/20 hover:shadow-[0_0_15px_-5px_rgba(255,255,255,0.1)]"
                       )}
                     >
                       {type}
@@ -266,13 +273,17 @@ export default function Start({ onStart, isRetake }) {
                     <motion.button
                       key={id}
                       onClick={() => setTestSet(id)}
-                      whileHover={{ scale: 1.05, y: -2 }}
-                      whileTap={{ scale: 0.95 }}
+                      whileHover={{
+                        scale: 1.15,
+                        y: -5,
+                        transition: { type: "spring", stiffness: 300, damping: 12 }
+                      }}
+                      whileTap={{ scale: 0.9 }}
                       className={cn(
-                        "relative h-16 rounded-2xl font-bold text-sm transition-all overflow-hidden group/btn border backdrop-blur-md",
+                        "relative h-16 rounded-2xl font-bold text-sm transition-all duration-300 overflow-hidden group/btn border backdrop-blur-md z-0 hover:z-20",
                         testSet === id
-                          ? "bg-blue-500/20 text-white shadow-lg shadow-blue-500/10 border-blue-500/30"
-                          : "bg-white/5 text-slate-400 hover:bg-white/10 border-white/5"
+                          ? "bg-transparent text-white border-blue-400/40 shadow-[0_8px_32px_-8px_rgba(59,130,246,0.6)]" // Glowing active state
+                          : "bg-gradient-to-b from-white/10 to-transparent text-slate-400 hover:text-white border-white/10 hover:border-white/30 hover:shadow-[0_8px_20px_-8px_rgba(255,255,255,0.2)]"
                       )}
                     >
                       <span className="relative z-10 flex flex-col items-center justify-center">
@@ -298,6 +309,11 @@ export default function Start({ onStart, isRetake }) {
                   <User className="w-3 h-3" /> Identification
                 </label>
                 <div className="relative">
+                  <motion.div
+                    animate={!name.trim() ? { opacity: [0.5, 1, 0.5] } : { opacity: 1 }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                    className="absolute -inset-[1px] rounded-2xl bg-gradient-to-r from-blue-500/20 to-purple-500/20 blur-sm -z-10"
+                  />
                   <input
                     type="text"
                     placeholder="Enter your name"
@@ -340,9 +356,19 @@ export default function Start({ onStart, isRetake }) {
                   color="blue"
                   onClick={handleStart}
                   disabled={!name.trim()}
-                  className="w-full h-auto px-6 py-4"
+                  className="w-full h-auto px-6 py-4 relative overflow-hidden"
                 >
-                  <div className="flex items-center justify-center w-full">
+                  {/* Validation Shockwave */}
+                  {name.trim() && (
+                    <motion.div
+                      initial={{ scale: 0, opacity: 0.5 }}
+                      animate={{ scale: 2, opacity: 0 }}
+                      transition={{ duration: 1, repeat: Infinity }}
+                      className="absolute inset-0 bg-blue-400/20 rounded-full blur-xl"
+                    />
+                  )}
+
+                  <div className="relative z-10 flex items-center justify-center w-full">
                     <span className="font-bold text-white flex items-center gap-2 group-disabled:text-slate-400">
                       {resumeData ? "Start New Exam" : "Initialize Exam"} <ChevronRight className="w-4 h-4" />
                     </span>
@@ -354,7 +380,7 @@ export default function Start({ onStart, isRetake }) {
               </div>
 
             </div>
-          </div>
+          </TiltCard>
 
           <div className="w-full flex flex-col sm:flex-row items-center justify-between gap-4 mt-2">
             <p className="text-slate-500 text-xs italic opacity-70 hover:opacity-100 transition-opacity text-center sm:text-left order-2 sm:order-1 w-full sm:w-auto">

@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import BuyMeCoffeeBtn from './BuyMeCoffeeBtn';
 
 import ThreeBackground from './ThreeBackground';
+import { TiltCard } from './TiltCard';
 
 export default function Result({ exam, answers, timeTaken, onRetake, candidateName }) {
     if (!exam || !Array.isArray(exam.questions)) {
@@ -259,7 +260,7 @@ export default function Result({ exam, answers, timeTaken, onRetake, candidateNa
 
     return (
         <div className="min-h-screen relative flex items-center justify-center p-4 font-sans text-slate-200 overflow-hidden">
-            <ThreeBackground />
+            {/* ThreeBackground lifted to App.jsx */}
             <motion.div
                 className="w-full max-w-5xl grid lg:grid-cols-[1.2fr_0.8fr] gap-6 relative z-20"
                 variants={containerVariants}
@@ -269,85 +270,87 @@ export default function Result({ exam, answers, timeTaken, onRetake, candidateNa
             >
 
                 {/* Main Card */}
-                <motion.div variants={itemVariants} className="bg-[#1a1c23] rounded-3xl p-8 border border-white/5 shadow-2xl relative overflow-hidden flex flex-col justify-between">
-                    <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+                <TiltCard className="h-full">
+                    <motion.div variants={itemVariants} className="bg-black/30 backdrop-blur-3xl rounded-[2.5rem] p-8 border border-white/10 shadow-[0_8px_40px_-12px_rgba(0,0,0,0.5)] ring-1 ring-white/5 relative overflow-hidden flex flex-col justify-between h-full">
+                        <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
 
-                    <div>
-                        <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4 sm:gap-0">
-                            <div>
-                                <h1 className="text-2xl font-bold text-white tracking-tight">Performance Summary</h1>
-                            </div>
-                            <div className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-bold text-slate-400 self-start sm:self-auto">
-                                {new Date().toLocaleDateString()}
-                            </div>
-                        </header>
-
-                        <div className="flex flex-col items-center justify-center py-8">
-                            <div className="relative mb-6">
-                                {/* Animated SVG Circular Progress */}
-                                <svg className="w-48 h-48 transform -rotate-90">
-                                    <circle cx="96" cy="96" r="88" stroke="currentColor" strokeWidth="12" fill="transparent" className="text-slate-800" />
-                                    <motion.circle
-                                        cx="96" cy="96" r="88"
-                                        stroke="currentColor"
-                                        strokeWidth="12"
-                                        fill="transparent"
-                                        strokeDasharray={circumference}
-                                        initial={{ strokeDashoffset: circumference }}
-                                        animate={{ strokeDashoffset: offset }}
-                                        transition={{ duration: 1.5, ease: "easeOut", delay: 0.5 }}
-                                        className={`drop-shadow-[0_0_10px_rgba(59,130,246,0.5)] ${scorePercent > 70 ? 'text-emerald-500' : scorePercent > 40 ? 'text-blue-500' : 'text-rose-500'}`}
-                                    />
-                                </svg>
-                                <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                    <motion.span
-                                        initial={{ scale: 0, opacity: 0 }}
-                                        animate={{ scale: 1, opacity: 1 }}
-                                        transition={{ delay: 1, type: "spring" }}
-                                        className="text-5xl font-bold text-white"
-                                    >
-                                        {scorePercent}%
-                                    </motion.span>
-                                    <span className="text-sm font-medium text-slate-400 uppercase tracking-widest mt-1">Score</span>
+                        <div>
+                            <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4 sm:gap-0">
+                                <div>
+                                    <h1 className="text-2xl font-bold text-white tracking-tight">Performance Summary</h1>
                                 </div>
+                                <div className="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs font-bold text-slate-400 self-start sm:self-auto backdrop-blur-md">
+                                    {new Date().toLocaleDateString()}
+                                </div>
+                            </header>
+
+                            <div className="flex flex-col items-center justify-center py-8">
+                                <div className="relative mb-6">
+                                    {/* Animated SVG Circular Progress */}
+                                    <svg className="w-48 h-48 transform -rotate-90">
+                                        <circle cx="96" cy="96" r="88" stroke="currentColor" strokeWidth="12" fill="transparent" className="text-white/5" />
+                                        <motion.circle
+                                            cx="96" cy="96" r="88"
+                                            stroke="currentColor"
+                                            strokeWidth="12"
+                                            fill="transparent"
+                                            strokeDasharray={circumference}
+                                            initial={{ strokeDashoffset: circumference }}
+                                            animate={{ strokeDashoffset: offset }}
+                                            transition={{ duration: 1.5, ease: "easeOut", delay: 0.5 }}
+                                            className={`drop-shadow-[0_0_15px_rgba(59,130,246,0.3)] ${scorePercent > 70 ? 'text-emerald-500' : scorePercent > 40 ? 'text-blue-500' : 'text-rose-500'}`}
+                                        />
+                                    </svg>
+                                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                                        <motion.span
+                                            initial={{ scale: 0, opacity: 0 }}
+                                            animate={{ scale: 1, opacity: 1 }}
+                                            transition={{ delay: 1, type: "spring" }}
+                                            className="text-5xl font-bold text-white"
+                                        >
+                                            {scorePercent}%
+                                        </motion.span>
+                                        <span className="text-sm font-medium text-slate-400 uppercase tracking-widest mt-1">Score</span>
+                                    </div>
+                                </div>
+
+                                <motion.div
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 1.2 }}
+                                    className="text-center space-y-1"
+                                >
+                                    <h3 className="text-xl font-bold text-white">
+                                        {scorePercent > 80 ? "Outstanding Performance!" :
+                                            scorePercent > 60 ? "Good Job, Keep Improving!" : "Needs More Practice"}
+                                    </h3>
+                                    <p className="text-slate-400 text-sm max-w-sm mx-auto">
+                                        You answered <span className="text-white font-bold">{correct}</span> out of <span className="text-white font-bold">{total}</span> questions correctly.
+                                    </p>
+                                </motion.div>
                             </div>
-
-                            <motion.div
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 1.2 }}
-                                className="text-center space-y-1"
-                            >
-                                <h3 className="text-xl font-bold text-white">
-                                    {scorePercent > 80 ? "Outstanding Performance!" :
-                                        scorePercent > 60 ? "Good Job, Keep Improving!" : "Needs More Practice"}
-                                </h3>
-                                <p className="text-slate-400 text-sm max-w-sm mx-auto">
-                                    You answered <span className="text-white font-bold">{correct}</span> out of <span className="text-white font-bold">{total}</span> questions correctly.
-                                </p>
-                            </motion.div>
                         </div>
-                    </div>
 
-                    <div className="grid grid-cols-2 gap-3 mt-8">
-                        <motion.button
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            onClick={onRetake}
-                            className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold text-sm bg-white/5 hover:bg-white/10 text-white transition-all border border-white/5"
-                        >
-                            <RefreshCw className="w-4 h-4" /> Retake Test
-                        </motion.button>
-                        <motion.button
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            onClick={generatePDF}
-                            className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold text-sm bg-blue-600 hover:bg-blue-700 text-white transition-all shadow-lg shadow-blue-600/20"
-                        >
-                            <Download className="w-4 h-4" /> Download AI Report
-                        </motion.button>
-                    </div>
-                </motion.div>
+                        <div className="grid grid-cols-2 gap-3 mt-8">
+                            <motion.button
+                                whileHover={{ scale: 1.02, y: -2 }}
+                                whileTap={{ scale: 0.98 }}
+                                onClick={onRetake}
+                                className="flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl font-bold text-sm bg-white/5 hover:bg-white/10 text-white transition-all border border-white/5 backdrop-blur-md"
+                            >
+                                <RefreshCw className="w-4 h-4" /> Retake Test
+                            </motion.button>
+                            <motion.button
+                                whileHover={{ scale: 1.02, y: -2 }}
+                                whileTap={{ scale: 0.98 }}
+                                onClick={generatePDF}
+                                className="flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl font-bold text-sm bg-blue-600/80 hover:bg-blue-600 text-white transition-all shadow-[0_8px_30px_rgba(37,99,235,0.3)] backdrop-blur-md border border-blue-500/30"
+                            >
+                                <Download className="w-4 h-4" /> Download AI Report
+                            </motion.button>
+                        </div>
+                    </motion.div>
+                </TiltCard>
 
                 {/* Analysis Side */}
                 <div className="space-y-6">
@@ -360,129 +363,131 @@ export default function Result({ exam, answers, timeTaken, onRetake, candidateNa
                     </div>
 
                     {/* Insights Card */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 60, rotateX: -10, filter: "blur(8px)" }}
-                        whileInView={{ opacity: 1, y: 0, rotateX: 0, filter: "blur(0px)" }}
-                        viewport={{ once: false, margin: "-10%" }}
-                        transition={{ duration: 0.7, ease: "easeOut" }}
-                        className="bg-[#1a1c23] rounded-3xl p-6 border border-white/5 shadow-xl"
-                    >
-                        <h4 className="font-bold text-white flex items-center gap-2 mb-4">
-                            <Award className="w-5 h-5 text-amber-500" /> Smart Performance Analysis {exam.type && <span className="text-xs opacity-50 bg-white/10 px-2 py-1 rounded-full">{exam.type}</span>}
-                        </h4>
-                        <ul className="space-y-4">
-                            {/* Dynamic Section Analysis */}
-                            {(() => {
-                                // 1. Calculate Section Performance
-                                const sections = {};
-                                exam.questions.forEach(q => {
-                                    if (!sections[q.section]) sections[q.section] = { total: 0, correct: 0 };
-                                    sections[q.section].total++;
-                                    if (answers[q.id] === q.answer) sections[q.section].correct++;
-                                });
+                    <TiltCard>
+                        <motion.div
+                            initial={{ opacity: 0, y: 60, rotateX: -10, filter: "blur(8px)" }}
+                            whileInView={{ opacity: 1, y: 0, rotateX: 0, filter: "blur(0px)" }}
+                            viewport={{ once: false, margin: "-10%" }}
+                            transition={{ duration: 0.7, ease: "easeOut" }}
+                            className="bg-black/30 backdrop-blur-2xl rounded-[2rem] p-6 border border-white/10 shadow-xl"
+                        >
+                            <h4 className="font-bold text-white flex items-center gap-2 mb-4">
+                                <Award className="w-5 h-5 text-amber-500" /> Smart Performance Analysis {exam.type && <span className="text-xs opacity-50 bg-white/10 px-2 py-1 rounded-full">{exam.type}</span>}
+                            </h4>
+                            <ul className="space-y-4">
+                                {/* Dynamic Section Analysis */}
+                                {(() => {
+                                    // 1. Calculate Section Performance
+                                    const sections = {};
+                                    exam.questions.forEach(q => {
+                                        if (!sections[q.section]) sections[q.section] = { total: 0, correct: 0 };
+                                        sections[q.section].total++;
+                                        if (answers[q.id] === q.answer) sections[q.section].correct++;
+                                    });
 
-                                // 2. Generate Insights
-                                const insights = [];
+                                    // 2. Generate Insights
+                                    const insights = [];
 
-                                // Accuracy Insight
-                                const accuracy = Math.round((correct / (attempted || 1)) * 100);
-                                if (accuracy > 80) {
-                                    insights.push({ color: 'bg-emerald-500', text: "High Precision: Your accuracy is excellent. You avoided guessing." });
-                                } else if (accuracy < 50) {
-                                    insights.push({ color: 'bg-rose-500', text: "High Negative Impact: Many wrong attempts. Try to skip if unsure." });
-                                } else {
-                                    insights.push({ color: 'bg-blue-500', text: `Balanced Approach: ${accuracy}% accuracy. Room for improvement.` });
-                                }
-
-                                // 3. Exam Specific Insights
-                                if (exam.type === "JOA IT") {
-                                    const compSection = Object.entries(sections).find(([name]) =>
-                                        name.toLowerCase().includes("computer") || name.toLowerCase().includes("it") || name.toLowerCase().includes("tech")
-                                    );
-                                    if (compSection) {
-                                        const [name, stats] = compSection;
-                                        const pct = Math.round((stats.correct / stats.total) * 100);
-                                        const color = pct > 70 ? 'bg-emerald-500' : pct > 40 ? 'bg-amber-500' : 'bg-rose-500';
-                                        insights.push({
-                                            color,
-                                            text: `Technical Core (${name}): ${pct}%. ${pct > 70 ? 'Strong command over IT concepts.' : 'Critical for JOA. Focus revision here.'}`
-                                        });
+                                    // Accuracy Insight
+                                    const accuracy = Math.round((correct / (attempted || 1)) * 100);
+                                    if (accuracy > 80) {
+                                        insights.push({ color: 'bg-emerald-500', text: "High Precision: Your accuracy is excellent. You avoided guessing." });
+                                    } else if (accuracy < 50) {
+                                        insights.push({ color: 'bg-rose-500', text: "High Negative Impact: Many wrong attempts. Try to skip if unsure." });
+                                    } else {
+                                        insights.push({ color: 'bg-blue-500', text: `Balanced Approach: ${accuracy}% accuracy. Room for improvement.` });
                                     }
 
-                                    // NEW: Non-Technical Balance
-                                    const nonTechSections = Object.entries(sections).filter(([name]) =>
-                                        !name.toLowerCase().includes("computer") &&
-                                        !name.toLowerCase().includes("it") &&
-                                        !name.toLowerCase().includes("tech")
-                                    );
-
-                                    if (nonTechSections.length > 0) {
-                                        let ntTotal = 0;
-                                        let ntCorrect = 0;
-                                        nonTechSections.forEach(([_, s]) => { ntTotal += s.total; ntCorrect += s.correct; });
-
-                                        if (ntTotal > 0) {
-                                            const ntPct = Math.round((ntCorrect / ntTotal) * 100);
-                                            const color = ntPct > 60 ? 'bg-blue-500' : 'bg-purple-500'; // Blue for good, Purple for needs balance
+                                    // 3. Exam Specific Insights
+                                    if (exam.type === "JOA IT") {
+                                        const compSection = Object.entries(sections).find(([name]) =>
+                                            name.toLowerCase().includes("computer") || name.toLowerCase().includes("it") || name.toLowerCase().includes("tech")
+                                        );
+                                        if (compSection) {
+                                            const [name, stats] = compSection;
+                                            const pct = Math.round((stats.correct / stats.total) * 100);
+                                            const color = pct > 70 ? 'bg-emerald-500' : pct > 40 ? 'bg-amber-500' : 'bg-rose-500';
                                             insights.push({
                                                 color,
-                                                text: `General Aptitude: ${ntPct}%. ${ntPct > 60 ? 'Good balance between Tech & GK.' : 'Don\'t ignore GK/Lang sections.'}`
+                                                text: `Technical Core (${name}): ${pct}%. ${pct > 70 ? 'Strong command over IT concepts.' : 'Critical for JOA. Focus revision here.'}`
+                                            });
+                                        }
+
+                                        // NEW: Non-Technical Balance
+                                        const nonTechSections = Object.entries(sections).filter(([name]) =>
+                                            !name.toLowerCase().includes("computer") &&
+                                            !name.toLowerCase().includes("it") &&
+                                            !name.toLowerCase().includes("tech")
+                                        );
+
+                                        if (nonTechSections.length > 0) {
+                                            let ntTotal = 0;
+                                            let ntCorrect = 0;
+                                            nonTechSections.forEach(([_, s]) => { ntTotal += s.total; ntCorrect += s.correct; });
+
+                                            if (ntTotal > 0) {
+                                                const ntPct = Math.round((ntCorrect / ntTotal) * 100);
+                                                const color = ntPct > 60 ? 'bg-blue-500' : 'bg-purple-500'; // Blue for good, Purple for needs balance
+                                                insights.push({
+                                                    color,
+                                                    text: `General Aptitude: ${ntPct}%. ${ntPct > 60 ? 'Good balance between Tech & GK.' : 'Don\'t ignore GK/Lang sections.'}`
+                                                });
+                                            }
+                                        }
+                                    } else if (exam.type === "Himachal GK") {
+                                        const hpSection = Object.entries(sections).find(([name]) =>
+                                            name.toLowerCase().includes("hp") || name.toLowerCase().includes("himachal")
+                                        );
+                                        if (hpSection) {
+                                            const [name, stats] = hpSection;
+                                            const pct = Math.round((stats.correct / stats.total) * 100);
+                                            const color = pct > 70 ? 'bg-emerald-500' : pct > 40 ? 'bg-amber-500' : 'bg-rose-500';
+                                            insights.push({
+                                                color,
+                                                text: `State GK (${name}): ${pct}%. ${pct > 70 ? 'Excellent state knowledge.' : 'Focus on Himachal specific topics.'}`
                                             });
                                         }
                                     }
-                                } else if (exam.type === "Himachal GK") {
-                                    const hpSection = Object.entries(sections).find(([name]) =>
-                                        name.toLowerCase().includes("hp") || name.toLowerCase().includes("himachal")
-                                    );
-                                    if (hpSection) {
-                                        const [name, stats] = hpSection;
-                                        const pct = Math.round((stats.correct / stats.total) * 100);
-                                        const color = pct > 70 ? 'bg-emerald-500' : pct > 40 ? 'bg-amber-500' : 'bg-rose-500';
-                                        insights.push({
-                                            color,
-                                            text: `State GK (${name}): ${pct}%. ${pct > 70 ? 'Excellent state knowledge.' : 'Focus on Himachal specific topics.'}`
-                                        });
+
+                                    // Strongest Section (Generic)
+                                    const sortedSections = Object.entries(sections).sort(([, a], [, b]) => (b.correct / b.total) - (a.correct / a.total));
+
+                                    // Filter out the one we just mentioned if any
+                                    const otherSections = sortedSections.filter(([name]) => {
+                                        if (exam.type === "JOA IT") return !name.toLowerCase().includes("computer") && !name.toLowerCase().includes("it");
+                                        if (exam.type === "Himachal GK") return !name.toLowerCase().includes("hp") && !name.toLowerCase().includes("himachal");
+                                        return true;
+                                    });
+
+                                    const best = otherSections[0];
+                                    const worst = otherSections[otherSections.length - 1];
+
+                                    if (best) {
+                                        const bestPct = Math.round((best[1].correct / best[1].total) * 100);
+                                        insights.push({ color: 'bg-purple-500', text: `Strong Domain: ${best[0]} (${bestPct}%). Capitalize on this.` });
                                     }
-                                }
 
-                                // Strongest Section (Generic)
-                                const sortedSections = Object.entries(sections).sort(([, a], [, b]) => (b.correct / b.total) - (a.correct / a.total));
+                                    if (worst && worst !== best) {
+                                        const worstPct = Math.round((worst[1].correct / worst[1].total) * 100);
+                                        insights.push({ color: 'bg-amber-500', text: `Weak Area: ${worst[0]} (${worstPct}%). Focus your revision here.` });
+                                    }
 
-                                // Filter out the one we just mentioned if any
-                                const otherSections = sortedSections.filter(([name]) => {
-                                    if (exam.type === "JOA IT") return !name.toLowerCase().includes("computer") && !name.toLowerCase().includes("it");
-                                    if (exam.type === "Himachal GK") return !name.toLowerCase().includes("hp") && !name.toLowerCase().includes("himachal");
-                                    return true;
-                                });
-
-                                const best = otherSections[0];
-                                const worst = otherSections[otherSections.length - 1];
-
-                                if (best) {
-                                    const bestPct = Math.round((best[1].correct / best[1].total) * 100);
-                                    insights.push({ color: 'bg-purple-500', text: `Strong Domain: ${best[0]} (${bestPct}%). Capitalize on this.` });
-                                }
-
-                                if (worst && worst !== best) {
-                                    const worstPct = Math.round((worst[1].correct / worst[1].total) * 100);
-                                    insights.push({ color: 'bg-amber-500', text: `Weak Area: ${worst[0]} (${worstPct}%). Focus your revision here.` });
-                                }
-
-                                return insights.slice(0, 3).map((insight, idx) => (
-                                    <motion.li
-                                        key={idx}
-                                        initial={{ x: -10, opacity: 0 }}
-                                        animate={{ x: 0, opacity: 1 }}
-                                        transition={{ delay: 0.8 + (idx * 0.1) }}
-                                        className="flex gap-3 text-sm text-slate-400 items-start"
-                                    >
-                                        <div className={`w-1.5 h-1.5 rounded-full ${insight.color} mt-1.5 flex-shrink-0`} />
-                                        <span>{insight.text}</span>
-                                    </motion.li>
-                                ));
-                            })()}
-                        </ul>
-                    </motion.div>
+                                    return insights.slice(0, 3).map((insight, idx) => (
+                                        <motion.li
+                                            key={idx}
+                                            initial={{ x: -10, opacity: 0 }}
+                                            animate={{ x: 0, opacity: 1 }}
+                                            transition={{ delay: 0.8 + (idx * 0.1) }}
+                                            className="flex gap-3 text-sm text-slate-400 items-start"
+                                        >
+                                            <div className={`w-1.5 h-1.5 rounded-full ${insight.color} mt-1.5 flex-shrink-0 shadow-[0_0_8px_${insight.color.replace('bg-', '')}]`} />
+                                            <span>{insight.text}</span>
+                                        </motion.li>
+                                    ));
+                                })()}
+                            </ul>
+                        </motion.div>
+                    </TiltCard>
                 </div>
 
             </motion.div>

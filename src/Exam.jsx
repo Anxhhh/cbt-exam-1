@@ -298,7 +298,7 @@ export default function Exam({
         />
       </div>
 
-      <header className="flex-shrink-0 px-4 md:px-6 pt-[calc(0.75rem+env(safe-area-inset-top))] pb-3 border-b border-black/5 dark:border-white/5 flex items-center justify-between backdrop-blur-md bg-opacity-95 z-30 shadow-sm transition-colors duration-300 bg-white/80 dark:bg-[#1a1c23]/90 sepia:bg-[#f4ecd8]/90">
+      <header className="flex-shrink-0 px-4 md:px-6 pt-[calc(0.75rem+env(safe-area-inset-top))] pb-3 border-b border-black/5 dark:border-white/10 flex items-center justify-between backdrop-blur-2xl bg-white/70 dark:bg-[#1a1c23]/60 z-30 shadow-sm transition-colors duration-300">
 
         {/* Left: Branding & User */}
         <div className="flex items-center gap-4">
@@ -389,7 +389,7 @@ export default function Exam({
         {/* === LEFT SIDEBAR (Question Palette) === */}
         <aside
           className={cn(
-            "flex-shrink-0 border-r border-black/10 dark:border-white/5 bg-white dark:bg-[#1a1c23] sepia:bg-[#f4ecd8] overflow-hidden flex flex-col transition-all duration-300 absolute inset-y-0 left-0 z-20 lg:static shadow-2xl lg:shadow-none",
+            "flex-shrink-0 border-r border-black/5 dark:border-white/5 overflow-hidden flex flex-col transition-all duration-300 absolute inset-y-0 left-0 z-20 lg:static shadow-2xl lg:shadow-none bg-white/50 dark:bg-[#1a1c23]/50 backdrop-blur-xl",
             isSidebarOpen ? "w-80 translate-x-0 opacity-100" : "w-0 -translate-x-full opacity-0 lg:w-0 lg:opacity-0"
           )}
         >

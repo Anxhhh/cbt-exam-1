@@ -1,8 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Cookie&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --font-sans: 'Roboto', system-ui, sans-serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
 }
 
 /* Fix "white screen" on hard scroll by matching background color */
