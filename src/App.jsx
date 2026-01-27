@@ -68,7 +68,9 @@ export default function App() {
         if (!baseConfigResponse.ok) throw new Error("Failed to load base config");
         const baseConfig = await baseConfigResponse.json();
 
-        const csvFile = testId ? `questions${testId}.csv` : `questions1.csv`;
+        const csvFile = testId === "PYQ" ? "pyquestions.csv" :
+          testId === "PYQ2" ? "pyquestions2.csv" :
+            (testId ? `questions${testId}.csv` : `questions1.csv`);
         const csvResponse = await fetch(import.meta.env.BASE_URL + csvFile);
         if (!csvResponse.ok) throw new Error(`Failed to load ${csvFile}`);
         const csvText = await csvResponse.text();
@@ -77,6 +79,7 @@ export default function App() {
           Papa.parse(csvText, {
             header: true,
             skipEmptyLines: true,
+            transformHeader: (h) => h.trim(),
             complete: (results) => {
               const parsedQuestions = results.data.map((row, index) => {
                 return {
@@ -104,7 +107,12 @@ export default function App() {
               }
 
               const numericId = parseInt(testId) || 1;
-              const examType = numericId >= 5 ? "JOA IT" : "Himachal GK";
+              let examType = "Himachal GK";
+              if (testId === "PYQ" || testId === "PYQ2") {
+                examType = "HPAS Prelims PYQ's";
+              } else if (numericId >= 5) {
+                examType = "JOA IT";
+              }
 
               resolve({
                 exam: {

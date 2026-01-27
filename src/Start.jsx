@@ -24,6 +24,11 @@ export default function Start({ onStart, isRetake }) {
     } catch (e) { console.error(e); }
   }, []);
 
+  // Reset testSet when examType changes to avoid invalid states
+  useEffect(() => {
+    setTestSet("1");
+  }, [examType]);
+
   // Retake Auto-Scroll
   const portalRef = useRef(null);
   useEffect(() => {
@@ -40,9 +45,14 @@ export default function Start({ onStart, isRetake }) {
     try { sounds.click(); } catch (e) { }
 
     if (name.trim()) {
-      let finalId = parseInt(testSet);
-      if (examType === "JOA IT") {
-        finalId += 4;
+      let finalId;
+      if (examType === "HPAS Prelims PYQ's") {
+        finalId = testSet === "2" ? "PYQ2" : "PYQ";
+      } else {
+        finalId = parseInt(testSet);
+        if (examType === "JOA IT") {
+          finalId += 4;
+        }
       }
       onStart(name, finalId.toString());
     }
@@ -53,24 +63,21 @@ export default function Start({ onStart, isRetake }) {
     try { sounds.click(); } catch (e) { }
 
     if (resumeData) {
-      // We assume '1' if not saved, or we should have saved it.
-      // Since we didn't save testSet explicitly in Exam.jsx (my bad), 
-      // we might just default to 1, OR we can infer it. 
-      // For now let's hope the user remembers or we default. 
-      // Update: I will update App.jsx to save the "testSet" into the Exam Data context passed to Exam.jsx?
-      // Or just pass it.
-      // Let's just use the current selected testSet if we can't find it, or allow user to pick.
-      // ACTUALLY: The `resumeData` contains `answers` and `candidateName`.
-      // If we call onStart, it re-fetches the CSV.
-      // Then Exam.jsx mounts and restores Time/Index/Visited.
-      // THIS WORKS.
-
       setName(resumeData.candidateName);
 
       // Calculate ID based on current selection logic
-      let finalId = parseInt(testSet);
-      if (examType === "JOA IT") {
-        finalId += 4;
+      let finalId;
+      if (examType === "HPAS Prelims PYQ's") {
+        // For resume, we might ideally want to know what the original ID was from resumeData if available,
+        // but since resumeData structure might not have it explicitly saved separately from what we can infer,
+        // we'll rely on the user's selection or default. 
+        // Ideally, we should really save 'examId' in local storage to be perfect.
+        finalId = testSet === "2" ? "PYQ2" : "PYQ";
+      } else {
+        finalId = parseInt(testSet);
+        if (examType === "JOA IT") {
+          finalId += 4;
+        }
       }
 
       onStart(resumeData.candidateName, finalId.toString());
@@ -124,6 +131,9 @@ export default function Start({ onStart, isRetake }) {
       transition: { duration: 0.6, ease: "easeOut" }
     }
   };
+
+  // Determine available sets based on exam type
+  const availableSets = examType === "HPAS Prelims PYQ's" ? ["1", "2"] : ["1", "2", "3", "4"];
 
   return (
     <div className="min-h-screen text-slate-300 font-sans selection:bg-blue-500/30 flex items-center justify-center p-4 pr-[calc(1rem+env(safe-area-inset-right))] pl-[calc(1rem+env(safe-area-inset-left))] pt-[calc(1rem+env(safe-area-inset-top))] pb-[calc(1rem+env(safe-area-inset-bottom))] relative">
@@ -220,11 +230,11 @@ export default function Start({ onStart, isRetake }) {
             {/* Glow backing */}
             <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-[2.5rem] blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200" />
 
-            <div className="relative bg-black/30 backdrop-blur-3xl border border-white/10 rounded-[2.5rem] p-8 shadow-[0_8px_40px_-12px_rgba(0,0,0,0.5)] ring-1 ring-white/5 flex flex-col gap-8 overflow-hidden">
+            <div className="relative bg-black/30 backdrop-blur-3xl border border-white/10 rounded-[2rem] p-6 shadow-[0_8px_40px_-12px_rgba(0,0,0,0.5)] ring-1 ring-white/5 flex flex-col gap-5 overflow-hidden">
               {/* Internal Ambient Glow (Match Result Card) */}
               <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
 
-              <div className="flex items-center justify-between border-b border-white/5 pb-6">
+              <div className="flex items-center justify-between border-b border-white/5 pb-4">
                 <div>
                   <h3 className="text-xl font-bold text-white max-w-[200px] truncate">{name.trim() || "Candidate Portal"}</h3>
                   <p className="text-xs text-slate-500 mt-1">Configure your session</p>
@@ -240,7 +250,7 @@ export default function Start({ onStart, isRetake }) {
                   <BookOpen className="w-3 h-3" /> Select Exam
                 </label>
                 <div className="grid grid-cols-2 gap-2">
-                  {["Himachal GK", "JOA IT"].map((type) => (
+                  {["Himachal GK", "JOA IT", "HPAS Prelims PYQ's"].map((type) => (
                     <motion.button
                       key={type}
                       onClick={() => setExamType(type)}
@@ -257,7 +267,14 @@ export default function Start({ onStart, isRetake }) {
                           : "bg-white/5 text-slate-400 border-white/5 hover:bg-white/10 hover:border-white/20 hover:shadow-[0_0_15px_-5px_rgba(255,255,255,0.1)]"
                       )}
                     >
-                      {type}
+                      <span className="relative z-10">{type}</span>
+                      {type === "HPAS Prelims PYQ's" && (
+                        <div className="absolute inset-0 bg-slate-900/90 backdrop-blur-sm flex items-center justify-center text-center opacity-0 hover:opacity-100 transition-opacity duration-300 z-20 px-2">
+                          <span className="text-[9px] text-blue-200 font-medium leading-tight">
+                            it covers all pyq's from 2016-2025
+                          </span>
+                        </div>
+                      )}
                     </motion.button>
                   ))}
                 </div>
@@ -268,8 +285,8 @@ export default function Start({ onStart, isRetake }) {
                 <label className="text-xs font-bold text-blue-400 uppercase tracking-wider flex items-center gap-2">
                   <Layers className="w-3 h-3" /> Select Module
                 </label>
-                <div className="grid grid-cols-4 gap-2">
-                  {["1", "2", "3", "4"].map((id) => (
+                <div className={cn("grid gap-2", availableSets.length === 2 ? "grid-cols-2" : "grid-cols-4")}>
+                  {availableSets.map((id) => (
                     <motion.button
                       key={id}
                       onClick={() => setTestSet(id)}

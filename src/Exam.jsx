@@ -149,13 +149,22 @@ export default function Exam({
     photo: profileImg
   };
 
+  const [isTimerPaused, setIsTimerPaused] = useState(false);
+
+  // Auto-resume timer if Instant Feedback is disabled
+  useEffect(() => {
+    if (!isInstantFeedback) {
+      setIsTimerPaused(false);
+    }
+  }, [isInstantFeedback]);
+
   // ================= EFFECTS =================
 
   // Timer
   // Persistence & Timer
   useEffect(() => {
-    // Pause timer if exit modal is open
-    if (showExitModal) return;
+    // Pause timer if exit modal is open or manually paused
+    if (showExitModal || isTimerPaused) return;
 
     if (time <= 0) {
       handleSubmit();
@@ -192,7 +201,7 @@ export default function Exam({
     }
 
     return () => clearInterval(t);
-  }, [time, index, visited, answers, marked, showExitModal, candidateName, data.questions]);
+  }, [time, index, visited, answers, marked, showExitModal, isTimerPaused, candidateName, data.questions]);
 
   const handleSubmit = () => {
     const timeTaken = (data.duration * 60) - time;
@@ -257,6 +266,7 @@ export default function Exam({
   };
 
   const getTimerColor = () => {
+    if (isTimerPaused) return "bg-blue-400/50"; // Visual cue for paused
     const percent = time / (data.duration * 60);
     if (percent > 0.5) return "bg-emerald-500";
     if (percent > 0.2) return "bg-amber-500";
@@ -264,6 +274,7 @@ export default function Exam({
   };
 
   const getTimerTextClass = () => {
+    if (isTimerPaused) return "text-blue-500 dark:text-blue-400 animate-pulse";
     const percent = time / (data.duration * 60);
     if (percent > 0.2) return "text-slate-800 dark:text-slate-200";
     return "text-rose-600 dark:text-rose-400 font-bold";
@@ -281,6 +292,20 @@ export default function Exam({
     themeClasses[theme],
     "text-base"
   );
+
+  const handleTimerClick = () => {
+    if (isInstantFeedback) {
+      if (!isTimerPaused) {
+        setIsTimerPaused(true);
+        toast.info("Timer Paused", { icon: '⏸️' });
+      } else {
+        setIsTimerPaused(false);
+        toast.success("Timer Resumed", { icon: '▶️' });
+      }
+    } else {
+      toast.error("Enable 'Instant Feedback' (Eye Icon) to pause timer");
+    }
+  };
 
   return (
     <motion.div
@@ -366,13 +391,18 @@ export default function Exam({
         {/* Right: Controls */}
         <div className="flex items-center gap-3">
           {/* Timer Display */}
-          <div className={cn(
-            "flex items-center gap-2 px-3 py-1.5 rounded-md border border-black/10 dark:border-white/10 bg-white/50 dark:bg-black/20 font-mono text-xl font-bold tabular-nums shadow-sm",
-            getTimerTextClass()
-          )}>
-            <Clock className="w-5 h-5 opacity-80" />
-            {formatTime(time)}
-          </div>
+          <button
+            onClick={handleTimerClick}
+            disabled={!isInstantFeedback && !isTimerPaused}
+            title={isInstantFeedback ? "Click to Pause/Resume Timer" : "Enable Eye Icon to Pause"}
+            className={cn(
+              "flex items-center gap-2 px-3 py-1.5 rounded-md border border-black/10 dark:border-white/10 bg-white/50 dark:bg-black/20 font-mono text-xl font-bold tabular-nums shadow-sm transition-all",
+              getTimerTextClass(),
+              isInstantFeedback ? "cursor-pointer hover:bg-white/80 dark:hover:bg-white/10 active:scale-95" : "cursor-default opacity-80"
+            )}>
+            {isTimerPaused ? <div className="w-2 h-5 flex justify-between items-center"><div className="w-0.5 h-3 bg-current" /><div className="w-0.5 h-3 bg-current" /></div> : <Clock className="w-5 h-5 opacity-80" />}
+            {isTimerPaused ? "PAUSED" : formatTime(time)}
+          </button>
 
           <button
             onClick={handleSubmit}
