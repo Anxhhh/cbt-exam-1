@@ -3,6 +3,7 @@ import Papa from "papaparse";
 import { Toaster, toast } from 'sonner';
 import { smartShuffle } from "./utils";
 import ThreeBackground from "./ThreeBackground";
+import AIConsoleLoader from "./AIConsoleLoader";
 
 // Lazy load components
 const Start = lazy(() => import("./Start"));
@@ -28,6 +29,7 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [tensionLoading, setTensionLoading] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
+  const [loadingTestId, setLoadingTestId] = useState(null);
 
   const [answers, setAnswers] = useState({});
   const [marked, setMarked] = useState({});
@@ -59,6 +61,7 @@ export default function App() {
   /* ================= LOAD EXAM DATA ================= */
   const loadExam = async (name, testId) => {
     setTensionLoading(true);
+    setLoadingTestId(testId);
     setCandidateName(name);
     setIsRetake(false);
 
@@ -130,7 +133,7 @@ export default function App() {
         });
       })();
 
-      const tensionPromise = new Promise(resolve => setTimeout(resolve, 3500));
+      const tensionPromise = new Promise(resolve => setTimeout(resolve, 6000));
       const [data] = await Promise.all([fetchPromise, tensionPromise]);
 
       setAnswers(data.answers);
@@ -310,57 +313,6 @@ export default function App() {
     </div>
   );
 
-  /* ================= TENSION SCREEN ================= */
-  const TensionScreen = () => {
-    const [count, setCount] = useState(1);
-
-    useEffect(() => {
-      const interval = setInterval(() => {
-        setCount(c => c < 3 ? c + 1 : 3);
-      }, 1000);
-      return () => clearInterval(interval);
-    }, []);
-
-    return (
-      <div className="fixed inset-0 z-[100] bg-[#0b0f19] text-white font-sans overflow-hidden select-none flex flex-col items-center justify-center">
-        {/* Transparent container to allow root ThreeBackground to show through (or use its own if needed, but we wanted unified) */}
-        {/* Since we are using unified background, this div should be transparent or semi-transparent if needed. */}
-        {/* But the Plexus is BEHIND. We just need to show the content. */}
-
-        <div className="relative z-10 flex flex-col items-center gap-10">
-          <div className="relative">
-            <div className="absolute inset-[-20%] border border-blue-500/10 rounded-full animate-[spin_10s_linear_infinite]" />
-            <div className="absolute inset-[-10%] border border-dashed border-cyan-500/20 rounded-full animate-[spin_20s_linear_infinite_reverse]" />
-            <div className="relative w-20 h-20 md:w-24 md:h-24 bg-[#0f172a] rounded-xl md:rounded-2xl rotate-45 border border-blue-500/30 flex items-center justify-center shadow-[0_0_40px_-5px_rgba(59,130,246,0.3)] animate-pulse">
-              <div className="w-12 h-12 md:w-16 md:h-16 bg-blue-500/10 rounded-lg flex items-center justify-center -rotate-45 overflow-hidden">
-                <span key={count} className="text-xl md:text-2xl font-bold text-cyan-400 animate-[bounce_1s_infinite_paused]">{count}</span>
-              </div>
-            </div>
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 md:w-40 md:h-40 animate-[spin_3s_linear_infinite]">
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 bg-blue-400 rounded-full shadow-[0_0_10px_#60a5fa]" />
-            </div>
-          </div>
-          <div className="flex flex-col items-center gap-3">
-            <div className="h-6 overflow-hidden flex flex-col items-center">
-              <span key={count} className="text-blue-400 font-mono text-xs md:text-sm tracking-widest uppercase animate-pulse">
-                {count === 1 && "INITIALIZING..."}
-                {count === 2 && "LOADING EXAM..."}
-                {count === 3 && "READY"}
-              </span>
-            </div>
-            <div className="flex items-center gap-1">
-              {[...Array(5)].map((_, i) => (
-                <div key={i} className="w-6 md:w-8 h-1 bg-slate-800 rounded-full overflow-hidden">
-                  <div className={`h-full bg-cyan-500 transition-all duration-300 ${i < ((count / 3) * 5) ? 'opacity-100' : 'opacity-0'}`} />
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
   /* ================= ANALYZING SCREEN ================= */
   const AnalyzingScreen = () => {
     const [statusText, setStatusText] = useState("Initializing Analysis Engine...");
@@ -418,7 +370,7 @@ export default function App() {
   if (loading) {
     content = <ExamSkeleton />;
   } else if (tensionLoading) {
-    content = <TensionScreen />;
+    content = <AIConsoleLoader name={candidateName} testId={loadingTestId} />;
   } else if (analyzing) {
     content = <AnalyzingScreen />;
   } else if (!started) {
