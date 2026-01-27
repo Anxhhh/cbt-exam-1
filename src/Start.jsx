@@ -261,7 +261,7 @@ export default function Start({ onStart, isRetake }) {
                       }}
                       whileTap={{ scale: 0.98 }}
                       className={cn(
-                        "relative h-12 rounded-2xl font-bold text-xs transition-all overflow-hidden border backdrop-blur-md z-0 hover:z-10",
+                        "relative h-12 rounded-2xl font-bold text-xs transition-all overflow-hidden border backdrop-blur-md z-0 hover:z-10 whitespace-nowrap",
                         examType === type
                           ? "bg-blue-500/20 text-blue-100 border-blue-400/30 shadow-[0_0_20px_-5px_rgba(59,130,246,0.5)]"
                           : "bg-white/5 text-slate-400 border-white/5 hover:bg-white/10 hover:border-white/20 hover:shadow-[0_0_15px_-5px_rgba(255,255,255,0.1)]"

@@ -414,16 +414,36 @@ export default function App() {
   let content = null;
 
   if (loading) {
-    content = <ExamSkeleton />;
+    content = (
+      <motion.div key="skeleton" exit={{ opacity: 0 }} transition={{ duration: 0.5 }}>
+        <ExamSkeleton />
+      </motion.div>
+    );
   } else if (tensionLoading) {
-    content = <AIConsoleLoader name={candidateName} testId={loadingTestId} />;
+    content = (
+      <motion.div key="loader" exit={{ opacity: 0 }} transition={{ duration: 0.5 }}>
+        <AIConsoleLoader name={candidateName} testId={loadingTestId} />
+      </motion.div>
+    );
   } else if (analyzing) {
-    content = <AnalyzingScreen />;
+    content = (
+      <motion.div key="analyzing" exit={{ opacity: 0 }} transition={{ duration: 0.5 }}>
+        <AnalyzingScreen />
+      </motion.div>
+    );
   } else if (!started) {
     content = (
-      <Suspense fallback={<StartSkeleton />}>
-        <Start onStart={loadExam} isRetake={isRetake} />
-      </Suspense>
+      <motion.div
+        key="start"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0, filter: "blur(10px)" }}
+        transition={{ duration: 0.8 }}
+      >
+        <Suspense fallback={<StartSkeleton />}>
+          <Start onStart={loadExam} isRetake={isRetake} />
+        </Suspense>
+      </motion.div>
     );
   } else if (submitted) {
     if (!exam || !Array.isArray(exam.questions)) {
@@ -434,49 +454,65 @@ export default function App() {
       );
     } else {
       content = (
-        <Suspense fallback={<ResultSkeleton />}>
-          <Result
-            exam={exam}
-            answers={answers}
-            timeTaken={timeTaken}
-            candidateName={candidateName}
-            onRetake={() => {
-              setAnswers({});
-              setMarked({});
-              setSubmitted(false);
-              setStarted(false);
-              setTimeTaken(0);
-              setCandidateName("");
-              setExam(null);
-              setIsRetake(true);
-            }}
-          />
-        </Suspense>
+        <motion.div
+          key="result"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.8 }}
+        >
+          <Suspense fallback={<ResultSkeleton />}>
+            <Result
+              exam={exam}
+              answers={answers}
+              timeTaken={timeTaken}
+              candidateName={candidateName}
+              onRetake={() => {
+                setAnswers({});
+                setMarked({});
+                setSubmitted(false);
+                setStarted(false);
+                setTimeTaken(0);
+                setCandidateName("");
+                setExam(null);
+                setIsRetake(true);
+              }}
+            />
+          </Suspense>
+        </motion.div>
       );
     }
   } else if (exam) {
     content = (
-      <Suspense fallback={<ExamSkeleton />}>
-        <Exam
-          data={exam}
-          answers={answers}
-          marked={marked}
-          candidateName={candidateName}
-          setAnswers={setAnswers}
-          setMarked={setMarked}
-          onSubmit={(tt) => {
-            setTimeTaken(tt || 0);
-            setAnalyzing(true);
-            setTimeout(() => {
-              setAnalyzing(false);
-              setSubmitted(true);
-              localStorage.removeItem("cbt_exam_state");
-            }, 3000);
-          }}
-          onClearSession={() => localStorage.removeItem("cbt_exam_state")}
-          onBackToStart={() => setStarted(false)}
-        />
-      </Suspense>
+      <motion.div
+        key="exam"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0, filter: "blur(10px)" }}
+        transition={{ duration: 1 }}
+      >
+        <Suspense fallback={<ExamSkeleton />}>
+          <Exam
+            data={exam}
+            answers={answers}
+            marked={marked}
+            candidateName={candidateName}
+            setAnswers={setAnswers}
+            setMarked={setMarked}
+            onSubmit={(tt) => {
+              setTimeTaken(tt || 0);
+              setAnalyzing(true);
+              setTimeout(() => {
+                setAnalyzing(false);
+                setSubmitted(true);
+                localStorage.removeItem("cbt_exam_state");
+              }, 6000); // Increased to match Sequence Duration
+            }}
+            onClearSession={() => localStorage.removeItem("cbt_exam_state")}
+            onBackToStart={() => setStarted(false)}
+          />
+        </Suspense>
+      </motion.div>
     );
   }
 
@@ -490,7 +526,9 @@ export default function App() {
   return (
     <>
       <ThreeBackground intensity={bgIntensity} />
-      {content}
+      <AnimatePresence mode="wait">
+        {content}
+      </AnimatePresence>
       <Toaster
         theme="dark"
         position="top-center"
