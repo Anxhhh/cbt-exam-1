@@ -3,23 +3,22 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 
 /**
- * "Flux Matrix"
+ * "Quantum Flux Surface"
  * 
- * Concept: A digital ocean of data points moving in harmonic waves.
- * Aesthetic: Dark, Neon, Mathematical perfection.
- * Interaction: Mouse creates a "gravity well" that pulls points up/down.
+ * Concept: A hyper-fluid data surface that behaves like varying liquid metal.
+ * Visuals: Polished Obsidian spheres that glow (emissive) when they peak.
+ * Physics: 3-Layer Harmonic Interference + Ripple Repulsion Physics.
  */
 
-const WaveGrid = ({ countX = 50, countY = 50 }) => {
+const HyperFluxGrid = ({ countX = 60, countY = 40 }) => {
     const meshRef = useRef();
-    const { viewport, mouse } = useThree();
+    const { viewport } = useThree();
 
     // 1. Initialize Grid
-    // We create a densely packed grid of spheres
-    const { positions, baseColors } = useMemo(() => {
+    // Denser grid for smoother visual flow
+    const { positions } = useMemo(() => {
         const pos = [];
-        const cols = [];
-        const sep = 0.5; // Separation
+        const sep = 0.45; // Tighter separation
         for (let x = 0; x < countX; x++) {
             for (let y = 0; y < countY; y++) {
                 const px = (x - countX / 2) * sep;
@@ -32,67 +31,91 @@ const WaveGrid = ({ countX = 50, countY = 50 }) => {
 
     const dummy = useMemo(() => new THREE.Object3D(), []);
     const color = useMemo(() => new THREE.Color(), []);
+    // Reusing standard colors to avoid allocation in loop
+    const cLow = new THREE.Color('#020617'); // Black/Slate base
+    const cMid = new THREE.Color('#1d4ed8'); // Blue 700
+    const cHigh = new THREE.Color('#22d3ee'); // Cyan 400
+
+    const smoothedMouse = useRef(new THREE.Vector2(0, 0));
 
     useFrame((state) => {
         if (!meshRef.current) return;
 
         const time = state.clock.getElapsedTime();
 
-        // Mouse interaction relative to grid
-        const mx = (state.mouse.x * viewport.width) / 2;
-        const my = (state.mouse.y * viewport.height) / 2; // vertically on screen maps to Z in grid?
-        // Actually, our grid is XZ plane, camera looks from above/angle.
-        // Let's map screen Y to Grid Z roughly.
-        const mz = -my;
+        // Target Mouse (Raw)
+        const targetX = (state.mouse.x * viewport.width) / 2;
+        const targetY = -(state.mouse.y * viewport.height) / 2;
+
+        // Smooth Mouse (Lerped) - 0.05 factor for heavy/slow feel
+        smoothedMouse.current.x = THREE.MathUtils.lerp(smoothedMouse.current.x, targetX, 0.05);
+        smoothedMouse.current.y = THREE.MathUtils.lerp(smoothedMouse.current.y, targetY, 0.05);
+
+        const mx = smoothedMouse.current.x;
+        const mz = smoothedMouse.current.y;
 
         let i = 0;
         for (let x = 0; x < countX; x++) {
             for (let y = 0; y < countY; y++) {
                 const p = positions[i];
 
-                // 1. Wave Math
-                // Combine sine waves for complex fluid motion
-                const w1 = Math.sin(x * 0.3 + time) * 1.5;
-                const w2 = Math.cos(y * 0.2 + time * 0.8) * 1.5;
-                const w3 = Math.sin((x + y) * 0.1 + time * 0.5) * 1.0;
+                // --- 1. Harmonic Physics ---
+                // Layer 1: Big, slow rolling ocean swell
+                const w1 = Math.sin(p.x * 0.15 + time * 0.2);
+                // Layer 2: Faster, diagonal cross-chop
+                const w2 = Math.cos((p.x * 0.3 + p.z * 0.3) + time * 0.4);
+                // Layer 3: High frequency "jitter" or surface tension detail
+                const w3 = Math.sin(p.z * 0.5 - time * 0.02);
 
-                let h = (w1 + w2 + w3) * 0.5;
+                let h = (w1 + w2 * 0.8 + w3 * 0.5) * 0.8;
 
-                // 2. Mouse Interaction (Gravity Well)
+                // --- 2. Interaction Physics (Ripple Field) ---
                 const dx = p.x - mx;
-                const dz = p.z - mz * 2; // Scale Z to match viewport feel
+                const dz = p.z - mz;
                 const dist = Math.sqrt(dx * dx + dz * dz);
-                if (dist < 8) {
-                    const force = (8 - dist) / 8; // 0 to 1
-                    h -= force * 3; // Push down
+
+                // Interactive Radius: 10 units
+                if (dist < 10) {
+                    // Create a "Dip" plus a "Ring"
+                    // - Force is stronger at center (dip)
+                    // - + sin wave creates a ripple ring around cursor
+                    const falloff = (10 - dist) / 10; // 1 at center, 0 at edge
+
+                    // Ripple equation: Dip at center, wave ring at edges
+                    // We push DOWN (-3) at center
+                    // We add ripples (sin) that move outward (dist * freq)
+                    const ripple = -3 * falloff + Math.sin(dist * 2 - time * 2) * 0.5 * falloff;
+
+                    h += ripple;
                 }
 
-                // Update Position
+                // Update Transform
                 dummy.position.set(p.x, h, p.z);
 
-                // Scale based on height (peaks are larger)
-                const scale = 0.3 + Math.max(0, h + 2) * 0.1;
+                // Scale peaks slightly for visual "pop"
+                // Smooth scale: 0.2 base + height influence
+                const scale = 0.25 + Math.max(0, h + 2) * 0.05;
                 dummy.scale.setScalar(scale);
                 dummy.updateMatrix();
                 meshRef.current.setMatrixAt(i, dummy.matrix);
 
-                // Update Color based on height
-                // Deep Blue (low) -> Cyan (mid) -> Purple (high)
-                // Map h from approx -3 to +3
+                // --- 3. Dynamic Coloring (Glow) ---
+                // Map height to color
+                // h range is approx -4 to +4
                 const normH = THREE.MathUtils.clamp((h + 3) / 6, 0, 1);
 
-                // Interpolate colors
-                // Low: #1e3a8a (Blue 900)
-                // Mid: #06b6d4 (Cyan 500)
-                // High: #d946ef (Fuchsia 500)
-                if (normH < 0.5) {
-                    color.set('#1e3a8a').lerp(new THREE.Color('#06b6d4'), normH * 2);
+                if (normH < 0.3) {
+                    // Dark base
+                    meshRef.current.setColorAt(i, cLow);
+                } else if (normH < 0.7) {
+                    // Transition to Blue
+                    color.lerpColors(cLow, cMid, (normH - 0.3) * 2.5);
+                    meshRef.current.setColorAt(i, color);
                 } else {
-                    color.set('#06b6d4').lerp(new THREE.Color('#d946ef'), (normH - 0.5) * 2);
+                    // Blue to Cyan highlight
+                    color.lerpColors(cMid, cHigh, (normH - 0.7) * 3.3);
+                    meshRef.current.setColorAt(i, color);
                 }
-
-                meshRef.current.setColorAt(i, color);
-
                 i++;
             }
         }
@@ -103,10 +126,12 @@ const WaveGrid = ({ countX = 50, countY = 50 }) => {
 
     return (
         <instancedMesh ref={meshRef} args={[null, null, countX * countY]}>
-            <sphereGeometry args={[0.3, 16, 16]} />
+            <sphereGeometry args={[0.35, 16, 16]} />
             <meshStandardMaterial
-                roughness={0.2}
-                metalness={0.8}
+                roughness={0.1}   // Glossy
+                metalness={0.6}   // Semi-metallic
+                emissive="#000000" // Base emissive (we rely on instance color mostly)
+                color="#ffffff"    // Tint
             />
         </instancedMesh>
     );
@@ -115,29 +140,29 @@ const WaveGrid = ({ countX = 50, countY = 50 }) => {
 export default function ThreeBackground({ intensity = 1 }) {
     return (
         <div className="fixed inset-0 z-0 pointer-events-none bg-[#020617] transition-colors duration-1000">
-            {/* 
-                Camera Angle: Tilted perspective to see the landscape 
-                Position: Up and back
-            */}
-            <Canvas camera={{ position: [0, 10, 15], fov: 45 }} dpr={[1, 2]}>
-                <fog attach="fog" args={['#020617', 5, 40]} />
+            <Canvas camera={{ position: [0, 8, 12], fov: 50 }} dpr={[1, 2]}>
+                <fog attach="fog" args={['#020617', 5, 35]} />
 
-                {/* Lighting to make the spheres pop */}
-                <ambientLight intensity={0.5} color="#0f172a" />
-                <directionalLight position={[10, 10, 5]} intensity={2} color="#ffffff" />
-                <pointLight position={[-10, 5, -5]} intensity={5} color="#3b82f6" />
+                {/* 
+                   Lighting: 
+                   1. Blue underglow (Point)
+                   2. White Key Light (Directional) 
+                */}
+                <ambientLight intensity={0.4} color="#0f172a" />
+                <pointLight position={[0, -5, 0]} intensity={3} color="#3b82f6" distance={20} />
+                <directionalLight position={[5, 10, 5]} intensity={1.5} color="#cffafe" />
 
-                <WaveGrid />
+                <HyperFluxGrid />
             </Canvas>
 
-            {/* Gradient Overlay (Vignette) */}
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_transparent_0%,_#020617_120%)] pointer-events-none opacity-90" />
+            {/* Cinematic Vignette */}
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_transparent_10%,_#020617_110%)] pointer-events-none opacity-80" />
 
-            {/* Top/Bottom Fade to blend seamlessly */}
-            <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-[#020617] to-transparent pointer-events-none" />
-            <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#020617] to-transparent pointer-events-none" />
+            {/* Seamless Blend UI */}
+            <div className="absolute top-0 w-full h-32 bg-gradient-to-b from-[#020617] to-transparent pointer-events-none" />
+            <div className="absolute bottom-0 w-full h-32 bg-gradient-to-t from-[#020617] to-transparent pointer-events-none" />
 
-            {/* Intensity Focus Layer */}
+            {/* Focus Dimmer */}
             <div
                 className="absolute inset-0 bg-[#020617] transition-opacity duration-1000 pointer-events-none"
                 style={{ opacity: 1 - intensity }}
