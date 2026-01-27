@@ -3,217 +3,144 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 
 /**
- * "Luminous Fiber Optic Flow"
+ * "Flux Matrix"
  * 
- * Concept: Vertical strands of "fiber optic" data cables swaying gently.
- * Symbolism: Connectivity, Flow of Knowledge, Infrastructure.
- * Visuals: 
- * - Tall, vertical lines that move like sea-grass.
- * - Gradient colors (Cyan to Purple).
- * - "Data Packets" (points) travelling up the lines.
+ * Concept: A digital ocean of data points moving in harmonic waves.
+ * Aesthetic: Dark, Neon, Mathematical perfection.
+ * Interaction: Mouse creates a "gravity well" that pulls points up/down.
  */
 
-// --- 1. The Strands (Vertical Waves) ---
-const FiberStrands = ({ count = 40 }) => {
-    const linesRef = useRef();
+const WaveGrid = ({ countX = 50, countY = 50 }) => {
+    const meshRef = useRef();
     const { viewport, mouse } = useThree();
 
-    // Generate strands
-    // distinct lines, each with randomized properties
-    const strands = useMemo(() => {
-        return new Array(count).fill().map(() => ({
-            x: (Math.random() - 0.5) * 25, // Spread across X
-            z: (Math.random() - 0.5) * 10, // Depth
-            height: 12 + Math.random() * 8, // Tall lines
-            speed: 0.5 + Math.random() * 0.5,
-            offset: Math.random() * 10,
-            colorPhase: Math.random() * Math.PI
-        }));
-    }, [count]);
+    // 1. Initialize Grid
+    // We create a densely packed grid of spheres
+    const { positions, baseColors } = useMemo(() => {
+        const pos = [];
+        const cols = [];
+        const sep = 0.5; // Separation
+        for (let x = 0; x < countX; x++) {
+            for (let y = 0; y < countY; y++) {
+                const px = (x - countX / 2) * sep;
+                const pz = (y - countY / 2) * sep;
+                pos.push({ x: px, z: pz, y: 0, id: x * countY + y });
+            }
+        }
+        return { positions: pos };
+    }, [countX, countY]);
 
-    // Geometry: We'll construct a single buffer geometry for all lines
-    // Each line has M segments
-    const segments = 20;
-    const vertexCount = count * segments;
-
-    // Position Buffer
-    const positions = useMemo(() => new Float32Array(vertexCount * 3), [vertexCount]);
-    // Color Buffer (for gradient)
-    const colors = useMemo(() => new Float32Array(vertexCount * 3), [vertexCount]);
+    const dummy = useMemo(() => new THREE.Object3D(), []);
+    const color = useMemo(() => new THREE.Color(), []);
 
     useFrame((state) => {
-        if (!linesRef.current) return;
+        if (!meshRef.current) return;
 
         const time = state.clock.getElapsedTime();
+
+        // Mouse interaction relative to grid
         const mx = (state.mouse.x * viewport.width) / 2;
+        const my = (state.mouse.y * viewport.height) / 2; // vertically on screen maps to Z in grid?
+        // Actually, our grid is XZ plane, camera looks from above/angle.
+        // Let's map screen Y to Grid Z roughly.
+        const mz = -my;
 
-        strands.forEach((strand, i) => {
-            // Calculate base color for this strand
-            const baseColor = new THREE.Color()
-                .setHSL(0.55 + Math.sin(time * 0.1 + strand.colorPhase) * 0.1, 0.8, 0.6); // Blue-ish range
+        let i = 0;
+        for (let x = 0; x < countX; x++) {
+            for (let y = 0; y < countY; y++) {
+                const p = positions[i];
 
-            for (let j = 0; j < segments; j++) {
-                const idx = (i * segments + j) * 3;
+                // 1. Wave Math
+                // Combine sine waves for complex fluid motion
+                const w1 = Math.sin(x * 0.3 + time) * 1.5;
+                const w2 = Math.cos(y * 0.2 + time * 0.8) * 1.5;
+                const w3 = Math.sin((x + y) * 0.1 + time * 0.5) * 1.0;
 
-                // Normalized height (0 at bottom, 1 at top)
-                const t = j / (segments - 1);
+                let h = (w1 + w2 + w3) * 0.5;
 
-                // Base Position
-                const y = -10 + t * strand.height; // Start from bottom (-10)
+                // 2. Mouse Interaction (Gravity Well)
+                const dx = p.x - mx;
+                const dz = p.z - mz * 2; // Scale Z to match viewport feel
+                const dist = Math.sqrt(dx * dx + dz * dz);
+                if (dist < 8) {
+                    const force = (8 - dist) / 8; // 0 to 1
+                    h -= force * 3; // Push down
+                }
 
-                // Wave Animation
-                // Sway amount increases with height (t)
-                const sway = Math.sin(time * strand.speed + strand.offset + (y * 0.2)) * (t * 2);
+                // Update Position
+                dummy.position.set(p.x, h, p.z);
 
-                // Mouse Wind interaction
-                // Calculate distance to mouse X
-                const distToMouse = Math.abs(strand.x - mx);
-                const repel = Math.max(0, 1 - distToMouse / 4) * 2 * t; // Top moves more
-                const mouseForce = (strand.x < mx ? -1 : 1) * repel;
+                // Scale based on height (peaks are larger)
+                const scale = 0.3 + Math.max(0, h + 2) * 0.1;
+                dummy.scale.setScalar(scale);
+                dummy.updateMatrix();
+                meshRef.current.setMatrixAt(i, dummy.matrix);
 
-                positions[idx] = strand.x + sway + mouseForce;     // X
-                positions[idx + 1] = y;                            // Y
-                positions[idx + 2] = strand.z;                     // Z
+                // Update Color based on height
+                // Deep Blue (low) -> Cyan (mid) -> Purple (high)
+                // Map h from approx -3 to +3
+                const normH = THREE.MathUtils.clamp((h + 3) / 6, 0, 1);
 
-                // Colors: Darker at bottom, brighter at top
-                const color = baseColor.clone().multiplyScalar(0.2 + t * 1.5); // Fade in from bottom
-                colors[idx] = color.r;
-                colors[idx + 1] = color.g;
-                colors[idx + 2] = color.b;
+                // Interpolate colors
+                // Low: #1e3a8a (Blue 900)
+                // Mid: #06b6d4 (Cyan 500)
+                // High: #d946ef (Fuchsia 500)
+                if (normH < 0.5) {
+                    color.set('#1e3a8a').lerp(new THREE.Color('#06b6d4'), normH * 2);
+                } else {
+                    color.set('#06b6d4').lerp(new THREE.Color('#d946ef'), (normH - 0.5) * 2);
+                }
+
+                meshRef.current.setColorAt(i, color);
+
+                i++;
             }
-        });
+        }
 
-        linesRef.current.geometry.attributes.position.needsUpdate = true;
-        linesRef.current.geometry.attributes.color.needsUpdate = true;
+        meshRef.current.instanceMatrix.needsUpdate = true;
+        if (meshRef.current.instanceColor) meshRef.current.instanceColor.needsUpdate = true;
     });
 
     return (
-        <lineSegments ref={linesRef}>
-            {/* 
-               Note: To draw continuous lines with lineSegments, we need to duplicate indices or use GL_LINES logic.
-               However, strictly creating disconnected segments is easier in basic setup.
-               For true curved lines, we'd need (j, j+1) pairs in buffer. 
-               Let's do indices.
-            */}
-            <bufferGeometry>
-                <bufferAttribute attach="attributes-position" count={vertexCount} array={positions} itemSize={3} />
-                <bufferAttribute attach="attributes-color" count={vertexCount} array={colors} itemSize={3} />
-                {/* Index buffer for connecting segments */}
-                <bufferAttribute
-                    attach="index"
-                    count={count * (segments - 1) * 2}
-                    array={useMemo(() => {
-                        const indices = [];
-                        for (let i = 0; i < count; i++) {
-                            for (let j = 0; j < segments - 1; j++) {
-                                const base = i * segments + j;
-                                indices.push(base, base + 1);
-                            }
-                        }
-                        return new Uint16Array(indices);
-                    }, [count, segments])}
-                    itemSize={1}
-                />
-            </bufferGeometry>
-            <lineBasicMaterial vertexColors opacity={0.6} transparent blending={THREE.AdditiveBlending} linewidth={1} />
-        </lineSegments>
+        <instancedMesh ref={meshRef} args={[null, null, countX * countY]}>
+            <sphereGeometry args={[0.3, 16, 16]} />
+            <meshStandardMaterial
+                roughness={0.2}
+                metalness={0.8}
+            />
+        </instancedMesh>
     );
 };
 
-// --- 2. Floating Data Packets (Upward Particles) ---
-const FloatingPackets = ({ count = 100 }) => {
-    const pointsRef = useRef();
-
-    const [positions, shifts] = useMemo(() => {
-        const pos = new Float32Array(count * 3);
-        const shift = new Float32Array(count);
-        for (let i = 0; i < count; i++) {
-            pos[i * 3] = (Math.random() - 0.5) * 30; // x
-            pos[i * 3 + 1] = -10 + Math.random() * 20; // y
-            pos[i * 3 + 2] = (Math.random() - 0.5) * 10; // z
-            shift[i] = Math.random() * Math.PI;
-        }
-        return [pos, shift];
-    }, [count]);
-
-    // Soft glow texture
-    const texture = useMemo(() => {
-        const c = document.createElement('canvas');
-        c.width = 32; c.height = 32;
-        const ctx = c.getContext('2d');
-        ctx.beginPath();
-        ctx.arc(16, 16, 12, 0, Math.PI * 2);
-        const grad = ctx.createRadialGradient(16, 16, 0, 16, 16, 12);
-        grad.addColorStop(0, 'rgba(255,255,255,1)');
-        grad.addColorStop(1, 'rgba(255,255,255,0)');
-        ctx.fillStyle = grad;
-        ctx.fill();
-        return new THREE.CanvasTexture(c);
-    }, []);
-
-    useFrame((state) => {
-        if (!pointsRef.current) return;
-        const time = state.clock.getElapsedTime();
-        const parr = pointsRef.current.geometry.attributes.position.array;
-
-        for (let i = 0; i < count; i++) {
-            const idx = i * 3;
-            // Float up
-            parr[idx + 1] += 0.03 + Math.sin(time + shifts[i]) * 0.01;
-
-            // Loop
-            if (parr[idx + 1] > 12) {
-                parr[idx + 1] = -12;
-                parr[idx] = (Math.random() - 0.5) * 30; // Reset X
-            }
-        }
-        pointsRef.current.geometry.attributes.position.needsUpdate = true;
-    });
-
-    return (
-        <points ref={pointsRef}>
-            <bufferGeometry>
-                <bufferAttribute attach="attributes-position" count={count} array={positions} itemSize={3} />
-            </bufferGeometry>
-            <pointsMaterial
-                map={texture}
-                size={0.25}
-                transparent
-                opacity={0.8}
-                color="#a5f3fc"
-                blending={THREE.AdditiveBlending}
-                depthWrite={false}
-            />
-        </points>
-    );
-}
-
 export default function ThreeBackground({ intensity = 1 }) {
     return (
-        <div className="fixed inset-0 z-0 pointer-events-none bg-[#02040a] transition-colors duration-1000">
-            <Canvas camera={{ position: [0, 0, 15], fov: 45 }} dpr={[1, 2]}>
-                <fog attach="fog" args={['#02040a', 5, 30]} />
-                <group scale={[1, 1, 1]} position={[0, -2, 0]}>
-                    <FiberStrands count={60} />
-                    <FloatingPackets count={150} />
-                </group>
+        <div className="fixed inset-0 z-0 pointer-events-none bg-[#020617] transition-colors duration-1000">
+            {/* 
+                Camera Angle: Tilted perspective to see the landscape 
+                Position: Up and back
+            */}
+            <Canvas camera={{ position: [0, 10, 15], fov: 45 }} dpr={[1, 2]}>
+                <fog attach="fog" args={['#020617', 5, 40]} />
+
+                {/* Lighting to make the spheres pop */}
+                <ambientLight intensity={0.5} color="#0f172a" />
+                <directionalLight position={[10, 10, 5]} intensity={2} color="#ffffff" />
+                <pointLight position={[-10, 5, -5]} intensity={5} color="#3b82f6" />
+
+                <WaveGrid />
             </Canvas>
 
-            {/* Aurora Overlay */}
-            <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-blue-500/10 to-transparent mix-blend-screen pointer-events-none" />
-            <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-purple-500/10 to-transparent mix-blend-screen pointer-events-none" />
+            {/* Gradient Overlay (Vignette) */}
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_transparent_0%,_#020617_120%)] pointer-events-none opacity-90" />
 
-            {/* Focus Mode Dimmers */}
+            {/* Top/Bottom Fade to blend seamlessly */}
+            <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-[#020617] to-transparent pointer-events-none" />
+            <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#020617] to-transparent pointer-events-none" />
+
+            {/* Intensity Focus Layer */}
             <div
-                className="absolute inset-0 bg-[#02040a] transition-opacity duration-1000 pointer-events-none"
+                className="absolute inset-0 bg-[#020617] transition-opacity duration-1000 pointer-events-none"
                 style={{ opacity: 1 - intensity }}
-            />
-            <div
-                className="absolute inset-0 backdrop-blur-sm transition-all duration-1000 pointer-events-none"
-                style={{
-                    opacity: intensity < 0.5 ? 1 : 0,
-                    backdropFilter: `blur(${10 * (1 - intensity)}px)`
-                }}
             />
         </div>
     );
