@@ -190,6 +190,7 @@ export default function Start({ onStart, isRetake }) {
               Live Assessment System
             </motion.div>
             <motion.h1
+
               initial={{ y: 50, opacity: 0, rotateX: -20, filter: "blur(10px)" }}
               whileInView={{ y: 0, opacity: 1, rotateX: 0, filter: "blur(0px)" }}
               viewport={{ once: false, margin: "-10%" }}
