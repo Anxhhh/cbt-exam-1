@@ -4,6 +4,7 @@ import { Toaster, toast } from 'sonner';
 import { smartShuffle } from "./utils";
 import ThreeBackground from "./ThreeBackground";
 import AIConsoleLoader from "./AIConsoleLoader";
+import { motion, AnimatePresence } from 'framer-motion';
 
 // Lazy load components
 const Start = lazy(() => import("./Start"));
@@ -313,52 +314,97 @@ export default function App() {
     </div>
   );
 
-  /* ================= ANALYZING SCREEN ================= */
+  /* ================= ANALYZING SCREEN (Gemini Style) ================= */
   const AnalyzingScreen = () => {
-    const [statusText, setStatusText] = useState("Initializing Analysis Engine...");
+    const [step, setStep] = useState(0);
+
+    const sequence = [
+      { text: "Analyzing Sessions...", subtext: "Verifying response integrity.", duration: 1500 },
+      { text: "Pattern Recognition", subtext: "Correlating answers with difficulty vectors.", duration: 2000 },
+      { text: "Generating Insights", subtext: " Synthesizing performance metrics.", duration: 1500 },
+      { text: "Finalizing Report", subtext: "Structuring your personalized summary.", duration: 1000 }
+    ];
 
     useEffect(() => {
-      const messages = [
-        "Verifying Response Integrity...",
-        "Correlating Answers with Key...",
-        "Calculating Accuracy Metrics...",
-        "Generating Performance Report..."
-      ];
-      let i = 0;
-      const interval = setInterval(() => {
-        setStatusText(messages[i]);
-        i = (i + 1) % messages.length;
-      }, 750);
-      return () => clearInterval(interval);
+      let totalDelay = 0;
+      sequence.forEach((s, i) => {
+        setTimeout(() => setStep(i), totalDelay);
+        totalDelay += s.duration;
+      });
     }, []);
 
     return (
-      <div className="min-h-screen text-slate-300 font-sans flex flex-col items-center justify-center relative overflow-hidden select-none">
-        <div className="relative z-10 flex flex-col items-center gap-6 md:gap-10">
-          <div className="relative">
-            <div className="absolute inset-[-20%] border border-blue-500/10 rounded-full animate-[spin_10s_linear_infinite]"></div>
-            <div className="absolute inset-[-10%] border border-dashed border-cyan-500/20 rounded-full animate-[spin_20s_linear_infinite_reverse]"></div>
-            <div className="relative w-20 h-20 md:w-24 md:h-24 bg-[#0f172a] rounded-xl md:rounded-2xl rotate-45 border border-blue-500/30 flex items-center justify-center shadow-[0_0_40px_-5px_rgba(59,130,246,0.3)] animate-pulse">
-              <div className="w-12 h-12 md:w-16 md:h-16 bg-blue-500/10 rounded-lg flex items-center justify-center -rotate-45">
-                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-cyan-400 animate-bounce md:w-8 md:h-8"><rect width="18" height="18" x="3" y="3" rx="2" /><path d="M9 9h6v6H9z" /><path d="M15 9l-6 6" /><path d="M9 15l6-6" /></svg>
-              </div>
+      <div className="fixed inset-0 z-[100] bg-[#020617] flex items-center justify-center font-sans p-6 overflow-hidden">
+        {/* Ambient Spotlight */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_#1e293b_0%,_#020617_60%)] opacity-40 pointer-events-none" />
+
+        <div className="w-full max-w-xl text-center space-y-10 relative z-10">
+
+          {/* Refined AI Sparkle Icon */}
+          <div className="flex justify-center items-center relative h-20">
+            <motion.div
+              animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
+              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute w-24 h-24 bg-blue-500/20 rounded-full blur-2xl"
+            />
+            <div className="relative w-14 h-14">
+              <svg viewBox="0 0 24 24" className="w-full h-full drop-shadow-[0_0_15px_rgba(96,165,250,0.5)]" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L14.8 9.2L22 12L14.8 14.8L12 22L9.2 14.8L2 12L9.2 9.2L12 2Z" fill="url(#sparkle-gradient-analyze)" />
+                <defs>
+                  <linearGradient id="sparkle-gradient-analyze" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+                    <stop stopColor="#93c5fd" />
+                    <stop offset="1" stopColor="#c084fc" />
+                  </linearGradient>
+                </defs>
+              </svg>
             </div>
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 md:w-40 md:h-40 animate-[spin_3s_linear_infinite]">
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 bg-blue-400 rounded-full shadow-[0_0_10px_#60a5fa]"></div>
-            </div>
+            <motion.div
+              animate={{ rotate: -360 }}
+              transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+              className="absolute w-8 h-8 opacity-70"
+            >
+              <svg viewBox="0 0 24 24" className="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 0L13.5 10.5L24 12L13.5 13.5L12 24L10.5 13.5L0 12L10.5 10.5L12 0Z" fill="white" />
+              </svg>
+            </motion.div>
           </div>
-          <div className="flex flex-col items-center gap-3">
-            <div className="h-6 overflow-hidden">
-              <span className="text-blue-400 font-mono text-xs md:text-sm tracking-widest uppercase animate-pulse">{statusText}</span>
-            </div>
-            <div className="flex items-center gap-1">
-              {[...Array(5)].map((_, i) => (
-                <div key={i} className="w-6 md:w-8 h-1 bg-slate-800 rounded-full overflow-hidden">
-                  <div className="h-full bg-cyan-500 animate-[shimmer_1.5s_infinite]" style={{ animationDelay: `${i * 0.15}s` }} />
-                </div>
-              ))}
-            </div>
+
+          {/* Text Content */}
+          <div className="h-32 flex flex-col items-center justify-start">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={step}
+                initial={{ opacity: 0, scale: 0.95, filter: 'blur(5px)' }}
+                animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+                exit={{ opacity: 0, scale: 1.05, filter: 'blur(5px)' }}
+                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                className="space-y-3"
+              >
+                <h2 className="text-3xl md:text-3xl font-light tracking-tight text-transparent bg-clip-text bg-gradient-to-br from-white via-blue-100 to-slate-400">
+                  {sequence[step]?.text}
+                </h2>
+                <p className="text-slate-400/80 text-sm md:text-base font-light tracking-wide max-w-md mx-auto">
+                  {sequence[step]?.subtext}
+                </p>
+              </motion.div>
+            </AnimatePresence>
           </div>
+
+          {/* Ultra-Minimal Progress Line */}
+          <div className="w-64 mx-auto relative h-0.5 bg-slate-800/50 rounded-full overflow-hidden">
+            <motion.div
+              className="absolute inset-y-0 left-0 bg-gradient-to-r from-transparent via-blue-400 to-purple-400"
+              initial={{ width: "0%" }}
+              animate={{ width: "100%" }}
+              transition={{ duration: 6, ease: "linear" }}
+            />
+            <motion.div
+              className="absolute inset-y-0 top-0 w-20 bg-white/20 skew-x-12 blur-sm"
+              animate={{ x: [-100, 300] }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: "linear", repeatDelay: 0.5 }}
+            />
+          </div>
+
         </div>
       </div>
     );
