@@ -664,75 +664,119 @@ export default function Exam({
       {/* ================= REVIEW DASHBOARD MODAL ================= */}
       {
         showReviewModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-200 p-4">
-            <div className="bg-white dark:bg-[#252830] w-[95%] max-w-sm md:max-w-lg max-h-[85vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-200 border border-white/10">
-              <div className="p-4 md:p-6 border-b border-black/5 dark:border-white/5 flex items-center justify-between bg-slate-50/50 dark:bg-white/5">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md animate-in fade-in duration-200 p-4">
+            <div className="bg-white/90 dark:bg-[#0f1115]/90 backdrop-blur-2xl w-full max-w-sm md:max-w-xl max-h-[85vh] rounded-3xl shadow-2xl shadow-black/50 overflow-hidden flex flex-col animate-in zoom-in-95 duration-200 border border-white/20 ring-1 ring-white/10">
+
+              {/* Header */}
+              <div className="p-4 md:p-5 border-b border-black/5 dark:border-white/5 flex items-center justify-between bg-white/50 dark:bg-white/5">
                 <div>
-                  <h2 className="text-xl font-bold">Review Exam Status</h2>
+                  <h2 className="text-lg md:text-xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 dark:from-white dark:to-slate-400 bg-clip-text text-transparent">
+                    Exam Status
+                  </h2>
+                  <p className="text-[10px] md:text-xs text-slate-500 dark:text-slate-400 font-medium tracking-wide uppercase mt-0.5">
+                    Overview & Review
+                  </p>
                 </div>
-                <button onClick={() => setShowReviewModal(false)} className="p-2 hover:bg-black/5 rounded-full dark:hover:bg-white/10">
-                  <X className="w-6 h-6 text-slate-500" />
+                <button
+                  onClick={() => setShowReviewModal(false)}
+                  className="p-2 rounded-full bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 transition-all active:scale-95 border border-transparent dark:border-white/5 group"
+                >
+                  <X className="w-4 h-4 text-slate-600 dark:text-slate-300 group-hover:rotate-90 transition-transform duration-300" />
                 </button>
               </div>
 
-              <div className="flex-1 overflow-y-auto p-4 md:p-6">
-                <div className="grid grid-cols-2 gap-3 mb-4">
-                  <div className="bg-emerald-50 dark:bg-emerald-900/20 p-4 rounded-xl border border-emerald-100 dark:border-emerald-800 flex flex-col items-center justify-center text-center">
-                    <span className="text-3xl font-bold text-emerald-600 dark:text-emerald-400 mb-1">{stats.answeredCount}</span>
-                    <span className="text-xs font-bold text-emerald-800 dark:text-emerald-300 opacity-70 uppercase tracking-wide">Answered</span>
+              {/* Scrollable Content */}
+              <div className="flex-1 overflow-y-auto p-4 md:p-6 custom-scrollbar">
+
+                {/* Stats Grid */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3 mb-6">
+                  <div className="bg-emerald-500/10 border border-emerald-500/20 p-3 rounded-xl flex flex-col items-center justify-center text-center backdrop-blur-sm relative overflow-hidden group">
+                    <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <span className="text-2xl md:text-3xl font-bold text-emerald-600 dark:text-emerald-400 mb-0.5">{stats.answeredCount}</span>
+                    <span className="text-[9px] md:text-[10px] font-bold text-emerald-800 dark:text-emerald-300 opacity-70 uppercase tracking-wider">Answered</span>
                   </div>
-                  <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-xl border border-purple-100 dark:border-purple-800 flex flex-col items-center justify-center text-center">
-                    <span className="text-3xl font-bold text-purple-600 dark:text-purple-400 mb-1">{stats.markedCount}</span>
-                    <span className="text-xs font-bold text-purple-800 dark:text-purple-300 opacity-70 uppercase tracking-wide">Marked</span>
+
+                  <div className="bg-purple-500/10 border border-purple-500/20 p-3 rounded-xl flex flex-col items-center justify-center text-center backdrop-blur-sm relative overflow-hidden group">
+                    <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <span className="text-2xl md:text-3xl font-bold text-purple-600 dark:text-purple-400 mb-0.5">{stats.markedCount}</span>
+                    <span className="text-[9px] md:text-[10px] font-bold text-purple-800 dark:text-purple-300 opacity-70 uppercase tracking-wider">Marked</span>
                   </div>
-                  <div className="bg-rose-50 dark:bg-rose-900/20 p-4 rounded-xl border border-rose-100 dark:border-rose-800 flex flex-col items-center justify-center text-center">
-                    <span className="text-3xl font-bold text-rose-600 dark:text-rose-400 mb-1">{stats.skipped}</span>
-                    <span className="text-xs font-bold text-rose-800 dark:text-rose-300 opacity-70 uppercase tracking-wide">Skipped</span>
+
+                  <div className="bg-rose-500/10 border border-rose-500/20 p-3 rounded-xl flex flex-col items-center justify-center text-center backdrop-blur-sm relative overflow-hidden group">
+                    <div className="absolute inset-0 bg-gradient-to-br from-rose-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <span className="text-2xl md:text-3xl font-bold text-rose-600 dark:text-rose-400 mb-0.5">{stats.skipped}</span>
+                    <span className="text-[9px] md:text-[10px] font-bold text-rose-800 dark:text-rose-300 opacity-70 uppercase tracking-wider">Skipped</span>
                   </div>
-                  <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-100 dark:border-slate-700 flex flex-col items-center justify-center text-center">
-                    <span className="text-3xl font-bold text-slate-600 dark:text-slate-400 mb-1">{stats.visitedCount}</span>
-                    <span className="text-xs font-bold text-slate-800 dark:text-slate-300 opacity-70 uppercase tracking-wide">Visited</span>
+
+                  <div className="bg-slate-500/10 border border-slate-500/20 p-3 rounded-xl flex flex-col items-center justify-center text-center backdrop-blur-sm relative overflow-hidden group">
+                    <div className="absolute inset-0 bg-gradient-to-br from-slate-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <span className="text-2xl md:text-3xl font-bold text-slate-600 dark:text-slate-400 mb-0.5">{stats.visitedCount}</span>
+                    <span className="text-[9px] md:text-[10px] font-bold text-slate-800 dark:text-slate-300 opacity-70 uppercase tracking-wider">Visited</span>
                   </div>
                 </div>
 
-                <h3 className="font-bold text-lg mt-8 mb-4 border-b border-black/5 pb-2">Question Matrix</h3>
-                <div className="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-8 gap-2">
-                  {data.questions.map((q, i) => (
-                    <button
-                      key={q.id}
-                      onClick={() => {
-                        setIndex(i);
-                        setShowReviewModal(false);
-                      }}
-                      className={cn(
-                        "aspect-square rounded-md flex items-center justify-center text-sm font-semibold border transition-all hover:scale-110",
-                        index === i ? "ring-2 ring-offset-2 ring-black dark:ring-white dark:ring-offset-[#252830]" : "",
-                        answers[q.id] !== undefined ? "bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800" :
-                          marked[q.id] ? "bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800" :
-                            visited[q.id] ? "bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700" :
-                              "bg-white dark:bg-transparent text-slate-300 dark:text-slate-600 border-slate-100 dark:border-slate-800"
-                      )}
-                    >
-                      {i + 1}
-                    </button>
-                  ))}
+                {/* Question Matrix */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between px-1">
+                    <h3 className="font-bold text-sm md:text-base text-slate-700 dark:text-slate-200">Question Matrix</h3>
+                    <div className="flex gap-1.5">
+                      <div className="w-2 h-2 rounded-full bg-emerald-500" title="Answered" />
+                      <div className="w-2 h-2 rounded-full bg-purple-500" title="Marked" />
+                      <div className="w-2 h-2 rounded-full bg-slate-200 dark:bg-slate-600" title="Not Visited" />
+                    </div>
+                  </div>
+
+                  <div className="bg-black/5 dark:bg-black/20 p-3 rounded-xl border border-black/5 dark:border-white/5 shadow-inner">
+                    <div className="grid grid-cols-5 xs:grid-cols-6 sm:grid-cols-8 md:grid-cols-10 gap-1.5 md:gap-2">
+                      {data.questions.map((q, i) => (
+                        <button
+                          key={q.id}
+                          onClick={() => {
+                            setIndex(i);
+                            setShowReviewModal(false);
+                          }}
+                          className={cn(
+                            "aspect-square rounded-lg flex items-center justify-center text-xs font-bold border transition-all duration-200 relative overflow-hidden active:scale-90",
+                            index === i ? "ring-2 ring-offset-1 ring-blue-500 ring-offset-white dark:ring-offset-[#1a1c23] z-10 scale-105" : "hover:scale-105 hover:shadow-md",
+
+                            // Colors
+                            answers[q.id] !== undefined
+                              ? "bg-emerald-500 text-white border-emerald-600 shadow-sm shadow-emerald-500/30"
+                              : marked[q.id]
+                                ? "bg-purple-600 text-white border-purple-700 shadow-sm shadow-purple-500/30"
+                                : visited[q.id]
+                                  ? "bg-white dark:bg-white/10 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-white/10"
+                                  : "bg-white/50 dark:bg-white/5 text-slate-400 dark:text-slate-600 border-transparent"
+                          )}
+                        >
+                          {i + 1}
+                          {/* Shine effect for active items */}
+                          {(answers[q.id] !== undefined || marked[q.id]) && (
+                            <div className="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent pointer-events-none" />
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              <div className="p-4 md:p-6 border-t border-black/5 dark:border-white/5 bg-slate-50 dark:bg-white/5 flex items-center justify-end gap-3">
+              {/* Footer */}
+              <div className="p-4 md:p-5 border-t border-black/5 dark:border-white/5 bg-white/5 backdrop-blur-md flex flex-col md:flex-row gap-2.5">
                 <button
                   onClick={() => setShowReviewModal(false)}
-                  className="px-5 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5"
+                  className="w-full md:w-auto px-5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 font-bold text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors order-2 md:order-1"
                 >
                   Keep Solving
                 </button>
                 <button
                   onClick={() => {
-                    window.confirm("Are you surely you want to submit? This cannot be undone.") && handleSubmit();
+                    if (navigator.vibrate) navigator.vibrate(50);
+                    if (window.confirm("Are you surely you want to submit? This cannot be undone.")) handleSubmit();
                   }}
-                  className="px-8 py-2.5 rounded-lg bg-blue-600 text-white font-bold hover:bg-blue-700 shadow-lg shadow-blue-500/20"
+                  className="w-full md:flex-1 px-6 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-sm shadow-lg shadow-blue-500/30 active:scale-[0.98] transition-all order-1 md:order-2 flex items-center justify-center gap-2"
                 >
-                  Submit Final Exam
+                  Submit Final Exam <ArrowRight className="w-4 h-4 opacity-80" />
                 </button>
               </div>
             </div>

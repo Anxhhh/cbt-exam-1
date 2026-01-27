@@ -15,6 +15,31 @@ export default function Start({ onStart, isRetake }) {
 
   const [resumeData, setResumeData] = useState(null);
 
+  // Long Press Logic for Deleting Session
+  const [isLongPressing, setIsLongPressing] = useState(false);
+  const pressTimer = useRef(null);
+  const longPressTriggered = useRef(false);
+
+  const handlePressStart = () => {
+    if (!resumeData) return;
+    longPressTriggered.current = false;
+    setIsLongPressing(true);
+    pressTimer.current = setTimeout(() => {
+      // Delete Action
+      localStorage.removeItem("cbt_exam_state");
+      setResumeData(null);
+      longPressTriggered.current = true;
+      setIsLongPressing(false);
+      if (navigator.vibrate) navigator.vibrate(200);
+      try { sounds.click(); } catch (e) { } // Feedback sound
+    }, 3000); // 3 seconds
+  };
+
+  const handlePressEnd = () => {
+    if (pressTimer.current) clearTimeout(pressTimer.current);
+    setIsLongPressing(false);
+  };
+
   useEffect(() => {
     try {
       const saved = JSON.parse(localStorage.getItem("cbt_exam_state"));
@@ -346,26 +371,61 @@ export default function Start({ onStart, isRetake }) {
                 {resumeData && (
                   <GlassButton
                     color="emerald"
-                    onClick={handleResume}
-                    className="w-full h-auto px-6 py-4"
+                    onClick={() => {
+                      if (longPressTriggered.current) {
+                        longPressTriggered.current = false;
+                        return;
+                      }
+                      handleResume();
+                    }}
+                    onMouseDown={handlePressStart}
+                    onMouseUp={handlePressEnd}
+                    onMouseLeave={handlePressEnd}
+                    onTouchStart={handlePressStart}
+                    onTouchEnd={handlePressEnd}
+                    onContextMenu={(e) => e.preventDefault()}
+                    className="w-full h-auto px-6 py-4 select-none relative overflow-hidden"
                   >
-                    <div className="flex flex-col items-center justify-center w-full">
-                      <span className="font-bold text-white flex items-center gap-2">
-                        <Clock className="w-4 h-4" /> Resume Previous Session
-                      </span>
-                      <span className="text-[10px] text-emerald-200 opacity-80">
-                        {resumeData.candidateName} • {Math.floor(resumeData.timeRemaining / 60)}m left
-                      </span>
+                    {/* Long Press Progress Bar */}
+                    {isLongPressing && (
+                      <motion.div
+                        initial={{ width: "0%" }}
+                        animate={{ width: "100%" }}
+                        transition={{ duration: 3, ease: "linear" }}
+                        className="absolute bottom-0 left-0 h-1.5 bg-red-500/80 z-50"
+                      />
+                    )}
+
+                    <div className="flex flex-col items-center justify-center w-full relative z-10 transition-all duration-200">
+                      {isLongPressing ? (
+                        <div className="flex flex-col items-center animate-pulse text-red-100">
+                          <span className="font-bold flex items-center gap-2">
+                            <Trash2 className="w-4 h-4" /> Deleting Session...
+                          </span>
+                          <span className="text-[10px] opacity-80">Keep holding to confirm</span>
+                        </div>
+                      ) : (
+                        <>
+                          <span className="font-bold text-white flex items-center gap-2">
+                            <Clock className="w-4 h-4" /> Resume Previous Session
+                          </span>
+                          <span className="text-[10px] text-emerald-200 opacity-80">
+                            {resumeData.candidateName} • {Math.floor(resumeData.timeRemaining / 60)}m left
+                          </span>
+                        </>
+                      )}
                     </div>
 
-                    {/* Delete Session Button (Visible on Hover) */}
-                    <button
-                      onClick={handleClearSession}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white transition-all opacity-0 group-hover:opacity-100 z-20"
-                      title="Delete saved session"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                    {/* Delete Session Button (Visible on Hover - Desktop Backup) */}
+                    {!isLongPressing && (
+                      <div
+                        onClick={handleClearSession}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white transition-all opacity-0 group-hover:opacity-100 z-20 cursor-pointer hidden md:block"
+                        title="Delete saved session"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </div>
+                    )}
                   </GlassButton>
                 )}
 
