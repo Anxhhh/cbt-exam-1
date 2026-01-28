@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, Fragment } from "react";
 import profileImg from "./assets/profile.png";
 import {
   ChevronLeft, ChevronRight, Menu, X, Flag,
@@ -9,6 +9,65 @@ import { cn, smartShuffle } from "./utils";
 import { toast } from 'sonner';
 import { sounds } from './utils/sound';
 import { AnimatePresence, motion } from "framer-motion";
+
+
+// Helper to identify statement/list based questions
+const isComplexQuestion = (text) => {
+  if (!text) return false;
+  const t = text.toLowerCase();
+  // Keywords indicating complex structure
+  if (t.includes("statement i") || t.includes("statement 1") ||
+    t.includes("match:") || t.includes("match the") ||
+    t.includes("consider the") || t.includes("arrange") ||
+    t.includes("select the correct") || t.includes("select the incorrect")) {
+    return true;
+  }
+  // List patterns: (a)...(b) or (i)...(ii) or (1)...(2)
+  if ((text.includes("(a)") && text.includes("(b)")) ||
+    (text.includes("(i)") && text.includes("(ii)")) ||
+    (text.includes("(1)") && text.includes("(2)"))) {
+    return true;
+  }
+  return false;
+};
+
+// Formatter for question text
+const formatQuestionText = (text) => {
+  if (!isComplexQuestion(text)) return text;
+
+  // 1. Statement splitting
+  if (text.match(/Statement I/i)) {
+    const parts = text.split(/(Statement [IV0-9]+[:\.]?)/i);
+    return (
+      <span className="block space-y-2">
+        {parts.map((part, i) => {
+          const isLabel = part.match(/Statement [IV0-9]+[:\.]?/i);
+          if (isLabel) return <span key={i} className="block font-bold text-blue-600 dark:text-blue-400 mt-2">{part}</span>
+          return <span key={i}>{part}</span>
+        })}
+      </span>
+    )
+  }
+
+  // 2. Generic List splitting
+  const listRegex = /(\([a-z0-9]+\))/g;
+  if (text.match(listRegex)?.length >= 2) {
+    const parts = text.split(listRegex);
+    return (
+      <span className="block mt-1">
+        {parts.map((part, i) => {
+          if (part.match(listRegex)) {
+            // Marker
+            return <Fragment key={i}><br /><span className="font-bold text-blue-600 dark:text-blue-400 mr-1">{part}</span></Fragment>
+          }
+          return <span key={i}>{part}</span>
+        })}
+      </span>
+    )
+  }
+
+  return text;
+};
 
 export default function Exam({
   data,
@@ -47,8 +106,15 @@ export default function Exam({
     if (!currentQ || !currentQ.options) return [];
     // Return options shuffled, but mapped to maintain original index for correctness
     const mapped = currentQ.options.map((text, originalIndex) => ({ text, originalIndex }));
+
+    // Check for complex questions (Statement based, Match lists, etc.)
+    // For these, we preserve the original option order (e.g. A, B, C, D usually corresponds to specific logic)
+    if (isComplexQuestion(currentQ.question)) {
+      return mapped;
+    }
+
     return smartShuffle(mapped);
-  }, [currentQ?.id, currentQ?.options]);
+  }, [currentQ?.id, currentQ?.options, currentQ?.question]);
 
   const handleAnswer = (originalIndex) => {
     // Lock only if instant feedback is enabled and already answered
@@ -556,7 +622,7 @@ export default function Exam({
                     <span className="inline-block text-slate-300 dark:text-slate-600 min-w-[2ch] mr-1 md:mr-2 user-select-none">
                       {index + 1}.
                     </span>
-                    {currentQ.question}
+                    {formatQuestionText(currentQ.question)}
                   </h2>
                 </div>
 
