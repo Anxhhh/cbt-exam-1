@@ -5,7 +5,7 @@ export default defineConfig(({ command }) => ({
   plugins: [react()],
 
   // DO NOT affect build output
-  base: command === "build" ? "/cbt-exam-1/" : "/",
+  base: "/",
 
   // DEV-ONLY fix for Electron white screen
   server: command === "serve"
