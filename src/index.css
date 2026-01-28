@@ -9,8 +9,8 @@ html,
 body {
   background-color: #0f1116;
   /* Application dark background */
-  overscroll-behavior-y: auto;
-  /* Enable Apple-style elastic 'rubber-banding' scroll */
+  overscroll-behavior-y: none;
+  /* Disable elastic 'rubber-banding' */
   -webkit-overflow-scrolling: touch;
   scroll-behavior: smooth;
   height: 100%;
@@ -22,6 +22,15 @@ body {
   /* Internet Explorer/Edge */
   user-select: none;
   /* Non-prefixed version, currently supported by Chrome, Edge, and Firefox */
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 /* Custom Scrollbar for Chrome/Safari/Edge */

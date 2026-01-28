@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, Fragment } from "react";
+import { useEffect, useMemo, useState, Fragment, useRef } from "react";
 import profileImg from "./assets/profile.png";
 import {
   ChevronLeft, ChevronRight, Menu, X, Flag,
@@ -77,6 +77,7 @@ export default function Exam({
   setMarked,
   onSubmit,
   candidateName,
+  userPhoto,
   onBackToStart,
   onClearSession
 }) {
@@ -212,7 +213,7 @@ export default function Exam({
   const candidate = {
     name: candidateName || savedState.candidateName || "Guest",
     rollNo: "HPGK-2026-001",
-    photo: profileImg
+    photo: userPhoto || profileImg
   };
 
   const [isTimerPaused, setIsTimerPaused] = useState(false);
@@ -373,6 +374,15 @@ export default function Exam({
     }
   };
 
+  // Scroll to top when question index changes
+  const scrollContainerRef = useRef(null);
+
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [index]);
+
   return (
     <motion.div
       className={containerClasses}
@@ -389,8 +399,8 @@ export default function Exam({
         />
       </div>
 
-      <header className="flex-shrink-0 px-4 md:px-6 pt-[calc(0.75rem+env(safe-area-inset-top))] pb-3 border-b border-black/5 dark:border-white/10 flex items-center justify-between backdrop-blur-2xl bg-white/70 dark:bg-[#1a1c23]/60 z-30 shadow-sm transition-colors duration-300">
-
+      <header className="flex-shrink-0 px-4 md:px-6 pt-[calc(0.75rem+env(safe-area-inset-top))] pb-3 border-none flex items-center justify-between bg-transparent z-30 transition-colors duration-300">
+        {/* Header Content... */}
         {/* Left: Branding & User */}
         <div className="flex items-center gap-4">
           <button
@@ -587,7 +597,7 @@ export default function Exam({
           </div>
 
 
-          <div className="flex-1 overflow-y-auto custom-scrollbar p-3 md:p-10 lg:p-16 w-full mx-auto max-w-5xl">
+          <div ref={scrollContainerRef} className="flex-1 overflow-y-auto custom-scrollbar p-3 md:p-10 lg:p-16 w-full mx-auto max-w-5xl">
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentQ.id}

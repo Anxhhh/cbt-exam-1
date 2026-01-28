@@ -10,7 +10,7 @@ import * as THREE from 'three';
  * Physics: 3-Layer Harmonic Interference + Ripple Repulsion Physics.
  */
 
-const HyperFluxGrid = ({ countX = 60, countY = 40 }) => {
+const HyperFluxGrid = ({ countX = 30, countY = 20 }) => {
     const meshRef = useRef();
     const { viewport } = useThree();
 
@@ -18,7 +18,7 @@ const HyperFluxGrid = ({ countX = 60, countY = 40 }) => {
     // Denser grid for smoother visual flow
     const { positions } = useMemo(() => {
         const pos = [];
-        const sep = 0.45; // Tighter separation
+        const sep = 0.9; // Increased separation for performance optimization
         for (let x = 0; x < countX; x++) {
             for (let y = 0; y < countY; y++) {
                 const px = (x - countX / 2) * sep;

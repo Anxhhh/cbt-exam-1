@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useMotionValue, useMotionTemplate } from 'framer-motion';
 import { cn } from './utils';
 
 export default function GlassButton({
@@ -11,13 +11,15 @@ export default function GlassButton({
     ...props
 }) {
     const divRef = useRef(null);
-    const [position, setPosition] = useState({ x: 0, y: 0 });
+    const mouseX = useMotionValue(0);
+    const mouseY = useMotionValue(0);
     const [opacity, setOpacity] = useState(0);
 
     const handleMouseMove = (e) => {
         if (!divRef.current || disabled) return;
         const rect = divRef.current.getBoundingClientRect();
-        setPosition({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+        mouseX.set(e.clientX - rect.left);
+        mouseY.set(e.clientY - rect.top);
     };
 
     const handleFocus = () => {
@@ -47,6 +49,9 @@ export default function GlassButton({
         blue: 'group-hover:border-blue-500/30'
     }[color] || 'group-hover:border-white/30';
 
+    const spotlightBg = useMotionTemplate`radial-gradient(600px circle at ${mouseX}px ${mouseY}px, rgba(255,255,255,0.03), transparent 40%)`;
+    const gradientMask = useMotionTemplate`radial-gradient(300px circle at ${mouseX}px ${mouseY}px, black, transparent)`;
+
     return (
         <motion.button
             ref={divRef}
@@ -69,24 +74,24 @@ export default function GlassButton({
             {...props}
         >
             {/* Interactive Spotlight Glow */}
-            <div
+            <motion.div
                 className="pointer-events-none absolute -inset-px opacity-0 transition duration-300 group-hover:opacity-100"
                 style={{
                     opacity,
-                    background: `radial-gradient(600px circle at ${position.x}px ${position.y}px, rgba(255,255,255,0.03), transparent 40%)`
+                    background: spotlightBg
                 }}
             />
 
             {/* Colored Gradient Follower (Subtle Tint) */}
-            <div
+            <motion.div
                 className={cn(
                     "pointer-events-none absolute -inset-px opacity-0 transition duration-500 group-hover:opacity-100",
                     "bg-gradient-to-r",
                     glowColors
                 )}
                 style={{
-                    maskImage: `radial-gradient(300px circle at ${position.x}px ${position.y}px, black, transparent)`,
-                    WebkitMaskImage: `radial-gradient(300px circle at ${position.x}px ${position.y}px, black, transparent)`
+                    maskImage: gradientMask,
+                    WebkitMaskImage: gradientMask
                 }}
             />
 

@@ -1,5 +1,6 @@
 import { ArrowRight, BookOpen, Clock, ShieldCheck, Zap, User, FileText, CheckCircle2, ChevronRight, Layers, Trash2 } from 'lucide-react';
 import { useState, useEffect, useRef } from "react";
+import { UserButton } from "@clerk/clerk-react"; // Import Clerk UserButton
 import { cn } from './utils';
 import { sounds } from './utils/sound'; // Import sounds
 import { motion, useMotionValue, useTransform, useSpring } from "framer-motion";
@@ -8,8 +9,8 @@ import ThreeBackground from './ThreeBackground';
 import GlassButton from './GlassButton';
 import { TiltCard } from './TiltCard';
 
-export default function Start({ onStart, isRetake }) {
-  const [name, setName] = useState("");
+export default function Start({ onStart, isRetake, user }) {
+  const [name, setName] = useState(user?.fullName || "");
   const [testSet, setTestSet] = useState("1"); // Default to Test 1
   const [examType, setExamType] = useState("Himachal GK"); // Default to Himachal GK
 
@@ -53,6 +54,12 @@ export default function Start({ onStart, isRetake }) {
   useEffect(() => {
     setTestSet("1");
   }, [examType]);
+
+  useEffect(() => {
+    if (user?.fullName) {
+      setName(user.fullName);
+    }
+  }, [user]);
 
   // Retake Auto-Scroll
   const portalRef = useRef(null);
@@ -161,13 +168,13 @@ export default function Start({ onStart, isRetake }) {
   const availableSets = examType === "HPAS Prelims PYQ's" ? ["1", "2"] : ["1", "2", "3", "4"];
 
   return (
-    <div className="min-h-screen text-slate-300 font-sans selection:bg-blue-500/30 flex items-center justify-center p-4 pr-[calc(1rem+env(safe-area-inset-right))] pl-[calc(1rem+env(safe-area-inset-left))] pt-[calc(1rem+env(safe-area-inset-top))] pb-[calc(1rem+env(safe-area-inset-bottom))] relative">
+    <div className="h-screen overflow-y-auto no-scrollbar text-slate-300 font-sans selection:bg-blue-500/30 flex justify-center p-4 pr-[calc(1rem+env(safe-area-inset-right))] pl-[calc(1rem+env(safe-area-inset-left))] pt-[calc(1rem+env(safe-area-inset-top))] pb-[calc(1rem+env(safe-area-inset-bottom))] relative">
 
       {/* 3D Background */}
       {/* 3D Background lifted to App.jsx */}
 
       <div
-        className="w-full max-w-6xl relative z-10 grid lg:grid-cols-[1.2fr_0.8fr] gap-8 lg:gap-16 items-start mt-10 lg:mt-0"
+        className="w-full max-w-6xl relative z-10 grid lg:grid-cols-[1.2fr_0.8fr] gap-8 lg:gap-16 items-start mt-10 lg:mt-0 my-auto"
       >
 
         {/* Left Column: Branding & Value Props */}
@@ -265,8 +272,15 @@ export default function Start({ onStart, isRetake }) {
                   <h3 className="text-xl font-bold text-white max-w-[200px] truncate">{name.trim() || "Candidate Portal"}</h3>
                   <p className="text-xs text-slate-500 mt-1">Configure your session</p>
                 </div>
-                <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center">
-                  <User className="w-5 h-5 text-slate-400" />
+                <div className="relative z-50">
+                  <UserButton
+                    afterSignOutUrl="/"
+                    appearance={{
+                      elements: {
+                        avatarBox: "w-10 h-10 border border-white/10 hover:border-blue-500/50 transition-colors"
+                      }
+                    }}
+                  />
                 </div>
               </div>
 

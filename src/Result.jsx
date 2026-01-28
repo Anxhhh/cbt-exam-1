@@ -8,6 +8,19 @@ import BuyMeCoffeeBtn from './BuyMeCoffeeBtn';
 import ThreeBackground from './ThreeBackground';
 import { TiltCard } from './TiltCard';
 
+/**
+ * @typedef {Object} ResultProps
+ * @property {Object} exam
+ * @property {Object} answers
+ * @property {number} timeTaken
+ * @property {Function} onRetake
+ * @property {string} candidateName
+ * @property {string} [userPhoto]
+ */
+
+/**
+ * @param {ResultProps} props
+ */
 export default function Result({ exam, answers, timeTaken, onRetake, candidateName }) {
     if (!exam || !Array.isArray(exam.questions)) {
         return (
@@ -260,6 +273,7 @@ export default function Result({ exam, answers, timeTaken, onRetake, candidateNa
 
     return (
         <div className="min-h-screen relative flex items-center justify-center p-4 font-sans text-slate-200 overflow-hidden">
+            {/* UserButton removed as requested */}
             {/* ThreeBackground lifted to App.jsx */}
             <motion.div
                 className="w-full max-w-5xl grid lg:grid-cols-[1.2fr_0.8fr] gap-6 relative z-20"
