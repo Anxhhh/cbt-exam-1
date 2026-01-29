@@ -186,8 +186,67 @@ export default function ExamPage() {
     );
 
     const ResultSkeleton = () => (
-        <div className="min-h-screen flex items-center justify-center bg-[#0b0f19] animate-pulse">
-            <div className="w-96 h-96 bg-white/5 rounded-3xl" />
+        <div className="min-h-screen relative flex items-center justify-center p-4 font-sans text-slate-200 overflow-hidden">
+            <div className="w-full max-w-5xl grid lg:grid-cols-[1.2fr_0.8fr] gap-6 relative z-20 animate-pulse">
+
+                {/* Main Card Skeleton */}
+                <div className="h-full bg-black/30 backdrop-blur-3xl rounded-[2.5rem] p-8 border border-white/5 flex flex-col justify-between min-h-[600px]">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4 sm:gap-0">
+                        <div className="h-8 w-64 bg-white/10 rounded-lg"></div>
+                        <div className="h-8 w-32 bg-white/10 rounded-full"></div>
+                    </div>
+
+                    <div className="flex flex-col items-center justify-center py-8 flex-grow">
+                        <div className="w-48 h-48 rounded-full border-[12px] border-white/5 flex items-center justify-center mb-6 relative">
+                            <div className="w-24 h-12 bg-white/10 rounded"></div>
+                        </div>
+                        <div className="space-y-4 text-center w-full flex flex-col items-center mt-4">
+                            <div className="h-8 w-64 bg-white/10 rounded-lg"></div>
+                            <div className="h-4 w-48 bg-white/10 rounded-lg"></div>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3 mt-8">
+                        <div className="h-14 bg-white/5 rounded-xl"></div>
+                        <div className="h-14 bg-white/5 rounded-xl"></div>
+                    </div>
+                </div>
+
+                {/* Analysis Side Skeleton */}
+                <div className="space-y-6">
+                    {/* Stats Grid */}
+                    <div className="grid grid-cols-2 gap-4">
+                        {[1, 2, 3, 4].map((i) => (
+                            <div key={i} className="bg-[#1a1c23]/80 backdrop-blur-md p-6 rounded-3xl border border-white/5 h-32 flex flex-col justify-between">
+                                <div className="flex justify-between items-center">
+                                    <div className="h-3 w-16 bg-white/10 rounded"></div>
+                                    <div className="h-5 w-5 bg-white/10 rounded-full"></div>
+                                </div>
+                                <div className="h-10 w-24 bg-white/10 rounded-lg"></div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Insights Card Skeleton */}
+                    <div className="bg-black/30 backdrop-blur-2xl rounded-[2rem] p-6 border border-white/5 h-full min-h-[200px]">
+                        <div className="h-6 w-56 bg-white/10 rounded-lg mb-6"></div>
+                        <div className="space-y-5">
+                            <div className="flex gap-3">
+                                <div className="w-2 h-2 rounded-full bg-white/10 mt-2"></div>
+                                <div className="h-4 w-full bg-white/5 rounded"></div>
+                            </div>
+                            <div className="flex gap-3">
+                                <div className="w-2 h-2 rounded-full bg-white/10 mt-2"></div>
+                                <div className="h-4 w-5/6 bg-white/5 rounded"></div>
+                            </div>
+                            <div className="flex gap-3">
+                                <div className="w-2 h-2 rounded-full bg-white/10 mt-2"></div>
+                                <div className="h-4 w-4/6 bg-white/5 rounded"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 
