@@ -25,6 +25,9 @@ if (!PUBLISHABLE_KEY) {
                     <p className="text-sm text-slate-400 leading-relaxed">
                         The application cannot start because the <code className="bg-white/10 px-1.5 py-0.5 rounded text-red-400">VITE_CLERK_PUBLISHABLE_KEY</code> is missing from the environment variables.
                     </p>
+                    <p className="text-xs text-slate-500 mt-4">
+                        If you just added the <code className="text-slate-400">.env</code> file, please <b>restart your development server</b>.
+                    </p>
                 </div>
             </div>
         </React.StrictMode>
