@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // --- Dynamic Exam Knowledge Base ---
-const getExamData = (testId) => {
+const getExamData = (testId: string) => {
     // 1. HPAS PYQ Set 1
     if (testId === "PYQ") {
         return {
@@ -64,7 +64,12 @@ const getExamData = (testId) => {
     };
 };
 
-export default function AIConsoleLoader({ name, testId }) {
+interface AIConsoleLoaderProps {
+    name: string;
+    testId: string;
+}
+
+export default function AIConsoleLoader({ name, testId }: AIConsoleLoaderProps) {
     const [step, setStep] = useState(0);
 
     // Memoize the sequence so it stays stable during the render, but randomized on mount

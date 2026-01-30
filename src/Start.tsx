@@ -1,24 +1,31 @@
 import { ArrowRight, BookOpen, Clock, ShieldCheck, Zap, User, FileText, CheckCircle2, ChevronRight, Layers, Trash2 } from 'lucide-react';
-import { useState, useEffect, useRef } from "react";
-import { UserButton } from "@clerk/clerk-react"; // Import Clerk UserButton
+import React, { useState, useEffect, useRef } from "react";
+import { UserButton } from "@clerk/clerk-react";
 import { cn } from './utils';
-import { sounds } from './utils/sound'; // Import sounds
-import { motion, useMotionValue, useTransform, useSpring } from "framer-motion";
+import { sounds } from './utils/sound';
+import { motion } from "framer-motion";
 import BuyMeCoffeeBtn from './BuyMeCoffeeBtn';
 import ThreeBackground from './ThreeBackground';
 import GlassButton from './GlassButton';
 import { TiltCard } from './TiltCard';
+import { ResumeData } from './types';
 
-export default function Start({ onStart, isRetake, user }) {
+interface StartProps {
+  onStart: (name: string, testId: string) => void;
+  isRetake: boolean;
+  user: any;
+}
+
+export default function Start({ onStart, isRetake, user }: StartProps) {
   const [name, setName] = useState(user?.fullName || "");
-  const [testSet, setTestSet] = useState("1"); // Default to Test 1
-  const [examType, setExamType] = useState("Himachal GK"); // Default to Himachal GK
+  const [testSet, setTestSet] = useState("1");
+  const [examType, setExamType] = useState("Himachal GK");
 
-  const [resumeData, setResumeData] = useState(null);
+  const [resumeData, setResumeData] = useState<ResumeData | null>(null);
 
   // Long Press Logic for Deleting Session
   const [isLongPressing, setIsLongPressing] = useState(false);
-  const pressTimer = useRef(null);
+  const pressTimer = useRef<NodeJS.Timeout | null>(null);
   const longPressTriggered = useRef(false);
 
   const handlePressStart = () => {
@@ -43,9 +50,12 @@ export default function Start({ onStart, isRetake, user }) {
 
   useEffect(() => {
     try {
-      const saved = JSON.parse(localStorage.getItem("cbt_exam_state"));
-      if (saved && saved.timeRemaining > 0 && !saved.submitted) {
-        setResumeData(saved);
+      const savedStr = localStorage.getItem("cbt_exam_state");
+      if (savedStr) {
+        const saved: ResumeData = JSON.parse(savedStr);
+        if (saved && saved.timeRemaining > 0 && !saved.submitted) {
+          setResumeData(saved);
+        }
       }
     } catch (e) { console.error(e); }
   }, []);
@@ -62,12 +72,12 @@ export default function Start({ onStart, isRetake, user }) {
   }, [user]);
 
   // Retake Auto-Scroll
-  const portalRef = useRef(null);
+  const portalRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (isRetake && portalRef.current) {
       // slight delay to allow animations to start
       setTimeout(() => {
-        portalRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        portalRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }, 500);
     }
   }, [isRetake]);
@@ -77,16 +87,17 @@ export default function Start({ onStart, isRetake, user }) {
     try { sounds.click(); } catch (e) { }
 
     if (name.trim()) {
-      let finalId;
+      let finalId: string;
       if (examType === "HPAS Prelims PYQ's") {
         finalId = testSet === "2" ? "PYQ2" : "PYQ";
       } else {
-        finalId = parseInt(testSet);
+        let idNum = parseInt(testSet);
         if (examType === "JOA IT") {
-          finalId += 4;
+          idNum += 4;
         }
+        finalId = idNum.toString();
       }
-      onStart(name, finalId.toString());
+      onStart(name, finalId);
     }
   };
 
@@ -98,25 +109,23 @@ export default function Start({ onStart, isRetake, user }) {
       setName(resumeData.candidateName);
 
       // Calculate ID based on current selection logic
-      let finalId;
+      // Ideally should be saved in resumeData, but sticking to original logic for now
+      let finalId: string;
       if (examType === "HPAS Prelims PYQ's") {
-        // For resume, we might ideally want to know what the original ID was from resumeData if available,
-        // but since resumeData structure might not have it explicitly saved separately from what we can infer,
-        // we'll rely on the user's selection or default. 
-        // Ideally, we should really save 'examId' in local storage to be perfect.
         finalId = testSet === "2" ? "PYQ2" : "PYQ";
       } else {
-        finalId = parseInt(testSet);
+        let idNum = parseInt(testSet);
         if (examType === "JOA IT") {
-          finalId += 4;
+          idNum += 4;
         }
+        finalId = idNum.toString();
       }
 
-      onStart(resumeData.candidateName, finalId.toString());
+      onStart(resumeData.candidateName, finalId);
     }
   };
 
-  const handleClearSession = (e) => {
+  const handleClearSession = (e: React.MouseEvent) => {
     e.stopPropagation();
     localStorage.removeItem("cbt_exam_state");
     setResumeData(null);
@@ -124,14 +133,14 @@ export default function Start({ onStart, isRetake, user }) {
 
   // Keyboard Shortcuts
   useEffect(() => {
-    const handleKeyDown = (e) => {
+    const handleKeyDown = (e: KeyboardEvent) => {
       // Enter to Start
       if (e.key === 'Enter') {
         if (name.trim()) handleStart();
       }
 
       // F for Fullscreen (ignore if typing)
-      if (e.key.toLowerCase() === 'f' && document.activeElement.tagName !== 'INPUT') {
+      if (e.key.toLowerCase() === 'f' && document.activeElement?.tagName !== 'INPUT') {
         if (!document.fullscreenElement) {
           document.documentElement.requestFullscreen().catch(e => console.error(e));
         } else {
@@ -169,9 +178,6 @@ export default function Start({ onStart, isRetake, user }) {
 
   return (
     <div className="h-screen overflow-y-auto no-scrollbar text-slate-300 font-sans selection:bg-blue-500/30 flex justify-center p-4 pr-[calc(1rem+env(safe-area-inset-right))] pl-[calc(1rem+env(safe-area-inset-left))] pt-[calc(1rem+env(safe-area-inset-top))] pb-[calc(1rem+env(safe-area-inset-bottom))] relative">
-
-      {/* 3D Background */}
-      {/* 3D Background lifted to App.jsx */}
 
       <div
         className="w-full max-w-6xl relative z-10 grid lg:grid-cols-[1.2fr_0.8fr] gap-8 lg:gap-16 items-start mt-10 lg:mt-0 my-auto"
@@ -398,7 +404,7 @@ export default function Start({ onStart, isRetake, user }) {
                     onMouseLeave={handlePressEnd}
                     onTouchStart={handlePressStart}
                     onTouchEnd={handlePressEnd}
-                    onContextMenu={(e) => e.preventDefault()}
+                    onContextMenu={(e: React.MouseEvent) => e.preventDefault()}
                     className="w-full h-auto px-6 py-4 select-none relative overflow-hidden"
                   >
                     {/* Long Press Progress Bar */}
@@ -499,7 +505,13 @@ export default function Start({ onStart, isRetake, user }) {
   );
 }
 
-function FeatureBox({ icon, title, desc }) {
+interface FeatureBoxProps {
+  icon: React.ReactNode;
+  title: string;
+  desc: string;
+}
+
+function FeatureBox({ icon, title, desc }: FeatureBoxProps) {
   return (
     <motion.div
       variants={{
@@ -521,5 +533,3 @@ function FeatureBox({ icon, title, desc }) {
     </motion.div>
   );
 }
-
-

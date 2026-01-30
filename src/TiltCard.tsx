@@ -1,8 +1,13 @@
 import { motion, useMotionValue, useTransform, useSpring } from "framer-motion";
 import React, { useRef } from "react";
 
-export function TiltCard({ children, className }) {
-    const ref = useRef(null);
+interface TiltCardProps {
+    children: React.ReactNode;
+    className?: string;
+}
+
+export function TiltCard({ children, className }: TiltCardProps) {
+    const ref = useRef<HTMLDivElement>(null);
 
     const x = useMotionValue(0);
     const y = useMotionValue(0);
@@ -11,7 +16,7 @@ export function TiltCard({ children, className }) {
     const mouseX = useSpring(x, { stiffness: 300, damping: 30 });
     const mouseY = useSpring(y, { stiffness: 300, damping: 30 });
 
-    function onMouseMove({ clientX, clientY }) {
+    function onMouseMove({ clientX, clientY }: React.MouseEvent) {
         if (!ref.current) return;
         const { left, top, width, height } = ref.current.getBoundingClientRect();
 
@@ -34,8 +39,8 @@ export function TiltCard({ children, className }) {
     const rotateY = useTransform(mouseX, [-0.5, 0.5], [-8, 8]);
 
     // Dynamic gloss/reflection movement (moves opposite to tilt)
-    const sheenX = useTransform(mouseX, [-0.5, 0.5], ["0%", "100%"]);
-    const sheenY = useTransform(mouseY, [-0.5, 0.5], ["0%", "100%"]);
+    // const sheenX = useTransform(mouseX, [-0.5, 0.5], ["0%", "100%"]);
+    // const sheenY = useTransform(mouseY, [-0.5, 0.5], ["0%", "100%"]);
 
     // Interactive transparency/opacity change on tilt
     const brightness = useTransform(mouseY, [-0.5, 0.5], [1.05, 0.95]);
@@ -51,14 +56,14 @@ export function TiltCard({ children, className }) {
                 filter: useTransform(brightness, (b) => `brightness(${b})`),
                 transformStyle: "preserve-3d",
             }}
-            className={`relative perspective-1000 ${className}`}
+            className={`relative perspective-1000 ${className || ''}`}
         >
             {/* Dynamic Holographic Sheen Layer */}
             <motion.div
                 style={{
                     background: useTransform(
                         [mouseX, mouseY],
-                        ([xVal, yVal]) => `linear-gradient(${115 + xVal * 40}deg, transparent 30%, rgba(255,255,255,0.1) 45%, rgba(255,255,255,0.0) 55%, transparent)`
+                        ([xVal, yVal]) => `linear-gradient(${115 + (xVal as number) * 40}deg, transparent 30%, rgba(255,255,255,0.1) 45%, rgba(255,255,255,0.0) 55%, transparent)`
                     ),
                     opacity: useTransform(mouseX, [-0.5, 0, 0.5], [0.4, 0, 0.4]) // Sheen visible at extremes
                 }}

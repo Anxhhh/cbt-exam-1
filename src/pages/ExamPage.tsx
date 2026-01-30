@@ -14,8 +14,10 @@ import AIConsoleLoader from "../AIConsoleLoader";
 const Exam = lazy(() => import("../Exam"));
 const Result = lazy(() => import("../Result"));
 
+import { ExamData, AnswersState, MarkedState } from "../types";
+
 // Helper from App.jsx
-const getAnswerIndex = (letter) => {
+const getAnswerIndex = (letter: string) => {
     if (!letter) return -1;
     const l = letter.trim().toUpperCase();
     if (l === 'A') return 0;
@@ -32,7 +34,7 @@ export default function ExamPage() {
     const { user } = useUser();
 
     // State from App.jsx
-    const [exam, setExam] = useState(null);
+    const [exam, setExam] = useState<ExamData | null>(null);
     const [started, setStarted] = useState(false);
     const [submitted, setSubmitted] = useState(false);
     const [timeTaken, setTimeTaken] = useState(0);
@@ -42,8 +44,8 @@ export default function ExamPage() {
     const [analyzing, setAnalyzing] = useState(false);
     // loadingTestId not really needed if we use params, but helpful for UI
 
-    const [answers, setAnswers] = useState({});
-    const [marked, setMarked] = useState({});
+    const [answers, setAnswers] = useState<AnswersState>({});
+    const [marked, setMarked] = useState<MarkedState>({});
     const [isRetake, setIsRetake] = useState(false);
 
     // Security Effects
@@ -67,8 +69,7 @@ export default function ExamPage() {
     useEffect(() => {
         if (!testId) return;
 
-        // Function to load exam
-        const loadExam = async (name, tid) => {
+        const loadExam = async (name: string, tid: string) => {
             setTensionLoading(true);
 
             try {
@@ -85,13 +86,13 @@ export default function ExamPage() {
                     if (!csvResponse.ok) throw new Error(`Failed to load ${csvFile}`);
                     const csvText = await csvResponse.text();
 
-                    return new Promise((resolve, reject) => {
+                    return new Promise<{ exam: ExamData, answers: AnswersState, marked: MarkedState }>((resolve, reject) => {
                         Papa.parse(csvText, {
                             header: true,
                             skipEmptyLines: true,
                             transformHeader: (h) => h.trim(),
-                            complete: (results) => {
-                                const parsedQuestions = results.data.map((row, index) => {
+                            complete: (results: any) => {
+                                const parsedQuestions = results.data.map((row: any, index: number) => {
                                     return {
                                         id: `Q${index + 1}`,
                                         question: row["Question"],
@@ -100,18 +101,18 @@ export default function ExamPage() {
                                             row["Option B"],
                                             row["Option C"],
                                             row["Option D"]
-                                        ].filter(opt => opt),
+                                        ].filter((opt: string) => opt),
                                         answer: getAnswerIndex(row["Correct Option (A/B/C/D)"]),
                                         section: row["Section"] || "General"
                                     };
                                 });
 
-                                const validQuestions = parsedQuestions.filter(q => q.question && q.answer !== -1 && q.options.length > 1);
+                                const validQuestions = parsedQuestions.filter((q: any) => q.question && q.answer !== -1 && q.options.length > 1);
 
                                 // Logic for saved state (resume)
                                 const savedState = JSON.parse(localStorage.getItem("cbt_exam_state") || "{}");
-                                let initialAnswers = {};
-                                let initialMarked = {};
+                                let initialAnswers: AnswersState = {};
+                                let initialMarked: MarkedState = {};
 
                                 if (savedState && savedState.candidateName === name && !savedState.submitted) {
                                     // Basic check if it matches the test ID could be added here
@@ -153,7 +154,7 @@ export default function ExamPage() {
                 setStarted(true);
                 setTensionLoading(false);
 
-            } catch (err) {
+            } catch (err: any) {
                 console.error("EXAM LOAD ERROR:", err);
                 toast.error(`Failed to load exam data: ${err.message}`);
                 setTensionLoading(false);

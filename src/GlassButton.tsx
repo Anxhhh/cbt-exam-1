@@ -1,6 +1,12 @@
 import React, { useRef, useState } from 'react';
 import { motion, useMotionValue, useMotionTemplate } from 'framer-motion';
+// @ts-ignore
 import { cn } from './utils';
+
+interface GlassButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+    children: React.ReactNode;
+    color?: 'blue' | 'emerald';
+}
 
 export default function GlassButton({
     children,
@@ -9,13 +15,13 @@ export default function GlassButton({
     color = 'blue',
     disabled = false,
     ...props
-}) {
-    const divRef = useRef(null);
+}: GlassButtonProps) {
+    const divRef = useRef<HTMLButtonElement>(null);
     const mouseX = useMotionValue(0);
     const mouseY = useMotionValue(0);
     const [opacity, setOpacity] = useState(0);
 
-    const handleMouseMove = (e) => {
+    const handleMouseMove = (e: React.MouseEvent<HTMLButtonElement>) => {
         if (!divRef.current || disabled) return;
         const rect = divRef.current.getBoundingClientRect();
         mouseX.set(e.clientX - rect.left);
@@ -39,15 +45,18 @@ export default function GlassButton({
     };
 
     // Color Mapping for the Interactive Glow
-    const glowColors = {
+    const glowColors: { [key: string]: string } = {
         emerald: 'from-emerald-500/10 via-teal-500/10 to-transparent',
         blue: 'from-blue-500/10 via-indigo-500/10 to-transparent'
-    }[color] || 'from-white/10 to-transparent';
+    };
 
-    const borderColors = {
+    const selectedGlow = glowColors[color] || 'from-white/10 to-transparent';
+
+    const borderColors: { [key: string]: string } = {
         emerald: 'group-hover:border-emerald-500/30',
         blue: 'group-hover:border-blue-500/30'
-    }[color] || 'group-hover:border-white/30';
+    };
+    const selectedBorder = borderColors[color] || 'group-hover:border-white/30';
 
     const spotlightBg = useMotionTemplate`radial-gradient(600px circle at ${mouseX}px ${mouseY}px, rgba(255,255,255,0.03), transparent 40%)`;
     const gradientMask = useMotionTemplate`radial-gradient(300px circle at ${mouseX}px ${mouseY}px, black, transparent)`;
@@ -55,7 +64,7 @@ export default function GlassButton({
     return (
         <motion.button
             ref={divRef}
-            onClick={!disabled ? onClick : undefined}
+            onClick={!disabled ? onClick as any : undefined}
             onMouseMove={handleMouseMove}
             onFocus={handleFocus}
             onBlur={handleBlur}
@@ -68,10 +77,10 @@ export default function GlassButton({
                 "relative group w-full overflow-hidden rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-3xl transition-all duration-300",
                 "shadow-[0_8px_30px_rgba(0,0,0,0.1)]", // Deeper shadow
                 disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:bg-white/[0.1]",
-                borderColors,
+                selectedBorder,
                 className
             )}
-            {...props}
+            {...props as any}
         >
             {/* Interactive Spotlight Glow */}
             <motion.div
@@ -87,7 +96,7 @@ export default function GlassButton({
                 className={cn(
                     "pointer-events-none absolute -inset-px opacity-0 transition duration-500 group-hover:opacity-100",
                     "bg-gradient-to-r",
-                    glowColors
+                    selectedGlow
                 )}
                 style={{
                     maskImage: gradientMask,

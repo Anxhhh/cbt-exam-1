@@ -1,10 +1,15 @@
-import { BookOpen, Sparkles, X, Database, ChevronRight } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { BookOpen, ChevronRight } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 
-export default function BuyMeCoffeeBtn({ screen = 'start', score = 0 }) {
+interface BuyMeCoffeeBtnProps {
+    screen?: 'start' | 'result';
+    score?: number;
+}
+
+export default function BuyMeCoffeeBtn({ screen = 'start', score = 0 }: BuyMeCoffeeBtnProps) {
     const [isScrolled, setIsScrolled] = useState(false);
-    const [showTooltip, setShowTooltip] = useState(true);
+    // const [showTooltip, setShowTooltip] = useState(true);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -14,16 +19,14 @@ export default function BuyMeCoffeeBtn({ screen = 'start', score = 0 }) {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    useEffect(() => {
-        const t = setTimeout(() => setShowTooltip(false), 8000);
-        return () => clearTimeout(t);
-    }, []);
+    // useEffect(() => {
+    //     const t = setTimeout(() => setShowTooltip(false), 8000);
+    //     return () => clearTimeout(t);
+    // }, []);
 
     return (
         <div className="fixed bottom-[calc(1rem+env(safe-area-inset-bottom))] right-4 sm:bottom-6 sm:right-6 z-50 flex flex-row items-end gap-3 sm:gap-4 pointer-events-none font-sans">
-
             <div className="relative flex flex-col items-end pointer-events-auto max-w-[90vw] sm:max-w-auto">
-
                 <motion.a
                     href="https://matlotia.gumroad.com/l/klofb"
                     target="_blank"

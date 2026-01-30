@@ -1,12 +1,12 @@
 // Audio synthesis utility using Web Audio API
 // No external assets required
 
-let ctx = null;
+let ctx: AudioContext | null = null;
 
 const getContext = () => {
     if (!ctx) {
         if (typeof window === 'undefined') return null;
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
         if (AudioContext) {
             ctx = new AudioContext();
         }
@@ -14,7 +14,8 @@ const getContext = () => {
     return ctx;
 };
 
-const playTone = (freq, type, duration, vol = 0.1) => {
+// @ts-ignore - unused for now but good to keep
+const playTone = (freq: number, type: OscillatorType, duration: number, vol = 0.1) => {
     const audioCtx = getContext();
     if (!audioCtx) return;
 

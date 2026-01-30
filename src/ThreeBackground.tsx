@@ -10,14 +10,19 @@ import * as THREE from 'three';
  * Physics: 3-Layer Harmonic Interference + Ripple Repulsion Physics.
  */
 
-const HyperFluxGrid = ({ countX = 30, countY = 20 }) => {
-    const meshRef = useRef();
+interface HyperFluxGridProps {
+    countX?: number;
+    countY?: number;
+}
+
+const HyperFluxGrid = ({ countX = 30, countY = 20 }: HyperFluxGridProps) => {
+    const meshRef = useRef<THREE.InstancedMesh>(null);
     const { viewport } = useThree();
 
     // 1. Initialize Grid
     // Denser grid for smoother visual flow
     const { positions } = useMemo(() => {
-        const pos = [];
+        const pos: { x: number; z: number; y: number; id: number }[] = [];
         const sep = 0.9; // Increased separation for performance optimization
         for (let x = 0; x < countX; x++) {
             for (let y = 0; y < countY; y++) {
@@ -125,6 +130,7 @@ const HyperFluxGrid = ({ countX = 30, countY = 20 }) => {
     });
 
     return (
+        // @ts-ignore
         <instancedMesh ref={meshRef} args={[null, null, countX * countY]}>
             <sphereGeometry args={[0.35, 16, 16]} />
             <meshStandardMaterial
@@ -137,10 +143,16 @@ const HyperFluxGrid = ({ countX = 30, countY = 20 }) => {
     );
 };
 
-export default function ThreeBackground({ intensity = 1 }) {
+interface ThreeBackgroundProps {
+    intensity?: number;
+}
+
+export default function ThreeBackground({ intensity = 1 }: ThreeBackgroundProps) {
     return (
         <div className="fixed inset-0 z-0 pointer-events-none bg-[#020617] transition-colors duration-1000">
+            {/* @ts-ignore */}
             <Canvas camera={{ position: [0, 8, 12], fov: 50 }} dpr={[1, 2]}>
+                {/* @ts-ignore */}
                 <fog attach="fog" args={['#020617', 5, 35]} />
 
                 {/* 

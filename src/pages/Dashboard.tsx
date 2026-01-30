@@ -10,7 +10,7 @@ export default function Dashboard() {
     const location = useLocation();
     const { user } = useUser();
 
-    const handleStart = (name, testId) => {
+    const handleStart = (name: string, testId: string) => {
         navigate(`/exam/${testId}`, { state: { name } });
     };
 
