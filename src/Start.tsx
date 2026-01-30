@@ -176,8 +176,10 @@ export default function Start({ onStart, isRetake, user }: StartProps) {
   // Determine available sets based on exam type
   const availableSets = examType === "HPAS Prelims PYQ's" ? ["1", "2"] : ["1", "2", "3", "4"];
 
+  const containerRef = useRef<HTMLDivElement>(null);
+
   return (
-    <div className="h-screen overflow-y-auto no-scrollbar text-slate-300 font-sans selection:bg-blue-500/30 flex justify-center p-4 pr-[calc(1rem+env(safe-area-inset-right))] pl-[calc(1rem+env(safe-area-inset-left))] pt-[calc(1rem+env(safe-area-inset-top))] pb-[calc(1rem+env(safe-area-inset-bottom))] relative">
+    <div ref={containerRef} className="h-screen overflow-y-auto no-scrollbar text-slate-300 font-sans selection:bg-blue-500/30 flex justify-center p-4 pr-[calc(1rem+env(safe-area-inset-right))] pl-[calc(1rem+env(safe-area-inset-left))] pt-[calc(1rem+env(safe-area-inset-top))] pb-[calc(1rem+env(safe-area-inset-bottom))] relative">
 
       <div
         className="w-full max-w-6xl relative z-10 grid lg:grid-cols-[1.2fr_0.8fr] gap-8 lg:gap-16 items-start mt-10 lg:mt-0 my-auto"
@@ -500,7 +502,7 @@ export default function Start({ onStart, isRetake, user }: StartProps) {
         </motion.div >
 
       </div >
-      <BuyMeCoffeeBtn screen="start" />
+      <BuyMeCoffeeBtn screen="start" targetRef={containerRef} />
     </div >
   );
 }

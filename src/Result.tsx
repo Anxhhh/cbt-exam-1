@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Download, RefreshCw, CheckCircle, XCircle, Award, TrendingUp, Clock } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { motion } from "framer-motion";
@@ -101,8 +101,11 @@ export default function Result({ exam, answers, timeTaken, onRetake, candidateNa
     const circumference = 2 * Math.PI * 88;
     const offset = circumference - (scorePercent / 100) * circumference;
 
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const containerRef = useRef<HTMLDivElement>(null);
+
     return (
-        <div className="min-h-screen relative flex items-center justify-center p-4 font-sans text-slate-200 overflow-hidden">
+        <div ref={containerRef} className="min-h-screen relative flex items-center justify-center p-4 font-sans text-slate-200 overflow-hidden">
             {/* Note: ThreeBackground is now handled in the parent/layout or App.tsx */}
             <motion.div
                 className="w-full max-w-5xl grid lg:grid-cols-[1.2fr_0.8fr] gap-6 relative z-20"
@@ -234,9 +237,8 @@ export default function Result({ exam, answers, timeTaken, onRetake, candidateNa
                         </motion.div>
                     </TiltCard>
                 </div>
-
             </motion.div>
-            <BuyMeCoffeeBtn screen="result" score={scorePercent} />
+            <BuyMeCoffeeBtn screen="result" score={scorePercent} targetRef={containerRef} />
         </div>
     );
 }

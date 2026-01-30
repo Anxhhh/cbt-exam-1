@@ -1,28 +1,32 @@
-import { BookOpen, ChevronRight } from 'lucide-react';
+import { BookOpen, ChevronRight, Minimize2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 
 interface BuyMeCoffeeBtnProps {
     screen?: 'start' | 'result';
     score?: number;
+    targetRef?: React.RefObject<HTMLDivElement>;
 }
 
-export default function BuyMeCoffeeBtn({ screen = 'start', score = 0 }: BuyMeCoffeeBtnProps) {
+export default function BuyMeCoffeeBtn({ screen = 'start', score = 0, targetRef }: BuyMeCoffeeBtnProps) {
     const [isScrolled, setIsScrolled] = useState(false);
-    // const [showTooltip, setShowTooltip] = useState(true);
+    const [isManuallyCollapsed, setIsManuallyCollapsed] = useState(false);
 
     useEffect(() => {
+        const target = targetRef?.current || window;
         const handleScroll = () => {
-            setIsScrolled(window.scrollY > 100);
+            const scrollTop = target instanceof Window ? target.scrollY : (target as HTMLElement).scrollTop;
+            setIsScrolled(scrollTop > 100);
         };
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
 
-    // useEffect(() => {
-    //     const t = setTimeout(() => setShowTooltip(false), 8000);
-    //     return () => clearTimeout(t);
-    // }, []);
+        target.addEventListener('scroll', handleScroll);
+        // Initial check
+        handleScroll();
+
+        return () => target.removeEventListener('scroll', handleScroll);
+    }, [targetRef]); // Re-run if ref changes (though usually stable)
+
+    const isCollapsed = isScrolled || isManuallyCollapsed;
 
     return (
         <div className="fixed bottom-[calc(1rem+env(safe-area-inset-bottom))] right-4 sm:bottom-6 sm:right-6 z-50 flex flex-row items-end gap-3 sm:gap-4 pointer-events-none font-sans">
@@ -40,7 +44,7 @@ export default function BuyMeCoffeeBtn({ screen = 'start', score = 0 }: BuyMeCof
                     transition={{ type: "spring", stiffness: 300, damping: 20, delay: 0.5 }}
                 >
                     {/* Collapsed State */}
-                    <div className={isScrolled ? "block sm:hidden" : "hidden"}>
+                    <div className={isCollapsed ? "block sm:hidden" : "hidden"}>
                         <div className="relative bg-blue-600 p-2.5 rounded-full shadow-lg border border-blue-400 shadow-blue-500/40">
                             <BookOpen className="w-4 h-4 text-white" />
                             <div className="absolute top-0 right-0 w-2 h-2 bg-cyan-400 rounded-full animate-ping" />
@@ -48,11 +52,23 @@ export default function BuyMeCoffeeBtn({ screen = 'start', score = 0 }: BuyMeCof
                     </div>
 
                     {/* Full State */}
-                    <div className={!isScrolled ? "block" : "hidden sm:block"}>
+                    <div className={!isCollapsed ? "block" : "hidden sm:block"}>
                         {/* Glow */}
                         <div className="absolute inset-0 bg-cyan-500 rounded-xl blur opacity-20 group-hover:opacity-40 animate-pulse transition-opacity duration-500" />
 
                         <div className="relative flex items-center gap-2.5 bg-[#0f172a] border border-blue-500/30 hover:border-blue-400/50 text-white px-3 py-2 rounded-xl shadow-xl overflow-hidden transition-all">
+                            {/* Collapse Button (Mobile Only) */}
+                            <button
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    setIsManuallyCollapsed(true);
+                                }}
+                                className="absolute top-0 right-0 p-1.5 opacity-50 hover:opacity-100 sm:hidden z-20"
+                            >
+                                <Minimize2 className="w-3 h-3 text-slate-400" />
+                            </button>
+
                             {/* Shimmer */}
                             <motion.div
                                 className="absolute top-0 bottom-0 w-20 bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent skew-x-[-30deg]"
@@ -64,7 +80,7 @@ export default function BuyMeCoffeeBtn({ screen = 'start', score = 0 }: BuyMeCof
                                 <BookOpen className="w-4 h-4" />
                             </div>
 
-                            <div className="flex flex-col">
+                            <div className="flex flex-col pr-4 sm:pr-0">
                                 <span className="font-bold text-[11px] tracking-wide text-slate-200 leading-tight">
                                     Ultimate HP GK E-Book
                                 </span>
