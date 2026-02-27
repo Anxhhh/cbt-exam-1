@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState, Fragment, useRef } from "react";
-// @ts-ignore
 import profileImg from "./assets/profile.png";
 import {
   ChevronLeft, ChevronRight, Menu, X, Flag,
@@ -108,6 +107,15 @@ export default function Exam({
   const [theme] = useState('dark'); // dark mode enforced
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isInstantFeedback, setIsInstantFeedback] = useState(true);
+
+  // Scroll to top when question index changes
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [index]);
 
   // ================= EFFECTS =================
 
@@ -391,16 +399,6 @@ export default function Exam({
     }
   };
 
-  // Scroll to top when question index changes
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  useEffect(() => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  }, [index]);
 
   return (
     <motion.div

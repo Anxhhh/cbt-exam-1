@@ -16,6 +16,8 @@ interface StatCardProps {
 }
 
 export default function Result({ exam, answers, timeTaken, onRetake, candidateName }: ResultProps) {
+    const containerRef = useRef<HTMLDivElement>(null);
+
     if (!exam || !Array.isArray(exam.questions)) {
         return <ResultSkeleton />;
     }
@@ -101,8 +103,6 @@ export default function Result({ exam, answers, timeTaken, onRetake, candidateNa
     const circumference = 2 * Math.PI * 88;
     const offset = circumference - (scorePercent / 100) * circumference;
 
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const containerRef = useRef<HTMLDivElement>(null);
 
     return (
         <div ref={containerRef} className="min-h-screen relative flex items-center justify-center p-4 font-sans text-slate-200 overflow-hidden">
