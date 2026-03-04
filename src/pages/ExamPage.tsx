@@ -47,6 +47,7 @@ export default function ExamPage() {
     const [answers, setAnswers] = useState<AnswersState>({});
     const [marked, setMarked] = useState<MarkedState>({});
     const [isRetake, setIsRetake] = useState(false);
+    const [reviewMode, setReviewMode] = useState(false);
 
     // Security Effects
     useEffect(() => {
@@ -364,7 +365,7 @@ export default function ExamPage() {
         );
     } else if (analyzing) {
         content = <AnalyzingScreen />;
-    } else if (submitted) {
+    } else if (submitted && !reviewMode) {
         content = (
             <Suspense fallback={<ResultSkeleton />}>
                 <Result
@@ -374,11 +375,9 @@ export default function ExamPage() {
                     candidateName={user?.fullName || candidateName}
                     userPhoto={user?.imageUrl}
                     onRetake={() => {
-                        // Logic for retake: Reset and Navigate back to dashboard?
-                        // Or reset state and stay here?
-                        // Original App.jsx handled retake by showing Start screen.
                         navigate('/dashboard', { state: { retake: true } });
                     }}
+                    onReview={() => setReviewMode(true)}
                 />
             </Suspense>
         );
@@ -393,7 +392,12 @@ export default function ExamPage() {
                     userPhoto={user?.imageUrl}
                     setAnswers={setAnswers}
                     setMarked={setMarked}
+                    reviewMode={reviewMode}
                     onSubmit={(tt) => {
+                        if (reviewMode) {
+                            setReviewMode(false);
+                            return;
+                        }
                         setTimeTaken(tt || 0);
                         setAnalyzing(true);
                         setTimeout(() => {

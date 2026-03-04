@@ -21,6 +21,7 @@ export interface ResultProps {
     answers: AnswersState;
     timeTaken: number;
     onRetake: () => void;
+    onReview?: () => void;
     candidateName: string;
     userPhoto?: string;
 }
@@ -48,4 +49,5 @@ export interface ExamProps {
     userPhoto?: string;
     onBackToStart: () => void;
     onClearSession: () => void;
+    reviewMode?: boolean;
 }

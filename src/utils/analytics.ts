@@ -107,5 +107,19 @@ export const generateInsights = (
         insights.push({ color: 'bg-amber-500', text: `Weak Area: ${worst[0]} (${worstPct}%). Focus your revision here.` });
     }
 
-    return insights.slice(0, 3);
+    return insights.slice(0, 4);
+};
+
+// Advanced Statistical Helpers
+export const calculateZScore = (score: number, mean: number = 65, stdDev: number = 15) => {
+    return ((score - mean) / stdDev).toFixed(2);
+};
+
+export const estimatePercentile = (zScore: number) => {
+    // Basic approximation of normal distribution CDF
+    const t = 1 / (1 + 0.2316419 * Math.abs(zScore));
+    const d = 0.3989423 * Math.exp(-zScore * zScore / 2);
+    const p = d * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274))));
+    if (zScore > 0) return Math.round((1 - p) * 100);
+    return Math.round(p * 100);
 };

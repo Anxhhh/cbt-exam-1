@@ -3,7 +3,7 @@ import profileImg from "./assets/profile.png";
 import {
   ChevronLeft, ChevronRight, Menu, X, Flag,
   Clock, LayoutGrid, ArrowRight, Home, Eye, EyeOff,
-  Save, Trash2
+  Save, Trash2, Keyboard
 } from 'lucide-react';
 import { cn, smartShuffle } from "./utils";
 import { toast } from 'sonner';
@@ -79,7 +79,8 @@ export default function Exam({
   candidateName,
   userPhoto,
   onBackToStart,
-  onClearSession
+  onClearSession,
+  reviewMode
 }: ExamProps) {
   // ================= STATE =================
   // Restore from localStorage if available, else default
@@ -102,6 +103,7 @@ export default function Exam({
   const [isSidebarOpen, setSidebarOpen] = useState(true);
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [showExitModal, setShowExitModal] = useState(false);
+  const [showShortcuts, setShowShortcuts] = useState(false);
 
   // Accessibility
   const [theme] = useState('dark'); // dark mode enforced
@@ -136,6 +138,7 @@ export default function Exam({
   }, [currentQ?.id, currentQ?.options, currentQ?.question]);
 
   const handleAnswer = (originalIndex: number) => {
+    if (reviewMode) return;
     // Lock only if instant feedback is enabled and already answered
     if (isInstantFeedback && answers[currentQ.id] !== undefined) return;
     setAnswers(prev => ({ ...prev, [currentQ.id]: originalIndex }));
@@ -143,6 +146,7 @@ export default function Exam({
   };
 
   const toggleReview = () => {
+    if (reviewMode) return;
     if (currentQ) {
       const isMarking = !marked[currentQ.id];
       setMarked(prev => ({ ...prev, [currentQ.id]: isMarking }));
@@ -192,6 +196,11 @@ export default function Exam({
       // Fullscreen (F)
       if (e.key.toLowerCase() === 'f') {
         toggleFullscreen();
+      }
+
+      // Shortcuts (K)
+      if (e.key.toLowerCase() === 'k') {
+        setShowShortcuts(prev => !prev);
       }
 
       // Enter to Save & Next (if answered)
@@ -475,6 +484,7 @@ export default function Exam({
               <p className="font-semibold text-sm truncate max-w-[120px] md:max-w-none">{candidate.name}</p>
             </div>
           </div>
+
         </div>
 
         {/* Center: Title (Desktop) */}
@@ -502,7 +512,7 @@ export default function Exam({
             onClick={handleSubmit}
             className={cn("hidden lg:block px-6 py-2 rounded-lg font-bold text-sm bg-blue-600 text-white hover:bg-blue-700 active:scale-95 transition-all shadow-lg shadow-blue-600/20")}
           >
-            Submit
+            {reviewMode ? "Exit Review" : "Submit"}
           </button>
         </div>
       </header>
@@ -662,8 +672,8 @@ export default function Exam({
                     const isSelected = currentAnswer === opt.originalIndex;
                     const isCorrect = opt.originalIndex === currentQ.answer;
 
-                    // Feedback Logic: Only active if isInstantFeedback is TRUE
-                    const showFeedback = isInstantFeedback;
+                    // Feedback Logic: Only active if isInstantFeedback is TRUE OR reviewMode is TRUE
+                    const showFeedback = isInstantFeedback || reviewMode;
 
                     const isRight = showFeedback && isSelected && isCorrect;
                     const isWrong = showFeedback && isSelected && !isCorrect;
@@ -678,7 +688,7 @@ export default function Exam({
                         onClick={() => handleAnswer(opt.originalIndex)}
                         className={cn(
                           "relative group rounded-xl border-2 p-3 md:p-5 flex items-start gap-3 md:gap-4 transition-all duration-200 select-none",
-                          (showFeedback && hasAnswered) ? "cursor-default" : "cursor-pointer",
+                          (showFeedback && hasAnswered || reviewMode) ? "cursor-default" : "cursor-pointer",
                           "bg-white dark:bg-white/5 border-slate-200 dark:border-[#2a2d36]", // Base
 
                           // Hover Logic
@@ -754,6 +764,44 @@ export default function Exam({
 
         </main>
       </div >
+
+      {/* ================= KEYBOARD SHORTCUTS OVERLAY ================= */}
+      <AnimatePresence>
+        {showShortcuts && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            className="fixed bottom-24 left-6 z-50 p-6 bg-slate-900/90 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl w-64"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h4 className="text-white font-bold text-sm uppercase tracking-widest flex items-center gap-2">
+                <Keyboard className="w-4 h-4 text-blue-400" /> Shortcuts
+              </h4>
+              <button onClick={() => setShowShortcuts(false)}><X className="w-4 h-4 text-slate-500" /></button>
+            </div>
+            <div className="space-y-3">
+              {[
+                { keys: ["←", "→"], label: "Navigate Questions" },
+                { keys: ["A", "B", "C", "D"], label: "Select Option" },
+                { keys: ["M"], label: "Mark for Review" },
+                { keys: ["Enter"], label: "Save & Next" },
+                { keys: ["F"], label: "Fullscreen Mode" },
+                { keys: ["K"], label: "Toggle this Menu" }
+              ].map((s, i) => (
+                <div key={i} className="flex items-center justify-between gap-4">
+                  <span className="text-[10px] text-slate-400 font-medium uppercase">{s.label}</span>
+                  <div className="flex gap-1">
+                    {s.keys.map(k => (
+                      <kbd key={k} className="px-1.5 py-0.5 bg-white/5 border border-white/10 rounded text-[10px] font-bold text-blue-400">{k}</kbd>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* ================= REVIEW DASHBOARD MODAL ================= */}
       {

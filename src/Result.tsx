@@ -1,12 +1,13 @@
 import { useEffect, useRef } from "react";
-import { Download, RefreshCw, CheckCircle, XCircle, Award, TrendingUp, Clock } from 'lucide-react';
+import { Download, RefreshCw, CheckCircle, XCircle, Award, TrendingUp, Clock, Eye } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { motion } from "framer-motion";
 import BuyMeCoffeeBtn from './BuyMeCoffeeBtn';
 import { TiltCard } from './TiltCard';
 import { ResultProps } from "./types";
 import { generatePDF } from "./utils/pdfGenerator";
-import { generateInsights } from "./utils/analytics";
+import { generateInsights, calculateZScore, estimatePercentile } from "./utils/analytics";
+import { cn } from "./utils";
 
 interface StatCardProps {
     label: string;
@@ -15,7 +16,7 @@ interface StatCardProps {
     delay: number;
 }
 
-export default function Result({ exam, answers, timeTaken, onRetake, candidateName }: ResultProps) {
+export default function Result({ exam, answers, timeTaken, onRetake, onReview, candidateName }: ResultProps) {
     const containerRef = useRef<HTMLDivElement>(null);
 
     if (!exam || !Array.isArray(exam.questions)) {
@@ -81,6 +82,8 @@ export default function Result({ exam, answers, timeTaken, onRetake, candidateNa
     };
 
     const insights = generateInsights(exam, answers, correct, attempted, total);
+    const zScore = calculateZScore(scorePercent);
+    const percentile = estimatePercentile(parseFloat(zScore));
 
     // Animation Variants
     const containerVariants = {
@@ -177,22 +180,32 @@ export default function Result({ exam, answers, timeTaken, onRetake, candidateNa
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-3 mt-8">
+                        <div className="flex flex-col gap-3 mt-8">
+                            <div className="grid grid-cols-2 gap-3">
+                                <motion.button
+                                    whileHover={{ scale: 1.02, y: -2 }}
+                                    whileTap={{ scale: 0.98 }}
+                                    onClick={onRetake}
+                                    className="flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl font-bold text-sm bg-white/5 hover:bg-white/10 text-white transition-all border border-white/5 backdrop-blur-md"
+                                >
+                                    <RefreshCw className="w-4 h-4" /> Retake Test
+                                </motion.button>
+                                <motion.button
+                                    whileHover={{ scale: 1.02, y: -2 }}
+                                    whileTap={{ scale: 0.98 }}
+                                    onClick={handleGeneratePDF}
+                                    className="flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl font-bold text-sm bg-white/5 hover:bg-white/10 text-white transition-all border border-white/5 backdrop-blur-md"
+                                >
+                                    <Download className="w-4 h-4" /> Download AI Report
+                                </motion.button>
+                            </div>
                             <motion.button
-                                whileHover={{ scale: 1.02, y: -2 }}
-                                whileTap={{ scale: 0.98 }}
-                                onClick={onRetake}
-                                className="flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl font-bold text-sm bg-white/5 hover:bg-white/10 text-white transition-all border border-white/5 backdrop-blur-md"
+                                whileHover={{ scale: 1.01, y: -1 }}
+                                whileTap={{ scale: 0.99 }}
+                                onClick={onReview}
+                                className="flex items-center justify-center gap-2 py-4 px-4 rounded-xl font-bold text-sm bg-blue-600/80 hover:bg-blue-600 text-white transition-all shadow-[0_8px_30px_rgba(37,99,235,0.3)] backdrop-blur-md border border-blue-500/30 w-full"
                             >
-                                <RefreshCw className="w-4 h-4" /> Retake Test
-                            </motion.button>
-                            <motion.button
-                                whileHover={{ scale: 1.02, y: -2 }}
-                                whileTap={{ scale: 0.98 }}
-                                onClick={handleGeneratePDF}
-                                className="flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl font-bold text-sm bg-blue-600/80 hover:bg-blue-600 text-white transition-all shadow-[0_8px_30px_rgba(37,99,235,0.3)] backdrop-blur-md border border-blue-500/30"
-                            >
-                                <Download className="w-4 h-4" /> Download AI Report
+                                <Eye className="w-4 h-4" /> Review Detailed Answers
                             </motion.button>
                         </div>
                     </motion.div>
@@ -203,9 +216,9 @@ export default function Result({ exam, answers, timeTaken, onRetake, candidateNa
                     {/* Stats Grid */}
                     <div className="grid grid-cols-2 gap-4">
                         <StatCard delay={0.2} label="Accuracy" value={`${Math.round((correct / (attempted || 1)) * 100)}%`} icon={<TrendingUp className="w-5 h-5 text-blue-400" />} />
-                        <StatCard delay={0.3} label="Time Taken" value={formatTime(timeTaken || 0)} icon={<Clock className="w-5 h-5 text-amber-500" />} />
-                        <StatCard delay={0.4} label="Correct" value={correct} icon={<CheckCircle className="w-5 h-5 text-emerald-400" />} />
-                        <StatCard delay={0.5} label="Wrong" value={wrong} icon={<XCircle className="w-5 h-5 text-rose-400" />} />
+                        <StatCard delay={0.3} label="Percentile" value={`~${percentile}th`} icon={<CheckCircle className="w-5 h-5 text-emerald-400" />} />
+                        <StatCard delay={0.4} label="Z-Score" value={zScore} icon={<Award className="w-5 h-5 text-amber-500" />} />
+                        <StatCard delay={0.5} label="Time Taken" value={formatTime(timeTaken || 0)} icon={<Clock className="w-5 h-5 text-indigo-400" />} />
                     </div>
 
                     {/* Insights Card */}
@@ -256,7 +269,10 @@ function StatCard({ label, value, icon, delay }: StatCardProps) {
 
             <div className="relative z-10 flex flex-col justify-between h-full gap-4">
                 <div className="flex justify-between items-center">
-                    <span className="text-slate-500 text-[10px] font-bold uppercase tracking-widest">{label}</span>
+                    <span className="text-slate-500 text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
+                        {label}
+                        {(label === "Z-Score" || label === "Percentile") && <span className="bg-blue-500/10 text-blue-400 px-1 rounded-[4px] text-[8px]">BETA</span>}
+                    </span>
                     <div className="text-slate-400 group-hover:text-white transition-colors group-hover:scale-110 duration-300">
                         {icon}
                     </div>
