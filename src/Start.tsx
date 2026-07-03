@@ -1,4 +1,4 @@
-import { ArrowRight, BookOpen, Clock, ShieldCheck, Zap, User, FileText, CheckCircle2, ChevronRight, Layers, Trash2 } from 'lucide-react';
+import { ArrowRight, BookOpen, Clock, ShieldCheck, Zap, User, FileText, CheckCircle2, ChevronRight, Layers, Trash2, Sparkles } from 'lucide-react';
 import React, { useState, useEffect, useRef } from "react";
 import { UserButton } from "@clerk/clerk-react";
 import { cn } from './utils';
@@ -46,6 +46,27 @@ export default function Start({ onStart, isRetake, user }: StartProps) {
       setName(user.fullName);
     }
   }, [user]);
+
+  useEffect(() => {
+    try {
+      const savedPrefs = localStorage.getItem("cbt_exam_preferences");
+      if (savedPrefs) {
+        const parsed = JSON.parse(savedPrefs);
+        if (parsed?.examType) setExamType(parsed.examType);
+        if (parsed?.testSet) setTestSet(parsed.testSet);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }, []);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("cbt_exam_preferences", JSON.stringify({ examType, testSet }));
+    } catch (e) {
+      console.error(e);
+    }
+  }, [examType, testSet]);
 
   // Retake Auto-Scroll
   const portalRef = useRef<HTMLDivElement>(null);
@@ -365,6 +386,20 @@ export default function Start({ onStart, isRetake, user }: StartProps) {
                 </div>
               </div>
 
+              <div className="rounded-2xl border border-amber-400/20 bg-amber-500/10 p-4 backdrop-blur-sm">
+                <div className="flex items-center gap-2 text-amber-200 font-semibold text-sm">
+                  <Sparkles className="w-4 h-4" /> Beta launch update
+                </div>
+                <p className="mt-2 text-sm text-slate-300 leading-relaxed">
+                  Free practice sets are live now. Premium mock packs, detailed explanations, and advanced analytics are planned for the next release.
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <span className="rounded-full bg-white/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-slate-300">Free Practice</span>
+                  <span className="rounded-full bg-white/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-slate-300">Premium Packs</span>
+                  <span className="rounded-full bg-white/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-slate-300">Smart Reports</span>
+                </div>
+              </div>
+
               {/* Step 4: Action */}
               <div className="pt-4 space-y-3">
                 {resumeData && (
@@ -416,7 +451,7 @@ export default function Start({ onStart, isRetake, user }: StartProps) {
                   </div>
                 </GlassButton>
                 <p className="text-center text-[10px] text-slate-600 mt-4 uppercase tracking-widest">
-                  Secure Browser Environment • Ver 2.5.0
+                  Secure Browser Environment • Ver 2.6.0
                 </p>
               </div>
 
