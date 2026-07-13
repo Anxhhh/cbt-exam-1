@@ -1,6 +1,29 @@
-# StatePrep - Advanced Computer Based Test (CBT) Platform
+# StatePrep - Advanced Computer Based Test (CBT) Platform 
 
 StatePrep is a modern, high-stakes Computer Based Test (CBT) application designed for Himachal Pradesh State level exams (HPAS, HPPSC, HPRCA). It features a high-fidelity examination environment, real-time analytics, and a premium "glassmorphism" UI powered by React and Three.js.
+
+## 🌐 Live Demo
+
+Experience the application live:
+
+**🔗 https://stateprep.netlify.app/**
+
+StatePrep CBT is a full-stack Computer-Based Testing (CBT) platform built to simulate real competitive examination environments. The platform enables candidates to take secure, timed examinations with randomized question generation, automated evaluation, performance analytics, and detailed result reports. It focuses on delivering a responsive, user-friendly, and reliable examination experience across desktop and mobile devices.
+
+### Key Features
+
+- 🔐 Secure Authentication
+- 📝 Computer-Based Test Simulation
+- ⏱️ Timed Examinations
+- 🔀 Randomized Questions & Options
+- 📊 Performance Analytics
+- 📈 Detailed Result Dashboard
+- 📖 Answer Review
+- 📌 Progress Tracking
+- 👤 Candidate Profile Management
+- 📱 Fully Responsive Interface
+- ⚡ REST API Integration
+- ✅ Functional, UI & Cross-Browser Tested
 
 ## Key Features
 
@@ -65,6 +88,7 @@ npm run test:e2e
     ```bash
     npm run dev
     ```
+
 
 ## License
 
